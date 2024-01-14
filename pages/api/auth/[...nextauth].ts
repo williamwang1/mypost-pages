@@ -1,0 +1,71 @@
+import prisma from "@/lib/prisma";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { getServerSession, type NextAuthOptions } from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
+import TwitterProvider from 'next-auth/providers/twitter';
+import { Session } from "@/types/auth";
+import {Profile} from '@/types/auth';
+import NextAuth from "next-auth";
+
+export const authOptions: NextAuthOptions = {
+    adapter: PrismaAdapter(prisma),
+  
+    providers: [
+      TwitterProvider({
+        clientId: process.env.TWITTER_CLIENT_ID as string,
+        clientSecret: process.env.TWITTER_CLIENT_SECRET as string,
+        version: '1.0A',
+        authorization: {
+          url: 'https://api.twitter.com/oauth/authenticate',
+          params: {
+            force_login: 'true',
+          },
+        },
+      })
+    ],
+    session: {
+      strategy: "jwt"
+    },
+    callbacks: {
+      async jwt({ token, account, profile}) {
+        if (account) {
+          console.log(account.provider)
+          switch (account.provider) {
+            case 'google':
+              // Add custom data from Google account
+              //token.googleId = profile?.sub;
+              // token.randomness = randomness.toString();
+              // token.maxEpoch = maxEpoch.toString();
+              token.id_token = account.id_token
+              break;
+            case 'twitter':
+              // Add custom data from Twitter account
+              // console.log(JSON.stringify(profile))
+              let p: Profile | undefined = profile;
+              token.provider = account.provider;
+              token.profile = p;
+              break;
+          }
+        }
+  
+        return token
+      },
+      async session({ session , user, token}) {
+        //console.log('Token ' + JSON.stringify(token.maxEpoch))
+        // console.log(ephemeralKeyPair.getPublicKey().toSuiPublicKey());
+        // console.log(randomness);
+        session.id_token = token.id_token as string;
+        session.profile = token.profile;
+        //session.zklogin.keypair = ephemeralKeyPair.getPublicKey.toString();
+        //session.zklogin.randomness = randomness.toString();
+        //console.log(JSON.stringify(token))
+        return Promise.resolve(session);
+      }
+    }
+  }
+  
+export function getSession() {
+    return getServerSession(authOptions) as Promise<Session>;
+}
+
+export default NextAuth(authOptions)

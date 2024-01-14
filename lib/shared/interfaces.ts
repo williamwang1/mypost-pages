@@ -1,5 +1,26 @@
 import { Infer, array, coerce, integer, object, string } from "superstruct";
 
+export const ProfileRequest = object({
+  name: string(),
+  global: string(),
+  bio: string(),
+  avatar: string()
+})
+export type ProfileRequest = Infer<typeof ProfileRequest>
+
+
+
+export const PublishRequest = object({
+  name: string()
+})
+export type PublishRequest = Infer<typeof PublishRequest>
+
+export const TransactionResponse = object({
+  txDigest: string(),
+});
+
+export type TransactionResponse = Infer<typeof TransactionResponse>
+
 export const AddRequest = object({
   x: integer(),
   y: integer(),

@@ -9,11 +9,14 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { mask } from "superstruct";
+import { Struct, mask, unknown } from "superstruct";
 import {
   AddRequest,
   AddResponse,
+  ProfileRequest,
+  PublishRequest,
   RecentTxsResponse,
+  TransactionResponse,
 } from "../shared/interfaces";
 
 /**
@@ -35,6 +38,43 @@ export function useAddMutation(): UseMutationResult<
       baseUri: () => "/api/add",
       body: ({ keyPair, ...req }) => req,
       resultSchema: AddResponse,
+    }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["api", "recent_txs"] });
+    },
+  });
+}
+
+export function useProfileMutation(): UseMutationResult<
+  TransactionResponse,
+  ApiError,
+  ProfileRequest & WithKeyPair
+> {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: apiTxExecMutationFn({
+      baseUri: () => "/api/profile/create",
+      body: ({ keyPair, ...req }) => req,
+      resultSchema: TransactionResponse,
+    }),
+    onSuccess: ({txDigest}) => {
+      console.log('success ' + txDigest)
+      //qc.invalidateQueries({ queryKey: ["api", "recent_txs"] });
+    },
+  });
+}
+
+export function usePublishMutation(): UseMutationResult<
+  unknown,
+  ApiError,
+  WithKeyPair
+> {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: apiTxExecMutationFn({
+      baseUri: () => "/api/profile/create",
+      body: ({ keyPair, ...req }) => req,
+      //resultSchema: Struct<unknown, unknown>,
     }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["api", "recent_txs"] });

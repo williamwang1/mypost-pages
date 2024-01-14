@@ -24,7 +24,7 @@ export default withNewZkLoginSession(
     ({ session }) => {
         const router = useRouter();
         const redirectTo = first(router.query.redirectTo);
-        const callbackBaseUrl = new URL("auth/", window.location.origin);
+        const callbackBaseUrl = new URL("authzk/", window.location.origin);
         const [signInClicked, setSignInClicked] = useState(false);
 
         const handleGoogle = () => {
@@ -76,13 +76,14 @@ export default withNewZkLoginSession(
                             setSignInClicked(true);
                             // signIn("google", { callbackUrl: 'http://localhost:3000/account' });
                             // handleGoogle
+                            console.log(callbackBaseUrl)
                             router.replace(
                                 getGoogleAuthUrl(
                                 session,
                                 GOOGLE_CLIENT_ID!,
                                 new URL("google", callbackBaseUrl),
-                                'http://localhost:3000/auth/login'
-                                )
+                                'http://localhost:3000/account'
+                                ), 'http://localhost:3000/account'
                             );
                         }}
                     >
@@ -120,7 +121,7 @@ export default withNewZkLoginSession(
                 </button>
               </div>
             )}
-            {TWITCH_CLIENT_ID && (
+            {/* {TWITCH_CLIENT_ID && (
               <div>
                 <button
                   onClick={() => {
@@ -137,7 +138,7 @@ export default withNewZkLoginSession(
                   Sign in with Twitch
                 </button>
               </div>
-            )}
+            )} */}
           </>
         );
     }

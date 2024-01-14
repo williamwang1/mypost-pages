@@ -6,11 +6,11 @@ import './globals.css'
 
 const queryClient = new QueryClient();
 
-export default function MyApp({ Component, pageProps }: AppProps) {
+export default function MyApp({ Component, pageProps : { session, ...pageProps } }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <ZkLoginSessionProvider>
-        <SessionProvider >
+        <SessionProvider session={session}>
           <Component {...pageProps} />
         </SessionProvider>
       </ZkLoginSessionProvider>
