@@ -12,15 +12,68 @@ datasource db {
   shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING") // used for migrations
 }
 
-model ConnectAccount {
+model Follow {
   id                String  @id @default(cuid())
-  userId            String
-  accountId         String
-  address           String
+  digest            String
+  follower          String  
+  following         String
+  following_id      String
+  following_profile String
+  follower_id       String
+  follower_profile  String
+  price             String
+  create_at         DateTime
   status            Boolean
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  account           Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  @@unique([userId, accountId, address])
+  @@unique([follower, following])
+}
+
+model AccessBought {
+  id                   String  @id @default(cuid())
+  digest               String  @unique
+  access_id            String  @unique
+  transaction_id       String
+  transaction_digest   String
+  profile_id           String
+  accessor_profile     String
+  price                String
+  address              String
+  package_id           String
+  create_at            DateTime
+  status               Boolean          
+}
+
+model Transaction {
+  id               String  @id @default(cuid())
+  digest           String  @unique
+  summary          String  @db.Text
+  public_content   String  @db.Text
+  address          String
+  profile_id       String
+  create_at        DateTime
+}
+
+model TransactionMeta {
+  id                String  @id @default(cuid())
+  digest            String  @unique
+  transaction_id    String  @unique
+  pool_id           String  @unique
+  profile_id        String
+  address           String
+  package_id        String
+  create_at         DateTime
+}
+
+
+model Profile {
+  id                String  @id @default(cuid())
+  address           String  @unique
+  digest            String
+  profile_id        String  
+  profile_pool_id   String
+  profile_meta_id   String
+  global_id         String
+  package_id        String
+  create_at         DateTime       
 }
 
 model Account {
@@ -39,7 +92,6 @@ model Account {
   id_token          String? @db.Text
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  caccounts         ConnectAccount[]
 
   @@unique([provider, providerAccountId])
   @@index([userId])
@@ -63,7 +115,6 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  caccounts     ConnectAccount[]
 }
 
 model VerificationToken {

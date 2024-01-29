@@ -1,9 +1,11 @@
 #[allow(unused_use)]
 module mypost::profile {
+    friend mypost::transaction;
     use std::option::{Self, Option};
     use std::string::{Self, String};
     use sui::coin::{Self, Coin};
     use sui::sui::SUI;
+    use sui::clock::{Self, Clock};
     use sui::balance::{Self, Balance};
     use sui::transfer;
     use sui::package;
@@ -11,6 +13,7 @@ module mypost::profile {
     use sui::tx_context::{Self, TxContext, sender};
     use sui::url::{Self, Url};
     use sui::object_table::{Self, ObjectTable};
+    use mypost::transaction::{Self, Transaction};
     use sui::event;
     use std::debug;
 
@@ -19,24 +22,24 @@ module mypost::profile {
     const NOT_FOLLOWING: u64 = 2;
     const CANNOT_FOLLOW_SELF: u64 = 3;
     const INSUFFICIENT_FUND: u64 = 1;
-    const MINIMUM_FUND: u64 = 1;
+    //const MINIMUM_FUND: u64 = 1;
 
     const RPOFILE_OWNER_FEE_PERCENT: u64 = 5;
     const PROTOCOL_FEE_PERCENT: u64 = 1;
 
-    struct ProfileCreated has copy, drop {
-        id: ID,
-        name: String,
-        owner: address
-    }
+    // struct ProfileCreated has copy, drop {
+    //     id: ID,
+    //     name: String,
+    //     owner: address
+    // }
 
-    struct ProfilePoolCreated has copy, drop {
-        id: ID,
-        for: ID,
-        name: String,
-        owner: address,
-        initial_price: u128
-    }
+    // struct ProfilePoolCreated has copy, drop {
+    //     id: ID,
+    //     for: ID,
+    //     name: String,
+    //     owner: address,
+    //     initial_price: u128
+    // }
 
     struct Profile has key {
         id: UID,
@@ -46,45 +49,48 @@ module mypost::profile {
         avatar: String,
         no_of_followers: u64,
         no_of_followings: u64,
-        followers: ObjectTable<address, Follow>,
-        followings: ObjectTable<address, Follow>
+        followers: ObjectTable<address, Follower>,
+        followings: ObjectTable<address, Following>,
+        transactions: ObjectTable<ID, TransactionMetadata>
         // transactions
         // assets - ft in sui, wish, wish well, ft in other chains, nfts in other chains
     }
 
-    struct ProfileSummary has key, store {
+    struct TransactionMetadata has key, store {
         id: UID,
-        for: ID,
-        owner: address,
-        name: String,
-        bio: String,
-        avatar: String,
+        transaction_id: ID,
+        pool_id: ID,
+        profile_id: ID,
+        price: u64,
+        timestamp_ms: u64
     }
 
-    struct Follow has key, store {
+    struct Follower has key, store {
         id: UID,
-        owner: address,
-        //following_profile: ProfileSummary,
-        following: address,
-        follower: address,
-       // price: u64,
-       // timestamp ??
+        follower_profile: ID,
+        price: u64,
+        timestamp_ms: u64
+    }
+
+    struct Following has key, store {
+        id: UID,
+        following_profile: ID,
+        price: u64,
+        timestamp_ms: u64
     }
 
 
-    struct FollowingCreated has copy, drop {
-        id: ID,
-        owner: address,
-        follower: address,
+    struct FollowCreated has copy, drop {
+        following_id: ID,
+        follower_id: ID,
+        following_profile: ID,
         following: address,
+        follower: address,
+        follower_profile: ID,
+        price: u64,
+        timestamp_ms: u64
     }
 
-    struct FollowerCreated has copy, drop {
-        id: ID,
-        owner: address,
-        follower: address,
-        following: address,
-    }
 
     struct ProfilePool has key {
         id: UID,
@@ -109,13 +115,15 @@ module mypost::profile {
     struct ProfileMetaDataCreated has copy, drop {
         id: ID,
         for: ID,
-        pool: ID
+        pool: ID,
+        timestamp_ms: u64
     }
 
-    struct ProfileMetaDataAdded has copy, drop {
-        global: ID,
-        metadata: ID,
-        owner: address
+    struct ProfileChecked has copy, drop {
+        meta_id: ID,
+        profile_id: ID,
+        pool_id: ID,
+        exist: bool
     }
 
     struct PROFILE has drop {}
@@ -140,9 +148,10 @@ module mypost::profile {
         bio: vector<u8>,
         avatar: vector<u8>,
         global: &mut Global,
+        clock: &Clock,
         ctx: &mut TxContext
     ) {
-        // check whether have profile created
+        //check whether have profile created
         let exists = object_table::contains(&global.profiles, sender(ctx));
         assert!(!exists, PROFILE_EXISTS);
 
@@ -152,86 +161,11 @@ module mypost::profile {
         let inner_pool_id = object::uid_to_inner(&pool_id);
         let metadata_id = object::new(ctx);
         let metadata_inner_id = object::uid_to_inner(&metadata_id);
+        let follower_id = object::new(ctx);
+        let inner_follower_id = object::uid_to_inner(&follower_id);
+        let following_id = object::new(ctx);
+        let inner_following_id = object::uid_to_inner(&following_id);
 
-        let pool = ProfilePool{
-            id: pool_id,
-            for: inner_id,
-            initial_price: 1,
-            price: 1,
-            balance: balance::zero(),
-        };
-        transfer::share_object(pool);
-        event::emit(
-            ProfilePoolCreated{
-                id: inner_pool_id,
-                for: inner_id,
-                name: string::utf8(name),
-                owner: sender(ctx),
-                initial_price: 1
-            }
-        );
-        let profile = Profile{
-            id: id,
-            owner: sender(ctx),
-            name: string::utf8(name),
-            bio: string::utf8(bio),
-            avatar: string::utf8(avatar),
-            no_of_followers: 0,
-            no_of_followings: 0,
-            followers: object_table::new(ctx),
-            followings: object_table::new(ctx),
-        };
-        transfer::transfer( profile, sender(ctx));
-        event::emit(
-            ProfileCreated {
-                id: inner_id,
-                name: string::utf8(name),
-                owner: sender(ctx),
-            }
-        );
-        let data = ProfileMetaData{id: metadata_id, for: inner_id, pool: inner_pool_id};
-        event::emit(
-            ProfileMetaDataCreated{
-                id: metadata_inner_id,
-                for: inner_id,
-                pool: inner_pool_id,
-            }
-        );
-        object_table::add(&mut global.profiles, sender(ctx), data);
-        event::emit(
-            ProfileMetaDataAdded {
-                global: object::uid_to_inner(&global.id),
-                metadata: metadata_inner_id,
-                owner: sender(ctx),
-            }
-        )
-    }
-
-    public entry fun create(
-        name: vector<u8>,
-        bio: vector<u8>,
-        avatar: vector<u8>,
-        payment: Coin<SUI>,
-        protocol_destination: address,
-        global: &mut Global,
-        ctx: &mut TxContext
-        ) {
-        // check payments is enough
-        let value = coin::value(&payment);
-        assert!(value == MINIMUM_FUND, INSUFFICIENT_FUND);
-        transfer::public_transfer(payment, protocol_destination);
-        // check whether have profile created
-        let exists = object_table::contains(&global.profiles, sender(ctx));
-        assert!(!exists, PROFILE_EXISTS);
-        // create profile, transfer to sender, add into global
-        let id = object::new(ctx);
-        let inner_id = object::uid_to_inner(&id);
-        let pool_id = object::new(ctx);
-        let inner_pool_id = object::uid_to_inner(&pool_id);
-        // let summary_id = object::new(ctx);
-        // let inner_summary_id = object::uid_to_inner(&summary_id);
-
-        // create profilepool 
         let pool = ProfilePool{
             id: pool_id,
             for: inner_id,
@@ -239,16 +173,7 @@ module mypost::profile {
             price: 0,
             balance: balance::zero(),
         };
-        transfer::share_object(pool);
-        event::emit(
-            ProfilePoolCreated{
-                id: inner_pool_id,
-                for: inner_id,
-                name: string::utf8(name),
-                owner: sender(ctx),
-                initial_price: 1
-            }
-        );
+
         let profile = Profile{
             id: id,
             owner: sender(ctx),
@@ -259,23 +184,86 @@ module mypost::profile {
             no_of_followings: 0,
             followers: object_table::new(ctx),
             followings: object_table::new(ctx),
+            transactions: object_table::new(ctx)
         };
-        transfer::transfer(profile, sender(ctx));
+
+        let data = ProfileMetaData{id: metadata_id, for: inner_id, pool: inner_pool_id};
         event::emit(
-            ProfileCreated {
-                id: inner_id,
-                name: string::utf8(name),
-                owner: sender(ctx),
+            ProfileMetaDataCreated{
+                id: metadata_inner_id,
+                for: inner_id,
+                pool: inner_pool_id,
+                timestamp_ms: clock::timestamp_ms(clock),
             }
         );
+        object_table::add(&mut global.profiles, sender(ctx), data);
+
+        //let current_price = getPrice(profile.no_of_followers);
+        let follower = Follower {
+            id: follower_id,
+            follower_profile: inner_id,
+            price: 0,
+            timestamp_ms: clock::timestamp_ms(clock),
+        };
+        let following = Following {
+            id: following_id,
+            following_profile: inner_id,
+            price: 0,
+            timestamp_ms: clock::timestamp_ms(clock),
+        };
+        event::emit(
+            FollowCreated {
+                follower_id: inner_follower_id,
+                following_id: inner_following_id,
+                following: sender(ctx),
+                following_profile: inner_id,
+                follower: sender(ctx),
+                follower_profile: inner_id,
+                price: 0,
+                timestamp_ms: clock::timestamp_ms(clock),
+            }
+        );
+        // update following profile
+        object_table::add(&mut profile.followers, sender(ctx), follower);
+        profile.no_of_followers = 1;
+        // update follower profile
+        object_table::add(&mut profile.followings, sender(ctx), following);
+        profile.no_of_followings =  1;
+        // update profile pool price
+        pool.price = getPrice(1);
+        transfer::transfer( profile, sender(ctx));
+        transfer::share_object(pool);
     }
 
+    public fun get_metadata(key: address, global: &Global) {
+        let exists = object_table::contains(&global.profiles, key);
+        let profile_id: ID = object::id_from_address(key);
+        let meta_id: ID = object::id_from_address(key);
+        let pool_id: ID = object::id_from_address(key);
+        if (exists) {
+            let data = object_table::borrow(&global.profiles, key);
+            meta_id = object::uid_to_inner(&data.id);
+            pool_id = data.pool;
+            profile_id = data.for;
+        };
+        event::emit(
+                ProfileChecked{
+                    meta_id: meta_id,
+                    profile_id: profile_id,
+                    pool_id: pool_id,
+                    exist: exists
+                }
+            );
+    }
+
+    #[lint_allow(self_transfer)]
     public entry fun follow(payment: Coin<SUI>, 
         protocol_destination: address,
         global: &mut Global, 
         profile: &mut Profile, 
         my_profile: &mut Profile, 
         pool: &mut ProfilePool, 
+        clock: &Clock,
         ctx: &mut TxContext) {
         // make sure sender is not owner
         let following_profile_exists = object_table::contains(&global.profiles, profile.owner);
@@ -304,45 +292,49 @@ module mypost::profile {
         transfer::public_transfer(payment, tx_context::sender(ctx));
 
        // let _following_summary = object_table::borrow(&global.profiles, profile.owner);
-        let follower = Follow {
+        // let follow = Follow {
+        //     id: follower_id,
+        //     following: profile.owner,
+        //     following_profile: object::uid_to_inner(&profile.id),
+        //     follower: my_profile.owner,
+        //     follower_profile: object::uid_to_inner(&my_profile.id),
+        //     price: current_price,
+        // };
+        let follower = Follower {
             id: follower_id,
-            owner: my_profile.owner,
-            following: profile.owner,
-            follower: my_profile.owner,
+            follower_profile: object::uid_to_inner(&my_profile.id),
+            price: current_price,
+            timestamp_ms: clock::timestamp_ms(clock),
         };
-        event::emit(
-            FollowerCreated {
-                id: inner_follower_id,
-                owner: sender(ctx),
-                following: profile.owner,
-                follower: my_profile.owner,
-            }
-        );
-        let following = Follow {
+        let following = Following {
             id: following_id,
-            owner: my_profile.owner,
-            follower: my_profile.owner,
-            following: profile.owner,
-
+            following_profile: object::uid_to_inner(&profile.id),
+            price: current_price,
+            timestamp_ms: clock::timestamp_ms(clock),
         };
         event::emit(
-            FollowingCreated {
-                id: inner_following_id,
-                owner: profile.owner,
+            FollowCreated {
+                follower_id: inner_follower_id,
+                following_id: inner_following_id,
                 following: profile.owner,
+                following_profile: object::uid_to_inner(&profile.id),
                 follower: my_profile.owner,
+                follower_profile: object::uid_to_inner(&my_profile.id),
+                price: current_price,
+                timestamp_ms: clock::timestamp_ms(clock),
             }
         );
         // update following profile
-        object_table::add(&mut profile.followers, sender(ctx), following);
+        object_table::add(&mut profile.followers, sender(ctx), follower);
         profile.no_of_followers = profile.no_of_followers + 1;
         // update follower profile
-        object_table::add(&mut my_profile.followings, profile.owner, follower);
+        object_table::add(&mut my_profile.followings, profile.owner, following);
         my_profile.no_of_followings = my_profile.no_of_followings + 1;
         // update profile pool price
         pool.price = getPrice(profile.no_of_followers);
     }
 
+    #[lint_allow(self_transfer)]
     public entry fun unfollow(
         global: &Global, 
         protocol_destination: address,
@@ -376,22 +368,112 @@ module mypost::profile {
 
             // update following profile
             let followernft = object_table::remove(&mut following_profile.followers, follower_profile.owner);
-            let Follow {id: follower_id, owner: _, follower: _, following: _} = followernft;
+            let Follower {id: follower_id, follower_profile: _, price: _, timestamp_ms: _} = followernft;
             object::delete(follower_id);
             following_profile.no_of_followers = following_profile.no_of_followers - 1;
             // update follower profile
             let followingnft = object_table::remove(&mut follower_profile.followings, following_profile.owner);
-            let Follow {id: following_id, owner: _, follower: _, following: _} = followingnft;
+            let Following {id: following_id, following_profile: _, price: _, timestamp_ms: _} = followingnft;
             object::delete(following_id);
+            follower_profile.no_of_followings = follower_profile.no_of_followings - 1;
             pool.price = getPrice(following_profile.no_of_followers);
     }
 
 
-    public fun getPrice(no_of_followers: u64): u64 {
-        let price = no_of_followers * no_of_followers * 10 / 16;
+    fun getPrice(no_of_followers: u64): u64 {
+        let initial_price: u64 = 10000000; // 0.01 SUI
+        let price = no_of_followers * no_of_followers * initial_price / 16000;
         // pool.price = price;
         (price)
     }
+
+    public(friend) fun get_profile_id(profile: &Profile): ID {
+        let id = object::uid_to_inner(&profile.id);
+        (id)
+    }
+
+    public(friend) fun add_transaction(
+        profile: &mut Profile, 
+        id: ID, 
+        pool_id: ID,
+        profile_id: ID,
+        price: u64,
+        clock: &Clock,
+        ctx: &mut TxContext
+        ) {
+        let transaction_metadata = TransactionMetadata {
+            id: object::new(ctx),
+            transaction_id: id,
+            pool_id: pool_id,
+            profile_id: profile_id,
+            price: price,
+            timestamp_ms: clock::timestamp_ms(clock)
+        };
+            object_table::add(&mut profile.transactions, id, transaction_metadata);
+    }
+
+    //     public entry fun create(
+    //     name: vector<u8>,
+    //     bio: vector<u8>,
+    //     avatar: vector<u8>,
+    //     payment: Coin<SUI>,
+    //     protocol_destination: address,
+    //     global: &mut Global,
+    //     ctx: &mut TxContext
+    //     ) {
+    //     // check payments is enough
+    //     let value = coin::value(&payment);
+    //     assert!(value == MINIMUM_FUND, INSUFFICIENT_FUND);
+    //     transfer::public_transfer(payment, protocol_destination);
+    //     // check whether have profile created
+    //     let exists = object_table::contains(&global.profiles, sender(ctx));
+    //     assert!(!exists, PROFILE_EXISTS);
+    //     // create profile, transfer to sender, add into global
+    //     let id = object::new(ctx);
+    //     let inner_id = object::uid_to_inner(&id);
+    //     let pool_id = object::new(ctx);
+    //     let inner_pool_id = object::uid_to_inner(&pool_id);
+    //     // let summary_id = object::new(ctx);
+    //     // let inner_summary_id = object::uid_to_inner(&summary_id);
+
+    //     // create profilepool 
+    //     let pool = ProfilePool{
+    //         id: pool_id,
+    //         for: inner_id,
+    //         initial_price: 0,
+    //         price: 0,
+    //         balance: balance::zero(),
+    //     };
+    //     transfer::share_object(pool);
+    //     event::emit(
+    //         ProfilePoolCreated{
+    //             id: inner_pool_id,
+    //             for: inner_id,
+    //             name: string::utf8(name),
+    //             owner: sender(ctx),
+    //             initial_price: 1
+    //         }
+    //     );
+    //     let profile = Profile{
+    //         id: id,
+    //         owner: sender(ctx),
+    //         name: string::utf8(name),
+    //         bio: string::utf8(bio),
+    //         avatar: string::utf8(avatar),
+    //         no_of_followers: 0,
+    //         no_of_followings: 0,
+    //         followers: object_table::new(ctx),
+    //         followings: object_table::new(ctx),
+    //     };
+    //     transfer::transfer(profile, sender(ctx));
+    //     event::emit(
+    //         ProfileCreated {
+    //             id: inner_id,
+    //             name: string::utf8(name),
+    //             owner: sender(ctx),
+    //         }
+    //     );
+    // }
 
 
     #[test_only]

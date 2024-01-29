@@ -9,12 +9,11 @@ import NextAuth from "next-auth";
 
 export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(prisma),
-  
     providers: [
       TwitterProvider({
         clientId: process.env.TWITTER_CLIENT_ID as string,
         clientSecret: process.env.TWITTER_CLIENT_SECRET as string,
-        version: '1.0A',
+       // version: "2.0",
         authorization: {
           url: 'https://api.twitter.com/oauth/authenticate',
           params: {
@@ -55,7 +54,7 @@ export const authOptions: NextAuthOptions = {
         // console.log(ephemeralKeyPair.getPublicKey().toSuiPublicKey());
         // console.log(randomness);
         session.id_token = token.id_token as string;
-        session.profile = token.profile;
+        session.profile = token.profile as Profile;
         //session.zklogin.keypair = ephemeralKeyPair.getPublicKey.toString();
         //session.zklogin.randomness = randomness.toString();
         //console.log(JSON.stringify(token))

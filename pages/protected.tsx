@@ -5,6 +5,20 @@ import { withZkLoginSessionRequired } from "@shinami/nextjs-zklogin/client";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/router";
+import React, { useEffect } from 'react';
+import { sui, suic} from '@/lib/hooks/sui'
+import { MYPOST_MOVE_PACKAGE_ID, EXAMPLE_MOVE_PACKAGE_ID } from "@/lib/api/move";
+
+// import { getFullnodeUrl, SuiClient, SuiHTTPTransport } from '@mysten/sui.js/client';
+// import { WebSocket } from 'ws';
+
+// const suiC = new SuiClient({
+// 	transport: new SuiHTTPTransport({
+// 		url: getFullnodeUrl('testnet'),
+// 		// The typescript definitions may not match perfectly, casting to never avoids these minor incompatibilities
+// 		WebSocketConstructor: WebSocket as never,
+// 	}),
+// });
 
 // This is an auth-protected page. Anonymous users will be auto-redirected to the login page.
 export default withZkLoginSessionRequired(({ session }) => {
@@ -13,6 +27,36 @@ export default withZkLoginSessionRequired(({ session }) => {
   const { mutateAsync: add, isPending: isAdding } = useAddMutation();
   const { data: txs, isLoading: isLoadingTxs } = useRecentTxsQuery();
   const router = useRouter();
+
+  // useEffect(() => {
+  //   // Subscribing to events
+  //   let unsubscribe: any
+  //   const subscribeToEvent = async () => {
+
+  //     try {
+  //       unsubscribe = await suic.subscribeEvent({
+  //         filter: { Package: EXAMPLE_MOVE_PACKAGE_ID },
+  //         onMessage: (event) => {
+  //           console.log('on Message')
+  //           console.log('subscribeEvent', JSON.stringify(event, null, 2));
+  //         },
+  //       });
+  //     } catch (error) {
+  //       console.error('Error subscribing to events:', error);
+  //     }
+  //   };
+
+  //   subscribeToEvent();
+
+  //   // Cleanup subscription on unmount
+  //   return () => {
+  //     if (unsubscribe) {
+  //       unsubscribe().catch((error: any)  => {
+  //         console.error('Error during unsubscribe:', error);
+  //       });
+  //     }
+  //   };
+  // }, []);
 
   if (isLoading) return <p>Loading zkLogin session...</p>;
 
@@ -35,7 +79,7 @@ export default withZkLoginSessionRequired(({ session }) => {
               keyPair: localSession.ephemeralKeyPair,
             });
             setResult(result);
-            router.push('/another')
+            //router.push('/another')
           }}
         >
           <div>

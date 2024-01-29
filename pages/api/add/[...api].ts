@@ -9,6 +9,7 @@ import {
   TransactionResponseParser,
   zkLoginSponsoredTxExecHandler,
 } from "@shinami/nextjs-zklogin/server/pages";
+import { teardownCrashReporter } from "next/dist/build/swc";
 import { mask, validate } from "superstruct";
 
 /**
@@ -42,7 +43,8 @@ const parseTxRes: TransactionResponseParser<AddResponse> = async (_, txRes) => {
   // Requires "showEvents: true" in tx response options.
   const event = first(txRes.events);
   if (!event) throw new Error("Event missing from tx response");
-
+  console.log(JSON.stringify(txRes.events));
+https://neuroswish.mirror.xyz/i7_5J7vyc-bg7r6pVzUNKH3bw_uQ6I1zPsTEmbiRktc
   const result = mask(event.parsedJson, AddResult);
   return { ...result, txDigest: txRes.digest };
 };

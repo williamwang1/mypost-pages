@@ -1,114 +1,59 @@
-import { ChevronRightIcon } from '@heroicons/react/20/solid'
-import { useRouter } from 'next/navigation'
+import React, { useState, useEffect, useRef } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
+import TransactionItem from "./TransactionItem";
+import { API_HOST } from '@/lib/api/move';
+import { TransactionList } from "@/types/transaction";
 
-const transactions = [
-  {
-    id: 1,
-    name: 'Leslie Alexander',
-    address: 'addressxxxxxxxxxxxxxxx',
-    account: 'Ethereum',
-    imageUrl:
-      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-    href: '/transaction/1',
-    summary: '0.005 Eth transferred',
-    lastSeen: '3h ago',
-    lastSeenDateTime: '2023-01-23T13:23Z',
-  },
-  {
-    id: 2,
-    name: 'Michael Foster',
-    address: 'addressxxxxxxxxxxxxxxx',
-    account: 'Polygon',
-    imageUrl:
-      'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-    href: '/transaction/1',
-    summary: 'function check has been called',
-    lastSeen: '3h ago',
-    lastSeenDateTime: '2023-01-23T13:23Z',
-  },
-  {
-    id:3,
-    name: 'Dries Vincent',
-    address: 'addressxxxxxxxxxxxxxxx',
-    account: 'SUI',
-    imageUrl:
-      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-    href: '/transaction/1',
-    summary: 'function check has been called',
-    lastSeen: '3h ago',
-    lastSeenDateTime: '2023-01-23T13:23Z',
-  },
-]
+const MyTransactions = ({slug}: {slug: string}) => {
+  const [items, setItems] = useState<TransactionList[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+  const isInitialRender = useRef(true);
 
-export default function MyTransactions() {
-  const router = useRouter()
+  const fetchData = async (currentPage: number) => {
+    //console.log('in fectch data ' + currentPage)
+    const transactionsdb = await fetch(`${API_HOST}/api/transactionmeta/getlist`, {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ slug, currentPage }),
+      })
+  
+      const newData : TransactionList[] = await transactionsdb.json();
+      //console.log('in fetch data ' + JSON.stringify(newData))
+      if (newData.length === 0) {
+        setHasMore(false);
+      } else {
+        setItems((prevItems) => [...prevItems, ...newData]);
+      }
+  }
 
-  // digest
-  // summary
-  // submitted timestamp
+  useEffect(() => {
+    if (isInitialRender.current) {
+        isInitialRender.current = false;
+        return;
+      }
+    fetchData(page);
+  }, [page]);
+
+
   return (
-    <ul
-      role="list"
-      className="divide-y divide-gray-100 mt-2 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl mb-14"
+    <InfiniteScroll
+      dataLength={items.length}
+      next={() => setPage((prevPage) => prevPage + 1)}
+      hasMore={hasMore}
+      loader={<div>Loading</div>}
     >
-      {transactions.map((t) => (
-        <li key={t.id} className="relative flex group justify-between gap-x-6 hover:bg-gray-50">
-          {/* <div className="flex min-w-0 gap-x-4">
-            <img className="h-12 w-12 flex-none rounded-full bg-gray-50" src={t.imageUrl} alt="" />
-            <div className="min-w-0 flex-auto">
-              <p className="text-sm font-semibold leading-6 text-gray-900">
-                <a href={t.href}>
-                  <span className="absolute inset-x-0 -top-px bottom-0" />
-                  {t.name}
-                </a>
-              </p>
-              <p className="mt-1 flex text-xs leading-5 text-gray-500">
-                {t.address}
-              </p>
-              <div className="text-sm leading-relaxed text-gray-900 mt-2">{t.summary}</div>
-            </div>
-          </div> */}
-          <div className='flex flex-col px-2 py-2'>
-            <div className='text-sm font-semibold leading-6 text-gray-900'>digest</div>
-            <p className='text-sm leading-relaxed text-gray-900 mt-2 break-all'>
-              summaryxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-            </p>
-            <div className="flex flex-col">
-              {/* <p className="text-sm leading-6 text-gray-900">{t.account}</p> */}
-              {t.lastSeen ? (
-                <p className="mt-1 text-xs leading-5 text-gray-500">
-                  submitted <time dateTime={t.lastSeenDateTime}>{t.lastSeen}</time>
-                </p>
-              ) : (
-                <div className="mt-1 flex items-center gap-x-1.5">
-                  <div className="flex-none rounded-full bg-emerald-500/20 p-1">
-                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  </div>
-                  <p className="text-xs leading-5 text-gray-500">submitted just now</p>
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="flex shrink-0 items-center gap-x-4">
-            {/* <div className="hidden sm:flex sm:flex-col sm:items-end">
-              <p className="text-sm leading-6 text-gray-900">{t.account}</p>
-              {t.lastSeen ? (
-                <p className="mt-1 text-xs leading-5 text-gray-500">
-                  submitted <time dateTime={t.lastSeenDateTime}>{t.lastSeen}</time>
-                </p>
-              ) : (
-                <div className="mt-1 flex items-center gap-x-1.5">
-                  <div className="flex-none rounded-full bg-emerald-500/20 p-1">
-                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  </div>
-                  <p className="text-xs leading-5 text-gray-500">submitted just now</p>
-                </div>
-              )}
-            </div> */}
-            <ChevronRightIcon className="h-5 w-5 flex-none text-gray-400" aria-hidden="true" />
-          </div>
-        </li>
-      ))}
-    </ul>
-  )
-}
+      <ul
+        role="list"
+        className="divide-y divide-gray-100 mt-2 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl mb-14"
+      >
+            {items &&
+              items.map((item) => <TransactionItem key={item.id} t={item}/>)}
+      </ul>
+    </InfiniteScroll>
+  );
+};
+
+export default MyTransactions;

@@ -16,6 +16,7 @@ import {
 import { useRouter } from "next/router";
 import { Google, LoadingDots } from "@/components/icons";
 import Auth from "./Auth";
+import { API_HOST } from "@/lib/api/move";
 
 
 
@@ -26,6 +27,7 @@ export default withNewZkLoginSession(
         const redirectTo = first(router.query.redirectTo);
         const callbackBaseUrl = new URL("authzk/", window.location.origin);
         const [signInClicked, setSignInClicked] = useState(false);
+        const {  } =session
 
         const handleGoogle = () => {
             router.replace(
@@ -82,8 +84,8 @@ export default withNewZkLoginSession(
                                 session,
                                 GOOGLE_CLIENT_ID!,
                                 new URL("google", callbackBaseUrl),
-                                'http://localhost:3000/account'
-                                ), 'http://localhost:3000/account'
+                                `${API_HOST}/account`
+                                ), `${API_HOST}/account`
                             );
                         }}
                     >

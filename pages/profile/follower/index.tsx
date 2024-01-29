@@ -11,6 +11,7 @@ import MyAssets from '@/components/MyAssets';
 import MyFollowings from '@/components/MyFollowings';
 import MyFollowers from '@/components/MyFollowers';
 import ProfileSummary from '@/components/ProfileSummary';
+import Nav from '@/components/Nav';
 
 const tabs = [
     {id: 1, name: 'Transactions', component: <MyTransactions/>, url: '/profile'},
@@ -29,10 +30,7 @@ export default withZkLoginSessionRequired(({session }) => {
     const { data: accountsession, status } = useSession()
 
     return (
-        <div className='container h-screen px-2 py-5 flex flex-col flex-1 relative'>
-            <LayoutHeader index={1} user={user}/>
-            {/* <UserDropdown user={user}/>
-        <div>{JSON.stringify(accountsession)}</div> */}
+        <Nav bottomIndex={4} leftIndex={-1} user={user}>
             <ProfileSummary/>
             <div className='bg-white shadow-md'>
                 <Tab.Group defaultIndex={2} >
@@ -56,7 +54,6 @@ export default withZkLoginSessionRequired(({session }) => {
                     </Tab.Panels>
                 </Tab.Group>
             </div>
-            <BottomNav index={3}/>
-        </div>
+        </Nav>
     )
 })

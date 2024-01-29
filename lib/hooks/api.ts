@@ -16,8 +16,16 @@ import {
   ProfileRequest,
   PublishRequest,
   RecentTxsResponse,
+  TransactionRequest,
+  CheckProfileRequest,
   TransactionResponse,
+  CheckProfileResponse,
 } from "../shared/interfaces";
+import { ProfileMetadataCreated, ProfileEvents } from '@/types/profile'
+import { MYPOST_MOVE_PACKAGE_ID, GLOBAL_OBJECT_ID } from '@/lib/api/move'
+import prisma from "@/lib/prisma";
+import { PROFILE_MUTATE_ROUTE, PROFILE_CREATE_ROUTE, 
+  TRANSACTION_MUTATE_ROUTE, PROFILe_CHECk_ROUTE } from '@/lib/api/constant'
 
 /**
  * An example mutation to execute a Sui transaction.
@@ -53,7 +61,7 @@ export function useProfileMutation(): UseMutationResult<
   const qc = useQueryClient();
   return useMutation({
     mutationFn: apiTxExecMutationFn({
-      baseUri: () => "/api/profile/create",
+      baseUri: () => `${PROFILE_MUTATE_ROUTE}`,
       body: ({ keyPair, ...req }) => req,
       resultSchema: TransactionResponse,
     }),
@@ -72,7 +80,7 @@ export function usePublishMutation(): UseMutationResult<
   const qc = useQueryClient();
   return useMutation({
     mutationFn: apiTxExecMutationFn({
-      baseUri: () => "/api/profile/create",
+      baseUri: () => `${PROFILE_CREATE_ROUTE}`,
       body: ({ keyPair, ...req }) => req,
       //resultSchema: Struct<unknown, unknown>,
     }),
@@ -96,3 +104,44 @@ export function useRecentTxsQuery() {
     },
   });
 }
+
+export function useTransactionMutation(): UseMutationResult<
+  TransactionResponse, ApiError, TransactionRequest & WithKeyPair
+> {
+  return useMutation({
+    mutationFn: apiTxExecMutationFn({
+      baseUri: () => `${TRANSACTION_MUTATE_ROUTE}`,
+      body: ({ keyPair, ...req }) => req,
+      resultSchema: TransactionResponse,
+    })
+  })
+}
+
+export function useProfileCheckMutation(): UseMutationResult<
+  CheckProfileResponse,
+  ApiError,
+  CheckProfileRequest & WithKeyPair
+> {
+  return useMutation({
+    mutationFn: apiTxExecMutationFn({
+      baseUri: () => `${PROFILe_CHECk_ROUTE}`,
+      body: ({ keyPair, ...req }) => req,
+      resultSchema: CheckProfileResponse,
+    }),
+    // onSuccess: ({txDigest}) => {
+    //   console.log('success ' + txDigest)
+    //   //qc.invalidateQueries({ queryKey: ["api", "recent_txs"] });
+    // },
+    // queryKey: ["api", "profile"],
+    // queryFn: async () => {
+    //   const resp = await fetch("/api/profile/get");
+    //   console.log(resp)
+    //   if (resp.status !== 200)
+    //     throw new Error(`Failed to fetch profile events. ${resp.status}`);
+    //   let json = await resp.json();
+    //   console.log(json)
+    // }
+  })
+}
+
+

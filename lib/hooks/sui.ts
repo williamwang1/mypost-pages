@@ -1,6 +1,8 @@
 import { createSuiClient } from "@shinami/clients";
 import { SUI_NETWORK } from "../shared/sui";
 import { throwExpression } from "../shared/utils";
+import { getFullnodeUrl, SuiClient, SuiHTTPTransport } from '@mysten/sui.js/client';
+import { WebSocket } from 'ws';
 
 const SUI_EXPLORER_BASE_URL = "https://suiexplorer.com";
 const SUI_VISION_BASE_URL = `https://${
@@ -47,3 +49,12 @@ export const sui = createSuiClient(
   process.env.NEXT_PUBLIC_SHINAMI_NODE_RPC_URL_OVERRIDE,
   process.env.NEXT_PUBLIC_SHINAMI_NODE_WS_URL_OVERRIDE
 );
+
+export const suic = new SuiClient({
+  transport: new SuiHTTPTransport({
+    url: getFullnodeUrl('testnet'),
+    // The typescript definitions may not match perfectly, casting to never avoids these minor incompatibilities
+    WebSocketConstructor: WebSocket as never,
+  }),
+});
+

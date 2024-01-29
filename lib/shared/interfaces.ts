@@ -1,4 +1,4 @@
-import { Infer, array, coerce, integer, object, string } from "superstruct";
+import { Infer, array, boolean, coerce, integer, object, string } from "superstruct";
 
 export const ProfileRequest = object({
   name: string(),
@@ -8,12 +8,39 @@ export const ProfileRequest = object({
 })
 export type ProfileRequest = Infer<typeof ProfileRequest>
 
+export const CheckProfileRequest = object({
+  address: string(),
+  global: string()
+})
 
+export type CheckProfileRequest = Infer<typeof CheckProfileRequest>
+
+export const CheckProfileResult = object({
+  meta_id: string(),
+  pool_id: string(),
+  profile_id: string(),
+  exist: boolean()
+})
+
+export type CheckProfileResult = Infer<typeof CheckProfileResult>;
+
+export const CheckProfileResponse = object({
+  ...CheckProfileResult.schema,
+  txDigest: string(),
+});
+export type CheckProfileResponse = Infer<typeof CheckProfileResponse>;
 
 export const PublishRequest = object({
   name: string()
 })
 export type PublishRequest = Infer<typeof PublishRequest>
+
+export const TransactionRequest = object({
+  profile: string(),
+  content: string()
+})
+
+export type TransactionRequest = Infer<typeof TransactionRequest>
 
 export const TransactionResponse = object({
   txDigest: string(),
@@ -39,6 +66,13 @@ export const AddResponse = object({
 export type AddResponse = Infer<typeof AddResponse>;
 
 export const RecentTxsResponse = object({
-  txDigests: array(string()),
+  txDigests: array(string())
 });
 export type RecentTxsResponse = Infer<typeof RecentTxsResponse>;
+
+export const ProfileEventsRes = object({
+  events: array(),
+  address: string()
+});
+
+export type ProfileEventsRes = Infer<typeof ProfileEventsRes>

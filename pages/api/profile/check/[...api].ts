@@ -1,7 +1,8 @@
 import { gas, sui } from "@/lib/api/shinami";
-import {MYPOST_MOVE_PACKAGE_ID} from '@/lib/api/move'
+import { MYPOST_MOVE_PACKAGE_ID, GLOBAL_OBJECT_ID, API_HOST } from '@/lib/api/move'
 import { buildGaslessTransactionBytes } from "@shinami/clients";
 import { first } from "@/lib/shared/utils";
+import prisma from "@/lib/prisma";
 import {
     GaslessTransactionBytesBuilder,
     InvalidRequest,
@@ -10,14 +11,16 @@ import {
     zkLoginTxExecHandler,
 } from "@shinami/nextjs-zklogin/server/pages";
 import { mask, validate } from "superstruct";
-import { ProfileRequest, TransactionResponse} from "@/lib/shared/interfaces";
+import { CheckProfileRequest, CheckProfileResponse, CheckProfileResult} from "@/lib/shared/interfaces";
+import { ProfileMetadataCreated } from '@/types/profile'
+import { FollowMetaData, FollowData } from "@/types/follow";
 
 
 const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {
-    const [error, body] = validate(req.body, ProfileRequest);
+    const [error, body] = validate(req.body, CheckProfileRequest);
     if (error) throw new InvalidRequest(error.message);
   
-    console.log("Preparing add tx for zkLogin wallet", wallet);
+    console.log("Preparing check profile tx for zkLogin wallet", wallet);
   
     const gaslessTxBytes = await buildGaslessTransactionBytes({
       sui,
@@ -25,25 +28,25 @@ const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {
         // Source code for this example Move function:
         // https://github.com/shinamicorp/shinami-typescript-sdk/blob/90f19396df9baadd71704a0c752f759c8e7088b4/move_example/sources/math.move#L13
         txb.moveCall({
-            target: `${MYPOST_MOVE_PACKAGE_ID}::profile::create_profile_pool`,
+            target: `${MYPOST_MOVE_PACKAGE_ID}::profile::get_metadata`,
             arguments: [
-                txb.pure(body.name),
+                txb.pure(body.address),
                 txb.object(body.global)
             ],
         });
       },
     });
-    return { gaslessTxBytes, gasBudget: 500_000_000 };
+    return { gaslessTxBytes, gasBudget: 200_000_000 };
 };
 
-
-const parseTxRes: TransactionResponseParser<TransactionResponse> = async (_, txRes) => {
+const parseTxRes: TransactionResponseParser<CheckProfileResponse> = async (_, txRes, user) => {
     // Requires "showEvents: true" in tx response options.
     const event = first(txRes.events);
     if (!event) throw new Error("Event missing from tx response");
-    console.log(JSON.stringify(txRes))
-    // const result = mask(event.parsedJson, ProfileResult);
-    return { txDigest: txRes.digest };
+    console.log('in check profile ' + JSON.stringify(event));
+    const result = mask(event.parsedJson, CheckProfileResult);
+
+    return { ...result, txDigest: txRes.digest };
 };
 
 

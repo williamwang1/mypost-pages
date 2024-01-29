@@ -1,7 +1,4 @@
-import React, { Fragment, useState, useRef } from 'react' ;
-import BottomNav from "@/components/BottomNav";
-import LayoutHeader from "@/components/LayoutHeader";
-import UserDropdown from "@/components/UserDropdown";
+import React, { Fragment, useState, useEffect } from 'react' ;
 import { withZkLoginSessionRequired } from "@shinami/nextjs-zklogin/client";
 import { useSession } from "next-auth/react"
 import { Tab } from '@headlessui/react'
@@ -11,13 +8,9 @@ import MyAssets from '@/components/MyAssets';
 import MyFollowings from '@/components/MyFollowings';
 import MyFollowers from '@/components/MyFollowers';
 import ProfileSummary from '@/components/ProfileSummary';
+import Nav from '@/components/Nav';
 
-const tabs = [
-    {id: 1, name: 'Transactions', component: <MyTransactions/>, url: '/profile'},
-    // {id: 2, name: 'Assets', component: <MyAssets/>, url: '/profile/asset'},
-    {id: 2, name: 'Followings', component: <MyFollowings/>, url: '/profile/following'},
-    {id: 3, name: 'Followers', component: <MyFollowers/>, url: '/profile/follower'},
-]
+
 
 export default withZkLoginSessionRequired(({session }) => {
     const { isLoading, user, localSession } = session;
@@ -28,13 +21,16 @@ export default withZkLoginSessionRequired(({session }) => {
 
     const { data: accountsession, status } = useSession()
 
+    useEffect(() => {
+        // Always do navigations after the first render
+        router.push(`/profile/${user.wallet}`)
+    }, [router, user.wallet])
+
+
     return (
-        <div className='container h-screen px-2 py-5 flex flex-col flex-1 relative'>
-            <LayoutHeader index={1} user={user}/>
-            {/* <UserDropdown user={user}/>
-        <div>{JSON.stringify(accountsession)}</div> */}
-            <ProfileSummary/>
-            <div className='bg-white shadow-md'>
+        <Nav bottomIndex={4} leftIndex={-1} user={user}>
+            {/* <ProfileSummary/> */}
+            {/* <div className='bg-white shadow-md'>
                 <Tab.Group defaultIndex={0} >
                     <Tab.List className='flex flex-1 justify-evenly mt-4'>
                         {tabs.map((tab) => (
@@ -55,8 +51,8 @@ export default withZkLoginSessionRequired(({session }) => {
                     ))}
                     </Tab.Panels>
                 </Tab.Group>
-            </div>
-            <BottomNav index={3}/>
-        </div>
+            </div> */}
+            <div>Redirecting....</div>
+        </Nav>
     )
 })

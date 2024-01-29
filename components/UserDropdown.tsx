@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { JWT } from "next-auth/jwt";
 import { Google } from "@/components/icons";
-import { ChevronRightIcon, ChevronDownIcon } from '@radix-ui/react-icons';
+import { ChevronRightIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 
 
 
@@ -16,7 +16,7 @@ export default function UserDropdown({ user }: { user: ZkLoginUser}) {
   const router = useRouter();
 
   return (
-    <div className="relative inline-block text-left">
+    <div className="">
       <Popover
         content={
           <div className="w-full rounded-md bg-white p-2 sm:w-56">
@@ -40,12 +40,10 @@ export default function UserDropdown({ user }: { user: ZkLoginUser}) {
       >
         <button
           onClick={() => setOpenPopover(!openPopover)}
-          className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-gray-300 transition-all duration-75 focus:outline-none active:scale-95 sm:h-9 sm:w-9"
+          className="flex h-8 w-16 items-center justify-end overflow-hidden rounded-full transition-all duration-75 focus:outline-none active:scale-95"
         >
-          {/* <span className="text-gray-900 text-normal font-bold leading-relaxed"> */}
-          <Google className="h-2 w-2" />
-          {/* <ChevronRightIcon/> */}
-          {/* </span> */}
+          <Google className="h-8 w-8" />
+          <ChevronRightIcon className="h-4 w-4 text-gray-700"/>
         </button>
       </Popover>
     </div>

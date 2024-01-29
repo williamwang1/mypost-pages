@@ -6,9 +6,10 @@ import {
 } from "@shinami/clients";
 import { throwExpression } from "../shared/utils";
 
+
 // This key is only used on the backend / api. It's not exposed to the frontend.
 const SHINAMI_SUPER_ACCESS_KEY =
-  process.env.SHINAMI_SUPER_ACCESS_KEY ??
+  process.env.NEXT_PUBLIC_SHINAMI_SUPER_ACCESS_KEY ??
   throwExpression(new Error("SHINAMI_SUPER_ACCESS_KEY not configured"));
 
 /**
@@ -19,6 +20,8 @@ export const sui = createSuiClient(
   process.env.NEXT_PUBLIC_SHINAMI_NODE_RPC_URL_OVERRIDE,
   process.env.NEXT_PUBLIC_SHINAMI_NODE_WS_URL_OVERRIDE
 );
+
+
 
 /**
  * Shinami gas station client.
