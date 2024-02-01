@@ -1,11 +1,14 @@
-import { TransactionData } from "@/types/transaction";
+import { TransactionDetails } from "@/types/transaction";
 import { ChevronRightIcon } from '@heroicons/react/20/solid'
+import { useRouter } from "next/navigation";
 
 
-export default function TransactionItem({t} : {t: TransactionData}) {
+export default function TransactionItem({t} : {t: TransactionDetails}) {
+    const router = useRouter()
+    let timestamp = <time>{t.create_at.toString().substring(0,10)}</time>;
 
     return (
-        <li key={t.id} className="relative flex group justify-between gap-x-6 hover:bg-gray-50">
+        <li key={t.id} className="relative flex group justify-between gap-x-6 hover:bg-gray-50" onClick={() => router.push(`/transaction/${t.digest}`)}>
           <div className='flex flex-col px-3 py-2'>
             <div className='text-sm font-semibold leading-6 text-gray-900 truncate max-w-xs'>{t.digest}</div>
             <p className='text-sm leading-relaxed text-gray-900 mt-2 break-all'>
@@ -15,7 +18,7 @@ export default function TransactionItem({t} : {t: TransactionData}) {
               {/* <p className="text-sm leading-6 text-gray-900">{t.account}</p> */}
               {t.create_at ? (
                 <p className="mt-1 text-xs leading-5 text-gray-500">
-                  submitted <time>{t.create_at}</time>
+                  submitted {timestamp}
                   {/* submitted <time dateTime={t.create_at}>{t.create_at}</time> */}
                 </p>
               ) : (

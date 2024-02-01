@@ -2,6 +2,7 @@ import React, { Fragment, useState, useRef } from 'react' ;
 import StepperPaid from '@/components/StepperPaid';
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic';
+import Tiptap from './TipTap';
 
 const QuillNoSSRWrapper = dynamic(
     () => import('react-quill'), // Replace 'react-quill' with your Quill import
@@ -70,7 +71,9 @@ export default function TransactionStepperPaid({paid, onPaidChange, step, onBack
                 Paid Content
             </label>
             <div className='mt-2'>
-                <QuillNoSSRWrapper theme="snow" modules={modules} value={paid} onChange={(value) => onPaidChange(value)} className='h-48 max-h-60'/>
+                {/* <QuillNoSSRWrapper theme="snow" modules={modules} value={paid} onChange={(value) => onPaidChange(value)} className='h-48 max-h-60'/> */}
+                <Tiptap content={paid} readOnly={false} onChange={(value: any) => onPaidChange(value)} />
+                {/* {JSON.stringify(paid)} */}
             </div>
             
 

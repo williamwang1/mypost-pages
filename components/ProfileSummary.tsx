@@ -10,7 +10,7 @@ import { ACCOUNT_LIST_ROUTE } from '@/lib/api/constant';
 import { Account } from '@/types/auth';
 
 
-export default function ProfileSummary({ summary, pool, metadata, accounts, user}: {summary: SuiObjectData | null | undefined, pool: SuiObjectData | null | undefined, metadata: ProfileMedata, accounts: Account[], user: any}) {
+export default function ProfileSummary({ summary, pool, metadata, accounts, user}: {summary: any, pool: any, metadata: ProfileMedata, accounts: Account[], user: any}) {
     let [isOpen, setIsOpen] = useState(false)
     const router = useRouter();
     let avatar = summary?.content?.fields?.avatar
@@ -35,11 +35,11 @@ export default function ProfileSummary({ summary, pool, metadata, accounts, user
     const handleFollow = () => {
         setIsOpen(true)
     }       
-    let follow = <button className='bg-sky-400 rounded-3xl py-1 px-2 mt-2' onClick={handleFollow}>
+    let follow = <button className='bg-sky-400 rounded-3xl py-1 px-2 mt-2 mr-4' onClick={handleFollow}>
                     <span className='text-center text-white text-normal font-semibold leading-relaxed px-2 py-2'>Follow</span>
                 </button>
     if (user.wallet === address) {
-        follow = <button className='bg-sky-400 rounded-3xl py-1 px-2 mt-2' onClick={handleFollow}>
+        follow = <button className='bg-sky-400 rounded-3xl py-1 px-2 mt-2 mr-4' onClick={handleFollow}>
                     <span className='text-center text-white text-normal font-semibold leading-relaxed px-2 py-2'>Edit</span>
                 </button>
     }
@@ -49,7 +49,46 @@ export default function ProfileSummary({ summary, pool, metadata, accounts, user
 
     return (
         <div className='px-2'>
-            <div className='flex flex-col z-0'>
+            <div className='flex justify-between items-center'>
+                <div>
+                    <div className='w-20 h-20 rounded-full border-white p-2'>
+                        <Image src={avatar} alt='WW' width={100} height={100} className='rounded-full border-white'/>
+                    </div>
+                </div>
+                <div>
+                <div className='bg-white rounded-3xl flex items-center px-2 gap-x-2'>
+                    <Image src='/images/sui.png' alt='WW' width={35} height={35} className='py-1'/>
+                    <span className='text-center text-sky-500 text-base font-medium leading-relaxed'>{price}</span>
+                </div>
+                
+                </div>
+            </div>
+            <div className='mt-2 text-gray-900 text-base font-black leading-relaxed'>{username}</div>
+            <div className='text-gray-500 text-xs font-normal leading-relaxed truncate'>{address}</div>
+            <div className='flex justify-between'>
+                <div>
+                    <div className='flex flex-1 gap-x-1 items-center mt-2'>
+                        <CalendarDaysIcon className='w-6 h-6'/>
+                        <div className='text-neutral-600 text-sm font-normal leading-normal'>Joined <time>{timestamp}</time></div>
+                    </div>
+                    <div className='flex flex-1 gap-x-8 mt-2'>
+                        <div className='flex gap-x-2'>
+                            <span className='text-gray-900 text-sm font-black leading-loose'>{followings}</span>
+                            <span className='text-neutral-600 text-sm font-normal leading-loose'>following</span>
+                        </div>
+                        <div className='flex gap-x-2'>
+                            <span className='text-gray-900 text-sm font-black leading-loose'>{followers}</span>
+                            <span className='text-neutral-600 text-sm font-normal leading-loose'>followers</span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    {follow}
+                </div>
+            </div>
+
+
+            {/* <div className='flex flex-col z-0'>
                 <div className='flex flex-1 w-full mt-2 justify-between'>
                     <div>
                         <div className='w-20 h-20 rounded-full border-white p-2'>
@@ -63,9 +102,7 @@ export default function ProfileSummary({ summary, pool, metadata, accounts, user
                                 <span className='text-center text-sky-500 text-base font-medium leading-relaxed'>{price}</span>
                             </button>
                             {follow}
-                        </div>
-
-                            
+                        </div>       
                     </div>
                 </div>
             </div>
@@ -85,7 +122,7 @@ export default function ProfileSummary({ summary, pool, metadata, accounts, user
                     <span className='text-gray-900 text-sm font-black leading-loose'>{followers}</span>
                     <span className='text-neutral-600 text-sm font-normal leading-loose'>followers</span>
                 </div>
-            </div>
+            </div> */}
         </div>
     )
 }

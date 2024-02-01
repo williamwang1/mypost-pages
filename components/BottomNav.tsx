@@ -21,7 +21,7 @@ import {
 const navigation = [
     { id: 1, name: 'Home', href: '/home', icon: HomeIcon },
     { id: 2, name: 'Wallet', href: '/wallet', icon: WalletIcon },
-    { id: 3, name: 'Transaction', href: '/transaction', icon: PlusCircleIcon },
+    { id: 3, name: 'Transaction', href: '/transactions', icon: PlusCircleIcon },
     { id: 4, name: 'Explore', href: '/explore', icon: MagnifyingGlassIcon },
     { id: 5, name: 'Profile', href: '/profile', icon: UserIcon },
 

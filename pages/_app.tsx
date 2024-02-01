@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { AppProps } from "next/app";
 import { SessionProvider } from "next-auth/react"
 import './globals.css'
+import './styles.scss'
 import React, { useEffect } from 'react';
 import { sui, suic} from '@/lib/hooks/sui'
 import { MYPOST_MOVE_PACKAGE_ID, EXAMPLE_MOVE_PACKAGE_ID } from "@/lib/api/move";

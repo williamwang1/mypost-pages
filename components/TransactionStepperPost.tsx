@@ -9,11 +9,7 @@ import { ProfileMedata } from '@/types/profile';
 import { ACCOUNT_LIST_ROUTE, PROFILE_GET_ROUTE, TRANSACTION_MUTATEDB_ROUTE } from '@/lib/api/constant';
 import { API_HOST } from '@/lib/api/move';
 import { useRouter } from 'next/navigation'
-
-const QuillNoSSRWrapper = dynamic(
-    () => import('react-quill'), // Replace 'react-quill' with your Quill import
-    { ssr: false } // This line is important. It disables server-side rendering for this component
-);
+import Tiptap from './TipTap';
 
 
 export default function TransactionStepperPost({ accounts, step, onBackChange , summary, digest, session, paid, metadata, free}
@@ -38,37 +34,23 @@ export default function TransactionStepperPost({ accounts, step, onBackChange , 
         id = id + 1;
     })
 
-    const  modules  = {
-        toolbar: [
-            [{ font: [] }],
-            [{ header: [1, 2, 3, 4, 5, 6, false] }],
-            ["bold", "italic", "underline", "strike"],
-            [{ color: [] }, { background: [] }],
-            [{ script:  "sub" }, { script:  "super" }],
-            ["blockquote", "code-block"],
-            [{ list:  "ordered" }, { list:  "bullet" }],
-            [{ indent:  "-1" }, { indent:  "+1" }, { align: [] }],
-            ["link", "image", "video"],
-            ["clean"],
-        ],
-    };
-
-
-
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         setClicked(true)
         const encryptRes = await fetch('/api/encrypt', {
-            method: 'POST',
+            method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify(paid),
-          })
+        })
     
         const enpaid = await encryptRes.json();
         // console.log(enpaid.ciphertext)
+        // let text = enpaid.ciphertext
+
+
         let txmetadata = await transaction({
             keyPair: localSession.ephemeralKeyPair,
             profile: metadata.profile_id,
@@ -150,7 +132,7 @@ export default function TransactionStepperPost({ accounts, step, onBackChange , 
                  </div>
                  <div className='bg-white shadow-md'>
                      <Tab.Group defaultIndex={0} >
-                         <Tab.List className='flex flex-1 justify-evenly mt-4'>
+                         <Tab.List className='flex flex-1 gap-x-2 mt-4'>
                              {tabs.map((tab) => (
                             <Tab as={Fragment} key={tab.id}>
                                 {({ selected }) =>                         
@@ -167,7 +149,7 @@ export default function TransactionStepperPost({ accounts, step, onBackChange , 
                         {tabs.map((tab) => (
                             <Tab.Panel key={tab.id}>
                                 <div className='mt-2 pb-2'>
-                                    <QuillNoSSRWrapper theme="bubble" modules={modules} value={digest} className='h-20' readOnly/>
+                                    <Tiptap content={digest} readOnly={true} onChange={undefined} />
                                 </div>
                             </Tab.Panel>
                         ))}
@@ -186,7 +168,6 @@ export default function TransactionStepperPost({ accounts, step, onBackChange , 
                     </label>
                 </div>
                 <div className="flex flex-col flex-1 mt-5">
-
                     <div className="flex justify-between mt-28 px-4 mb-16">
                         <button type="button" 
                             className="px-4 py-2 bg-white rounded-md border border-gray-300 justify-center items-center gap-2.5 inline-flex text-sm font-semibold leading-6 text-gray-900"

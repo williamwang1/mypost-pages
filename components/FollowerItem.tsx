@@ -8,7 +8,7 @@ import Image from 'next/image';
 
 
 export default function FollowerItem({f}: {f: FollowData}) {
-  const [profile, setProfile] = useState<SuiObjectResponse>({})
+  const [profile, setProfile] = useState<any>({})
   const router = useRouter()
   const isInitialRender = useRef(true);
 
@@ -18,7 +18,7 @@ export default function FollowerItem({f}: {f: FollowData}) {
       return;
     }
     const getProfile = async () => {
-      const profiledata: SuiObjectResponse = await sui.getObject({
+      const profiledata: any = await sui.getObject({
           id: f.follower_profile,
           options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 
       })
@@ -39,34 +39,36 @@ export default function FollowerItem({f}: {f: FollowData}) {
   let timestamp = <time>{f.create_at.toString().substring(0,10)}</time>;
 
     return (
-        <li key={f.id} className="relative flex flex-1 group gap-x-6 px-2 py-1 hover:bg-gray-50">
-          <div className="flex min-w-0 gap-x-4">
-            <img className="h-12 w-12 flex-none rounded-full bg-gray-50" src={avatar} alt="" />
-            <div className="min-w-0 flex-auto">
+        <div className='relative group hover:bg-gray-50'>
+        <li key={f.id} className="flex justify-between">
+          <div className='flex gap-x-2 items-center'>
+            <div className='rounded-full border-white flex items-center px-2'>
+              <Image src={avatar} alt='MM' width={35} height={35} className='rounded-full border-white align-middle'/>
+            </div>
+            <div>
               <p className="text-sm font-semibold leading-6 text-gray-900">
-                <a href=''>
-                  <span className="absolute inset-x-0 -top-px bottom-0" />
-                  {username}
-                </a>
+                    <span className="absolute inset-x-0 -top-px bottom-0" />
+                    {username}
               </p>
-              <p className="mt-1 flex text-xs leading-5 text-gray-500 truncate max-w-xs">
+              <p className="mt-1 flex text-xs leading-5 text-gray-500 truncate max-w-32">
                 {address}
               </p>
-              <div className="text-sm leading-relaxed text-gray-900 mt-2">{bio}</div>
             </div>
           </div>
-          <div className="flex flex-1 items-center">
-            <div className="flex flex-1 flex-col items-end">
-                <div className='bg-white rounded-3xl flex items-center px-2 gap-x-2'>
+          <div className='flex items-center pt-2'>
+            <div>
+              <div className='bg-white rounded-3xl flex items-center gap-x-2'>
                     <Image src='/images/sui.png' alt='WW' width={25} height={25} className='py-1'/>
                     <span className='text-center text-sky-500 text-base font-medium leading-relaxed'>{f.price}</span>
-                </div>
-                <p className="mt-1 text-xs leading-5 text-gray-500">
-                  {timestamp}
-                </p>
+              </div>
             </div>
-            <ChevronRightIcon className="h-5 w-5 flex-none text-gray-400 align-middle" aria-hidden="true"/>
+            <ChevronRightIcon className="h-5 w-5 flex-none text-gray-400 align-middle pr-2" aria-hidden="true"/>
           </div>
-        </li>
+      </li>
+      <div className="text-sm leading-relaxed text-gray-900 mt-2">{bio}</div>
+          <p className="mt-1 text-xs leading-5 text-gray-500 pl-2">
+              submitted {timestamp}
+          </p>
+    </div>
     )
 }

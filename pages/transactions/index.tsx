@@ -321,7 +321,7 @@ function Transaction({session, accounts} : {session: ZkLoginSession, accounts: A
 
     useEffect(() => {
         // Always do navigations after the first render
-        router.push(`/transaction/${user?.wallet}`)
+        router.push(`/transactions/${user?.wallet}`)
     }, [router, user?.wallet])
 
     return (

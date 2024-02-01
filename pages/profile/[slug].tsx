@@ -92,7 +92,7 @@ function Profile({metadata, session, profiledata, profilepool, accounts, slug}
             <ProfileSummary summary={profiledata.data} pool={profilepool.data} metadata={metadata} accounts={accounts} user={user}/>
             <div className='bg-white shadow-md'>
                 <Tab.Group defaultIndex={activeIndex} >
-                    <Tab.List className='flex flex-1 justify-evenly mt-4'>
+                    <Tab.List className='flex flex-1 justify-between mt-4 px-2'>
                         {tabs.map((tab) => (
                         <Tab as={Fragment} key={tab.id}>
                             {({ selected }) =>                         

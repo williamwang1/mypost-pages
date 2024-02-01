@@ -8,6 +8,8 @@ export const TRANSACTION_MUTATEDB_ROUTE = '/api/transaction/mutatedb'
 
 export const TRANSACTION_MUTATE_ROUTE = '/api/transaction/mutate'
 
+export const TRANSACTION_GET = '/api/transaction/get'
+
 export const PROFILE_MUTATE_ROUTE = '/api/profile/mutate';
 
 export const PROFILE_MUTATEDB_ROUTE = '/api/profile/mutatedb'
@@ -19,3 +21,7 @@ export const PROFILe_CHECk_ROUTE = '/api/profile/check'
 export const FOLLOW_FOLLOWING_LIST_ROUTE = '/api/follow/followingslist'
 
 export const FOLLOW_FOLLOWER_LIST_ROUTE = '/api/follow/followerslist'
+
+export const ACCESS_HISTORY_LIST_ROUTE = '/api/access/getlist'
+
+export const ACCESS_CHECK_ROUTE = '/api/access/check'
