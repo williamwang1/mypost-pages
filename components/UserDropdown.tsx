@@ -15,6 +15,12 @@ export default function UserDropdown({ user }: { user: ZkLoginUser}) {
   const [openPopover, setOpenPopover] = useState(false);
   const router = useRouter();
 
+  const handleLogout = () => {
+    
+    //signOut()
+    router.push(`${AUTH_API_BASE}/logout`)
+  }
+
   return (
     <div className="">
       <Popover
@@ -27,7 +33,7 @@ export default function UserDropdown({ user }: { user: ZkLoginUser}) {
             </div>
             <button
               className="relative flex w-full items-center justify-start space-x-2 rounded-md p-2 text-left text-sm transition-all duration-75 hover:bg-gray-100"
-              onClick={() => router.push(`${AUTH_API_BASE}/logout`)}
+              onClick={handleLogout}
             >
               <LogOut className="h-4 w-4" />
               <p className="text-sm">Logout</p>

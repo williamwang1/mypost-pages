@@ -36,11 +36,27 @@ export const PublishRequest = object({
 export type PublishRequest = Infer<typeof PublishRequest>
 
 export const TransactionRequest = object({
-  profile: string(),
+  pool: string(),
   content: string()
 })
-
 export type TransactionRequest = Infer<typeof TransactionRequest>
+
+export const BuyRequest = object({
+  price: string(),
+  budget: string(),
+  coin_count: string(),
+  protocol_destination: string(),
+  transaction_digest: string(),
+  pool: string()
+})
+export type BuyRequest = Infer<typeof BuyRequest>
+
+export const SellRequest = object({
+  protocol_destination: string(),
+  transaction_digest: string(),
+  pool: string()
+})
+export type SellRequest = Infer<typeof SellRequest>
 
 export const TransactionResponse = object({
   txDigest: string(),

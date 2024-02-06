@@ -1,7 +1,7 @@
 
 import prisma from "@/lib/prisma";
 import { ProfileMedata } from "@/types/profile";
-import { TransactionData } from "@/types/transaction";
+import { TransactionDetails } from "@/types/transaction";
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 
@@ -15,7 +15,7 @@ export default async function handler(
     let result;
     try {
         console.log('address in transaction mutatedb ' + req.body.address)
-        const transaction: TransactionData | null = await prisma.transaction.findUnique({
+        const transaction: any = await prisma.transaction.findUnique({
             where: {
                 digest: req.body.digest,
             }

@@ -6,6 +6,7 @@ import { signIn } from 'next-auth/react';
 import { User } from 'next-auth'
 import prisma from "@/lib/prisma";
 import { ZkLoginUser } from '@shinami/nextjs-zklogin';
+import { API_HOST } from '@/lib/api/move';
 
 const types = [
     { id: 1, name: 'Twitter', description: '', url: '/well', tooltip: '' },
@@ -42,7 +43,7 @@ export default function AccountAdd({ user }: { user: ZkLoginUser}) {
     }
 
     const handleConfirm = () => {
-        signIn("twitter", { callbackUrl: 'http://localhost:3000/account' })
+        signIn("twitter", { callbackUrl: `${API_HOST}/account/${user.wallet}` })
     }
     let button = null
     // console.log('select' + JSON.stringify(selected))

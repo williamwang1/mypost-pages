@@ -20,12 +20,14 @@ import {
   CheckProfileRequest,
   TransactionResponse,
   CheckProfileResponse,
+  BuyRequest,
+  SellRequest,
 } from "../shared/interfaces";
 import { ProfileMetadataCreated, ProfileEvents } from '@/types/profile'
 import { MYPOST_MOVE_PACKAGE_ID, GLOBAL_OBJECT_ID } from '@/lib/api/move'
 import prisma from "@/lib/prisma";
 import { PROFILE_MUTATE_ROUTE, PROFILE_CREATE_ROUTE, 
-  TRANSACTION_MUTATE_ROUTE, PROFILe_CHECk_ROUTE } from '@/lib/api/constant'
+  TRANSACTION_MUTATE_ROUTE, PROFILe_CHECk_ROUTE, BUY_MUTATE_ROUTE, SELL_MUTATE_ROUTE } from '@/lib/api/constant'
 
 /**
  * An example mutation to execute a Sui transaction.
@@ -116,6 +118,32 @@ export function useTransactionMutation(): UseMutationResult<
     })
   })
 }
+
+export function useBuyMutation(): UseMutationResult<
+  TransactionResponse, ApiError, BuyRequest & WithKeyPair
+> {
+  return useMutation({
+    mutationFn: apiTxExecMutationFn({
+      baseUri: () => `${BUY_MUTATE_ROUTE}`,
+      body: ({ keyPair, ...req }) => req,
+      resultSchema: TransactionResponse,
+    })
+  })
+}
+
+export function useSellMutation(): UseMutationResult<
+  TransactionResponse, ApiError, SellRequest & WithKeyPair
+> {
+  return useMutation({
+    mutationFn: apiTxExecMutationFn({
+      baseUri: () => `${SELL_MUTATE_ROUTE}`,
+      body: ({ keyPair, ...req }) => req,
+      resultSchema: TransactionResponse,
+    })
+  })
+}
+
+
 
 export function useProfileCheckMutation(): UseMutationResult<
   CheckProfileResponse,

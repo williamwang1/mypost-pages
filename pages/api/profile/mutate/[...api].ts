@@ -65,7 +65,7 @@ const parseTxRes: TransactionResponseParser<TransactionResponse> = async (_, txR
     })
     // console.log(events?.length)
     let data = txRes.events?.at(0)?.parsedJson as ProfileMetadataCreated;
-    console.log('profile metadata ' + JSON.stringify(data))
+    //console.log('profile metadata ' + JSON.stringify(data))
     let body = {
         package_id: `${MYPOST_MOVE_PACKAGE_ID}`,
         profile_id: data.for,

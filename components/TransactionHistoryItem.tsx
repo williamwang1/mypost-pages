@@ -17,7 +17,7 @@ export default function TransactionHistoryItem({transaction, profile}: {transact
                     {name}
                 </div>
                 <div className='py-2 text-sm text-gray-500 truncate max-w-20'>
-                    {address}
+                    {transaction.address}
                 </div>
                 <div className='py-2 text-sm text-gray-500 truncate'>
                     {transaction.type}

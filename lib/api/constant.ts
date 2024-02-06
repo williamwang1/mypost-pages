@@ -8,6 +8,10 @@ export const TRANSACTION_MUTATEDB_ROUTE = '/api/transaction/mutatedb'
 
 export const TRANSACTION_MUTATE_ROUTE = '/api/transaction/mutate'
 
+export const BUY_MUTATE_ROUTE = '/api/buy/mutate'
+
+export const SELL_MUTATE_ROUTE = '/api/sell/mutate'
+
 export const TRANSACTION_GET = '/api/transaction/get'
 
 export const PROFILE_MUTATE_ROUTE = '/api/profile/mutate';

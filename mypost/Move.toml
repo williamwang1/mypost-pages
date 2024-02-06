@@ -1,6 +1,7 @@
 [package]
 name = "mypost"
 version = "0.0.1"
+published-at = "0x0d954e5c69aec24dd44f65afdbe4e1a46cba667a7cf299f6d55a97bcb72e4b75"
 
 [dependencies]
 Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "08119f95e9ccdc926eae3fff8c95e50678f56aed" }

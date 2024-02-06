@@ -22,7 +22,7 @@ model Follow {
   follower_id       String
   follower_profile  String
   price             String
-  type              String @default('follow')
+  type              String @default("follow")
   create_at         DateTime
   status            Boolean @default(true)
   @@unique([follower, following, status])
@@ -38,7 +38,7 @@ model Unfollow {
   follower_id       String
   follower_profile  String
   price             String
-  type              String @default('unfollow')
+  type              String @default("unfollow")
   create_at         DateTime
   status            Boolean @default(true)
   @@unique([follower, following, status])
@@ -53,7 +53,7 @@ model AccessBought {
   profile_id           String
   accessor_profile     String
   price                String
-  type                 String  @default('buy')
+  type                 String  @default("buy")
   address              String
   package_id           String
   create_at            DateTime
@@ -70,7 +70,7 @@ model AccessSold {
   profile_id           String
   accessor_profile     String
   price                String
-  type                 String  @default('buy')
+  type                 String  @default("sell")
   address              String
   package_id           String
   create_at            DateTime
@@ -128,6 +128,7 @@ model Account {
   id_token          String? @db.Text
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status            Boolean @default(true)
 
   @@unique([provider, providerAccountId])
   @@index([userId])

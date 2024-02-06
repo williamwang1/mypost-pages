@@ -30,8 +30,9 @@ const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {
         txb.moveCall({
             target: `${MYPOST_MOVE_PACKAGE_ID}::transaction::create`,
             arguments: [
-                txb.object(body.profile),
+                txb.object(body.pool),
                 txb.pure(body.content),
+                txb.pure('new transction'),
                 txb.object('0x6')
             ],
         });

@@ -13,6 +13,8 @@ interface AccessBought {
     profile_id: string,
     accessor_profile: string,
     price: string,
+    buyer: string,
+    transaction_digest: string,
     timestamp_ms: string
 }
 

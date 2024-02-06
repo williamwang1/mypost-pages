@@ -22,9 +22,10 @@ export default async function handler(
         //         // digest:''
         //     }
         // });
+        console.log('in chcek ' + req.body.address)
         let accesses = await prisma.$queryRaw`SELECT * from "AccessBought" at 
-        where at.address=${req.body.address} 
-        and at.Transaction_digest=${req.body.transaction_digest} and Status=true`
+        where at.Address=${req.body.address} 
+        and at.Transaction_digest=${req.body.slug} and Status=true`
         res.status(200).json( accesses )
       } catch (err) {
         res.status(500).json({ err })

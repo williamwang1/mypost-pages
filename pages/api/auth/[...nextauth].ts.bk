@@ -6,6 +6,7 @@ import TwitterProvider from 'next-auth/providers/twitter';
 import { Session } from "@/types/auth";
 import {Profile} from '@/types/auth';
 import NextAuth from "next-auth";
+import { NextApiRequest, NextApiResponse } from "next";
 
 export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(prisma),
@@ -26,9 +27,6 @@ export const authOptions: NextAuthOptions = {
       strategy: "jwt"
     },
     callbacks: {
-      // async signIn({ user, account, profile, email, credentials, req }) {
-
-      // },
       async jwt({ token, account, profile}) {
         if (account) {
           console.log(account.provider)
@@ -66,8 +64,23 @@ export const authOptions: NextAuthOptions = {
     }
   }
   
-export function getSession() {
-    return getServerSession(authOptions) as Promise<Session>;
-}
+// export function getSession() {
+//     return getServerSession(authOptions) as Promise<Session>;
+// }
 
-export default NextAuth(authOptions)
+// export default NextAuth(authOptions)
+
+export default async function auth(req: NextApiRequest, res: NextApiResponse) {
+
+  if(req.query.nextauth.includes("callback") && req.method === "POST") {
+    console.log(
+      "Handling callback request from my Identity Provider",
+      req.body
+    )
+  }
+
+  // Get a custom cookie value from the request
+  const someCookie = req.cookies["some-custom-cookie"]
+
+  return await NextAuth(req, res, authOptions)
+}

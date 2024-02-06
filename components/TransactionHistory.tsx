@@ -2,43 +2,27 @@ import { ChevronRightIcon } from '@heroicons/react/20/solid'
 import React, { useEffect, useState, useRef } from 'react'
 import { API_HOST } from '@/lib/api/move';
 import { useRouter } from 'next/navigation'
-import { ACCESS_HISTORY_LIST_ROUTE } from '@/lib/api/constant'
+import { ACCESS_HISTORY_LIST_ROUTE, ACCESS_CHECK_ROUTE } from '@/lib/api/constant'
 import InfiniteScroll from "react-infinite-scroll-component";
 import { AccessHistory } from '@/types/transaction';
 import TransactionHistoryItem from './TransactionHistoryItem';
+import { useBuyMutation } from '@/lib/hooks/api';
+import { sui } from '@/lib/api/shinami';
+import { TransactionList } from '@/types/transaction';
 import { AlignHorizontalDistributeCenterIcon } from 'lucide-react';
 
-const transactions = [
-    {
-        id: '2DTbJx...bgBkqseddddddddddddd',
-        name: 'william.wang',
-        //address: '0xer343ffd..............',
-        type: 'buy',
-        price: '2.34',
-        
-        // timestamp: '3rd Nov 2023',
-        // status: 'confirmed',
-      },
-    // More transactions...
-]
 
-const headers = [
-    'Profile',
-    'Name',
-    // 'Address',
-    'Type',
-    'Price',
-
-    // 'Timestamp',
-    // 'Status'
-]
-
-export default function TransactionHistory({slug, profile}: {slug: string, profile: any}) {
+export default function TransactionHistory({slug, profile, session, pool, txs}: 
+  {slug: string, profile: any, session: any, pool: any, txs: TransactionList[]}) {
+    const { isLoading, user, localSession } = session;
     const [items, setItems] = useState<AccessHistory[]>([]);
     const [hasMore, setHasMore] = useState(true);
+
     const [page, setPage] = useState(1);
     const isInitialRender = useRef(true);
     const [loading, setLoading] = useState(true)
+    let price = pool?.data?.content?.fields.price;
+
 
     const fetchData = async (currentPage: number) => {
         //console.log('in fectch data ' + currentPage)
@@ -51,8 +35,23 @@ export default function TransactionHistory({slug, profile}: {slug: string, profi
             },
             body: JSON.stringify({ slug, currentPage }),
           })
-      
           const newData : AccessHistory[] = await accessdb.json();
+          // let checkBody = {
+          //   slug: slug,
+          //   address: user.wallet
+          // }
+          // const accessCheckB = await fetch(`${API_HOST}${ACCESS_CHECK_ROUTE}`, {
+          //   method: 'POST',
+          //   headers: {
+          //   'Content-Type': 'application/json',
+          //   },
+          //   body: JSON.stringify(checkBody),
+          // })
+          // const accessCheck : AccessHistory[] = await accessCheckB.json();
+          // console.log('in history client ' + JSON.stringify(accessCheck))
+          // if (accessCheck.length > 0) {
+          //     setBought(true)
+          // }
           //console.log('in fetch data ' + JSON.stringify(newData))
           if (newData.length === 0) {
             setHasMore(false);
@@ -67,7 +66,8 @@ export default function TransactionHistory({slug, profile}: {slug: string, profi
           setLoading(false); // Set loading to false after fetching data
         }
     
-      }
+    }
+
 
     useEffect(() => {
         if (isInitialRender.current) {
@@ -78,22 +78,14 @@ export default function TransactionHistory({slug, profile}: {slug: string, profi
 
     }, [page])
 
+
     return (
         <div className=' bg-white w-auto h-auto mt-2'>
-        {/* <table className="min-w-full divide-y divide-gray-300">
-            <thead>
-                <tr>
-                    {headers.map((header) => (
-                        <th
-                            scope="col"
-                            className="whitespace-nowrap py-2 text-left text-sm font-semibold text-gray-900"
-                            key={header}
-                        >
-                            {header}
-                        </th>
-                    ))}
-                </tr>
-            </thead> */}
+            <div className='mt-2 flex justify-between items-center'>
+                <div className='text-black text-lg font-bold leading-7'>
+                    Trading History
+                </div>
+            </div>
             <InfiniteScroll
                 dataLength={items.length}
                 next={() => setPage((prevPage) => prevPage + 1)}

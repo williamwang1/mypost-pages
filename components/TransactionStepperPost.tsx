@@ -53,7 +53,7 @@ export default function TransactionStepperPost({ accounts, step, onBackChange , 
 
         let txmetadata = await transaction({
             keyPair: localSession.ephemeralKeyPair,
-            profile: metadata.profile_id,
+            pool: metadata.profile_pool_id,
             content: enpaid.ciphertext
         })
         let txbody = {
@@ -73,13 +73,13 @@ export default function TransactionStepperPost({ accounts, step, onBackChange , 
 
         let text = summary + '\n' + free +  '\n' + `Check this out: https://www.example.com/transaction/${ txmetadata.txDigest }`
 
-        const response = await fetch('/api/tweet', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ text }),
-          });
+        // const response = await fetch('/api/tweet', {
+        //     method: 'POST',
+        //     headers: {
+        //       'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({ text }),
+        //   });
         
         router.push('/profile')
         //   if (data.success) {

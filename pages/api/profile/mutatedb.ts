@@ -13,7 +13,7 @@ export default async function handler(
     // }
     let result;
     try {
-        console.log(req.body.address)
+        //console.log(req.body.address)
         const profile: ProfileMedata | null = await prisma.profile.findUnique({
             where: {
                 address: req.body.address,

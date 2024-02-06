@@ -1,11 +1,11 @@
 import { GetServerSideProps } from 'next';
 import { ZkLoginSession, withZkLoginSessionRequired } from "@shinami/nextjs-zklogin/client";
 import Nav from '@/components/Nav';
-import { ACCESS_CHECK_ROUTE, PROFILE_GET_ROUTE, TRANSACTION_GET } from '@/lib/api/constant';
+import { ACCESS_CHECK_ROUTE, ACCESS_HISTORY_LIST_ROUTE, PROFILE_GET_ROUTE, TRANSACTION_GET } from '@/lib/api/constant';
 import { API_HOST } from '@/lib/api/move';
 import { sui } from '@/lib/api/shinami'
 import { SuiObjectResponse } from "@mysten/sui.js/client";
-import { TransactionDetails } from '@/types/transaction';
+import { TransactionList } from '@/types/transaction';
 import Image from 'next/image';
 import { ProfileData, ProfileMedata } from '@/types/profile';
 import TransactionHistory from '@/components/TransactionHistory';
@@ -14,11 +14,9 @@ import dynamic from 'next/dynamic';
 import 'react-quill/dist/quill.snow.css';
 import 'react-quill/dist/quill.bubble.css';
 import Tiptap from '@/components/TipTap';
-
-const QuillNoSSRWrapper = dynamic(
-    () => import('react-quill'), // Replace 'react-quill' with your Quill import
-    { ssr: false } // This line is important. It disables server-side rendering for this component
-);
+import { AccessHistory } from '@/types/transaction';
+import { useBuyMutation, useSellMutation } from '@/lib/hooks/api';
+import {Drawer} from 'vaul';
 
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -42,6 +40,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             id: txs[0].profile_id,
             options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 
         })
+        // TODO redirect to account page is no profile
         pooldata = await sui.getObject({
             id: txs[0].pool_id,
             options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 
@@ -65,7 +64,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 function Transaction ({session, profiledata, txs, pooldata, transactiondata, slug}
     : 
-    {session: any, profiledata: any, txs: TransactionDetails[], 
+    {session: any, profiledata: any, txs: TransactionList[], 
         pooldata: any, transactiondata: any, slug: string}) {
     const { isLoading, user, localSession } = session;
     let avatar = profiledata?.data?.content?.fields?.avatar
@@ -75,14 +74,21 @@ function Transaction ({session, profiledata, txs, pooldata, transactiondata, slu
     let summary = txs[0].summary;
     let public_content = txs[0].public_content;
     let price = pooldata?.data?.content?.fields.price
-    const [access, setAcess] = useState([]);
-    const [unlock, setUnlock] = useState(false)
-    const [plaintext, setPlaintext] = useState('')
-    let encrypt_content = transactiondata?.data?.content?.fields?.content?.fields?.content
+    const [loading, setLoaiding] = useState(true);
+    const [bought, setBought] = useState(false);
+    const [unlock, setUnlock] = useState(false);
+    const [plaintext, setPlaintext] = useState('');
+    const [sellConfirm, setSellConfirm] = useState(false);
+    const [inbalance, setInbalance] = useState(false);
+    const {mutateAsync: buy, isPending: isCreating } = useBuyMutation();
+    const {mutateAsync: sell, isPending: isSellCreating } = useSellMutation();
+    let encrypt_content = transactiondata?.data?.content?.fields?.content
+
 
     const handleClick = async () => {
-        if(access && access.length > 0) {
-            console.log('eligible to decrypt')
+        //console.log('in transction slug ' + JSON.stringify(bought))
+        if(bought) {
+            //console.log('eligible to decrypt')
             const decryptRes = await fetch('/api/decrypt', {
                 method: 'PUT',
                 headers: {
@@ -99,6 +105,49 @@ function Transaction ({session, profiledata, txs, pooldata, transactiondata, slu
         }
     }
 
+    const handleBuy = async () => {
+        setLoaiding(true)
+        let balance = await sui.getBalance({owner: user.wallet})
+        console.log(JSON.stringify(balance))
+        //console.log(price)
+        if (parseInt(balance.totalBalance) < parseInt(price)) {
+            console.log('Insufficient Balance');
+            // set notification insufficient balance
+            setInbalance(true)
+        }
+        let buyMeta = await buy({
+            keyPair: localSession.ephemeralKeyPair,
+            price: price,
+            budget: price,
+            coin_count: balance.coinObjectCount.toString(),
+            protocol_destination: user.wallet,
+            transaction_digest: txs[0].digest,
+            pool: txs[0].pool_id
+        })
+        console.log('in buy ' + JSON.stringify(buyMeta))
+        setLoaiding(false)
+    }
+
+    const handleSellConfirm = async () => {
+        setLoaiding(true)
+        let sellMeta = await sell({
+            keyPair: localSession.ephemeralKeyPair,
+            protocol_destination: user.wallet,
+            transaction_digest: txs[0].digest,
+            pool: txs[0].pool_id
+        })
+        console.log('in sell ' + JSON.stringify(sellMeta))
+        setLoaiding(false)
+    }
+
+    const handleRepost = () => {
+        
+    }
+
+    const handleReply = () => {
+        
+    }
+
     let private_content = (<button className='overflow-hidden break-words max-w-full underline' onClick={handleClick}>
                             {encrypt_content}
                             </button>)
@@ -106,41 +155,52 @@ function Transaction ({session, profiledata, txs, pooldata, transactiondata, slu
         private_content = <Tiptap content={plaintext} readOnly={true} onChange={undefined}/>
     }
 
-    const handleTrade = () => {
-
-    }
-
-    let trade = <button className='bg-sky-400 rounded-3xl py-1 px-2 mt-2' onClick={handleTrade}>
-                    <span className='text-center text-white text-normal font-semibold leading-relaxed px-2 py-2'>Buy</span>
-                </button>
-    if (user.wallet === address) {
-        trade = <button className='bg-sky-400 rounded-3xl py-1 px-2 mt-2' onClick={handleTrade}>
-                <span className='text-center text-white text-normal font-semibold leading-relaxed px-2 py-2'>Sell</span>
-            </button>
-    }
     useEffect(() => {
         const fetchData = async () => {
-            let body = {
-                transaction_digest: slug,
+            let checkBody = {
+                slug: slug,
                 address: user.wallet
-            }
-            const accessRes = await fetch(`${API_HOST}${ACCESS_CHECK_ROUTE}`, {
+              }
+            const accessCheckB = await fetch(`${API_HOST}${ACCESS_CHECK_ROUTE}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    },
-                body: JSON.stringify(body)
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(checkBody),
             })
-            const access = await accessRes.json()
-            if (!accessRes.ok) {
-                throw new Error(`Error: ${accessRes.status}`);
+            const accessCheck : AccessHistory[] = await accessCheckB.json();
+            console.log('in history client ' + JSON.stringify(accessCheck))
+            if (accessCheck.length > 0) {
+                setBought(true)
             }
-            setAcess(access)
-            // console.log(user.wallet + '   ' + slug)
-            // console.log('in transaction slug' + JSON.stringify(accessRes))
+            setLoaiding(false);
         }
         fetchData()
     }, [slug, user.wallet])
+
+    let trade = <button className='bg-sky-400 rounded-3xl px-2 hover:bg-sky-800' onClick={handleBuy}>
+                <span className='text-center text-white text-normal font-semibold leading-relaxed px-2 py-2'>Buy</span>
+            </button>
+    if (bought) {
+        trade = <div className='flex gap-x-2'>
+                    <button className='bg-sky-400 rounded-3xl px-2 hover:bg-sky-800' onClick={handleRepost}>
+                        <span className='text-center text-white text-normal font-semibold leading-relaxed px-2 py-2 '>Repost</span>
+                    </button>
+                    <button className='bg-sky-400 rounded-3xl px-2 hover:bg-sky-800' onClick={handleReply}>
+                        <span className='text-center text-white text-normal font-semibold leading-relaxed px-2 py-2'>Reply</span>
+                    </button>
+                    <button className='bg-sky-400 rounded-3xl px-2 hover:bg-sky-800' onClick={() => setSellConfirm(true)}>
+                        <span className='text-center text-white text-normal font-semibold leading-relaxed px-2 py-2 '>Sell</span>
+                    </button>
+                </div>
+    }
+    if (loading) {
+        return (
+            <Nav bottomIndex={-1} leftIndex={-1} user={user}>
+                Loading
+            </Nav>
+        )
+    }
 
     return (
         <Nav bottomIndex={-1} leftIndex={-1} user={user}>
@@ -165,22 +225,47 @@ function Transaction ({session, profiledata, txs, pooldata, transactiondata, slu
                 <div className='flex text-clip'>
                 {public_content}
                 </div>
-                {/* <button className='overflow-hidden break-words max-w-full underline' onClick={handleClick}>
-                    {private_content}
-                </button> */}
                 {private_content}
             </div>
+            {trade}
             <div className='flex justify-between items-center'>
                 <div className='mt-2 text-xs text-gray-500' >
                     created at {timestamp}
                 </div>
-                {trade}
+               
             </div>
-
-            <div className='text-black text-lg font-bold leading-7 mt-2'>
-                Trading History
-            </div>
-            <TransactionHistory slug={slug} profile={profiledata}/>
+            <TransactionHistory slug={slug} profile={profiledata} session={session} pool={profiledata} txs={txs}/>
+            {/* {JSON.stringify(transactiondata?.data?.content?.fields)} */}
+            {sellConfirm &&
+                <Drawer.Root>
+                    <Drawer.Portal>
+                        <Drawer.Overlay className="fixed inset-0 bg-black/40" />
+                            <Drawer.Content className="bg-zinc-100 flex flex-col rounded-t-[10px] h-[50%] mt-24 fixed bottom-0 left-0 right-0">
+                                <div className='p-4 bg-white'>
+                                    <button disabled className='bg-sky-800 rounded-3xl py-3 w-full'
+                                    onClick={handleSellConfirm}
+                                    >
+                                        <span className='text-white font-semibold'>Confirm</span>
+                                    </button>
+                                </div>
+                            </Drawer.Content>
+                    </Drawer.Portal>
+                </Drawer.Root>}
+            {inbalance &&
+                <Drawer.Root>
+                    <Drawer.Portal>
+                        <Drawer.Overlay className="fixed inset-0 bg-black/40" />
+                            <Drawer.Content className="bg-zinc-100 flex flex-col rounded-t-[10px] h-[50%] mt-24 fixed bottom-0 left-0 right-0">
+                                <div className='p-4 bg-white'>
+                                    <button disabled className='bg-sky-800 rounded-3xl py-3 w-full'
+                                    onClick={handleSellConfirm}
+                                    >
+                                        <span className='text-white font-semibold'>Insufficient Balance</span>
+                                    </button>
+                                </div>
+                            </Drawer.Content>
+                    </Drawer.Portal>
+                </Drawer.Root>}
             </div>
         </Nav>
     )

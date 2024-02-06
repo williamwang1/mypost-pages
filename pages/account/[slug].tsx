@@ -14,6 +14,7 @@ import { GetServerSideProps } from 'next';
 import { API_HOST } from '@/lib/api/move';
 import { ACCOUNT_LIST_ROUTE, PROFILE_GET_ROUTE, PROFILE_MUTATEDB_ROUTE } from '@/lib/api/constant';
 import { getFaucetHost, requestSuiFromFaucetV0 } from '@mysten/sui.js/faucet';
+import { getServerSession } from "next-auth";
 
 const accounts = [
     {id: 1, address: 'addressxxxxxxxx1', timestamp: 'joined 11 Sep 2021', status: 'synced'},
@@ -56,7 +57,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { props: { accounts, metadata} };
 }
 
-function NewAccount ({accounts, session, metadata} : {accounts: Account[], metadata: ProfileMedata, session: any}) {
+function NewAccount ({session, metadata} : { metadata: ProfileMedata, session: any}) {
     const { isLoading, user, localSession } = session;
 
     const [data, setData] = useState<Account[]>([])
@@ -67,6 +68,7 @@ function NewAccount ({accounts, session, metadata} : {accounts: Account[], metad
     const accountSession = useSession();
     const {mutateAsync: profile, isPending: isCreating } = useProfileMutation()
     const {mutateAsync: profileCheck, isPending: isChecking} = useProfileCheckMutation()
+    const [accounts, setAccounts] = useState<Account[]>([])
     let image = "https://abs.twimg.com/sticky/default_profile_images/default_profile.png";
     if (accountSession.data?.profile.profile_image_url_https) {
         image = accountSession.data?.user.image
@@ -82,6 +84,24 @@ function NewAccount ({accounts, session, metadata} : {accounts: Account[], metad
     let expire = accountSession.data?.expires;
     let expireDate = new Date(expire + '').toLocaleDateString();
     let status = accountSession.status;
+    let email = accountSession.data?.user.email;
+
+    useEffect(() => {
+        let fectchData = async () => {
+            console.log('in account fetch ' + email)
+            const accountsdb = await fetch(`${API_HOST}${ACCOUNT_LIST_ROUTE}`, {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email }),
+            })
+            const accounts: Account[] = await accountsdb.json()
+            console.log(JSON.stringify(accounts))
+            setAccounts(accounts)
+        }
+        fectchData()
+    },[email])
 
 
     const handleNext = async (e: any) => {
