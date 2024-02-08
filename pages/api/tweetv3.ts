@@ -36,7 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const response = await rwClient.v2.tweet(text);
     console.log(JSON.stringify(response))
     res.status(200).json({ success: true, data: response });
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 }

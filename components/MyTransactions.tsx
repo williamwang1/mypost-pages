@@ -9,9 +9,12 @@ const MyTransactions = ({slug}: {slug: string}) => {
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const isInitialRender = useRef(true);
+  const [loading, setLoading] = useState(true);
 
   const fetchData = async (currentPage: number) => {
     //console.log('in fectch data ' + currentPage)
+    setLoading(true); 
+    try {
     const transactionsdb = await fetch(`${API_HOST}/api/transactionmeta/getlist`, {
         method: 'POST',
         headers: {
@@ -27,6 +30,12 @@ const MyTransactions = ({slug}: {slug: string}) => {
       } else {
         setItems((prevItems) => [...prevItems, ...newData]);
       }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      // Handle error appropriately
+    } finally {
+      setLoading(false); // Set loading to false after fetching data
+    }
   }
 
   useEffect(() => {
@@ -43,15 +52,19 @@ const MyTransactions = ({slug}: {slug: string}) => {
       dataLength={items.length}
       next={() => setPage((prevPage) => prevPage + 1)}
       hasMore={hasMore}
-      loader={<div>Loading</div>}
+      loader={loading && <div>Loading</div>}
+      endMessage={
+        <p style={{ textAlign: 'center' }}>
+          <b>no more data</b>
+        </p>}
     >
-      <ul
+      <div
         role="list"
-        className="divide-y divide-gray-100 mt-2 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl mb-14"
+        className="divide-y divide-gray-100 mt-2 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl"
       >
             {items &&
               items.map((item) => <TransactionItem key={item.id} t={item}/>)}
-      </ul>
+      </div>
     </InfiniteScroll>
   );
 };

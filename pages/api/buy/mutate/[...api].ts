@@ -55,7 +55,7 @@ const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {
         });
       },
     });
-    return { gaslessTxBytes, gasBudget: 500_000_000 };
+    return { gaslessTxBytes, gasBudget: 200_000_000 };
 };
 
 const parseTxRes: TransactionResponseParser<TransactionResponse> = async (req, txRes, user) => {

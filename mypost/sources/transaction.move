@@ -13,14 +13,18 @@ module mypost::transaction {
     use mypost::profile::{Self, Profile, ProfilePool};
     use sui::transfer;
     use std::vector;
+    use std::debug;
 
 
     const RPOFILE_OWNER_FEE_PERCENT: u64 = 5;
+    const RPOFILE_OWNER_BUY_FEE_PERCENT: u64 = 3;
     const PROTOCOL_FEE_PERCENT: u64 = 1;
+    const PROTOCOL_BUT_FEE_PERCENT: u64 = 0;
 
     const INSUFFICIENT_FUND: u64 = 1;
     const NOT_ALLOWED_BOUGHT: u64 = 2;
     const NOT_BOUGHT: u64 = 3;
+    const NOT_ENOUGH_BALANCE: u64 = 4;
     const SUI_MIST: u64 = 1000000000;
 
     struct Transaction has key, store {
@@ -245,10 +249,10 @@ module mypost::transaction {
         let current_price = getPrice(pool.no_of_accessors);
         let value = coin::value(&payment);
         assert!(value >= current_price, INSUFFICIENT_FUND);
-        let subjectFee = current_price * RPOFILE_OWNER_FEE_PERCENT / 100;
+        let subjectFee = current_price * RPOFILE_OWNER_BUY_FEE_PERCENT / 100;
         let subject_coin = coin::split(&mut payment, subjectFee, ctx);
         transfer::public_transfer(subject_coin, sender(ctx));
-        let protocolFee = current_price * PROTOCOL_FEE_PERCENT / 100;
+        let protocolFee = current_price * PROTOCOL_BUT_FEE_PERCENT / 100;
         let protocol_coin = coin::split(&mut payment, protocolFee, ctx);
         transfer::public_transfer(protocol_coin, protocol_destination);
         let price_coin = coin::split(&mut payment, current_price - subjectFee - subjectFee, ctx);
@@ -299,14 +303,24 @@ module mypost::transaction {
         let bought = object_table::contains(&pool.accessors, sender(ctx));
         assert!(bought, NOT_BOUGHT);
 
-        let current_price = getPrice(pool.no_of_accessors);
+        let sold_price = getPrice(pool.no_of_accessors - 1);
+        debug::print(&sold_price);
+        debug::print(&pool.balance);
 
-        let price = balance::split(&mut pool.balance, current_price);
-        let subjectFee = balance::split(&mut price, current_price * RPOFILE_OWNER_FEE_PERCENT / 100);
-        let protocolFee = balance::split(&mut price, current_price * PROTOCOL_FEE_PERCENT / 100);
-        let subject_coin = coin::from_balance(subjectFee, ctx);
+        let subject_fee = sold_price * RPOFILE_OWNER_FEE_PERCENT / 100;
+        let protocol_fee = sold_price * PROTOCOL_FEE_PERCENT / 100;
+
+        let notenough = balance::value(&pool.balance) < sold_price - subject_fee - protocol_fee;
+        debug::print(&notenough);
+
+        let subject_fee_balance = balance::split(&mut pool.balance, subject_fee);
+        let protocol_fee_balance = balance::split(&mut pool.balance, protocol_fee);
+        let price = balance::split(&mut pool.balance, sold_price - subject_fee - protocol_fee);
+
+
+        let subject_coin = coin::from_balance(subject_fee_balance, ctx);
         transfer::public_transfer(subject_coin, sender(ctx));
-        let protocol_coin = coin::from_balance(protocolFee, ctx);
+        let protocol_coin = coin::from_balance(protocol_fee_balance, ctx);
         transfer::public_transfer(protocol_coin, protocol_destination);
         let price_coin = coin::from_balance(price, ctx);
         transfer::public_transfer(price_coin, sender(ctx));
@@ -321,7 +335,7 @@ module mypost::transaction {
                 transaction_id: pool.for,
                 profile_id: owner_profile_id,
                 //accessor_profile: profile_id,
-                price: current_price,
+                price: sold_price,
                 transaction_digest: string::utf8(transaction_digest),
                 seller: sender(ctx),
                 timestamp_ms: clock::timestamp_ms(clock)

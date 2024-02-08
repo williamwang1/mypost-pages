@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation'
 import Tiptap from './TipTap';
 
 
-export default function TransactionStepperPost({ accounts, step, onBackChange , summary, digest, session, paid, metadata, free}
+export default function TransactionStepperPost({accounts, step, onBackChange , summary, digest, session, paid, metadata, free}
     : 
     {accounts: Account[], step: number, 
         onBackChange: (newStep: number) => void, 
@@ -56,6 +56,16 @@ export default function TransactionStepperPost({ accounts, step, onBackChange , 
             pool: metadata.profile_pool_id,
             content: enpaid.ciphertext
         })
+
+        let text = summary + '\n' + free +  '\n' + `Check this out: https://www.example.com/transaction/${ txmetadata.txDigest }`
+
+        // const response = await fetch('/api/tweet', {
+        //     method: 'POST',
+        //     headers: {
+        //       'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({ text }),
+        //   });
         let txbody = {
             digest: txmetadata.txDigest,
             profile_id: metadata.profile_id,
@@ -70,16 +80,6 @@ export default function TransactionStepperPost({ accounts, step, onBackChange , 
             },
             body: JSON.stringify(txbody),
         })
-
-        let text = summary + '\n' + free +  '\n' + `Check this out: https://www.example.com/transaction/${ txmetadata.txDigest }`
-
-        // const response = await fetch('/api/tweet', {
-        //     method: 'POST',
-        //     headers: {
-        //       'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({ text }),
-        //   });
         
         router.push('/profile')
         //   if (data.success) {

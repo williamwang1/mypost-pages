@@ -81,6 +81,7 @@ module mypost::profile {
         initial_price: u64,
         price: u64,
         balance: Balance<SUI>,
+        owner: address,
         no_of_followers: u64,
         no_of_followings: u64,
         followers: ObjectTable<address, Follower>,
@@ -160,6 +161,7 @@ module mypost::profile {
             initial_price: 0,
             price: 0,
             balance: balance::zero(),
+            owner: sender(ctx),
             no_of_followers: 0,
             no_of_followings: 0,
             followers: object_table::new(ctx),
@@ -248,14 +250,13 @@ module mypost::profile {
     public entry fun follow(payment: Coin<SUI>, 
         protocol_destination: address,
         global: &mut Global, 
-        following_address: address,
         my_profile: &mut Profile, 
         following_pool: &mut ProfilePool, 
         follower_pool: &mut ProfilePool,
         clock: &Clock,
         ctx: &mut TxContext) {
         // make sure sender is not owner
-        let following_profile_exists = object_table::contains(&global.profiles, following_address);
+        let following_profile_exists = object_table::contains(&global.profiles, following_pool.owner);
         let follower_profile_exists = object_table::contains(&global.profiles, my_profile.owner);
         assert!(following_profile_exists, PROFILE_NOT_EXISTS);
         assert!(follower_profile_exists, PROFILE_NOT_EXISTS);
@@ -263,7 +264,7 @@ module mypost::profile {
         let following_id = object::new(ctx);
         let inner_following_id = object::uid_to_inner(&following_id);
         let inner_follower_id = object::uid_to_inner(&follower_id);
-        assert!(following_address != sender(ctx), CANNOT_FOLLOW_SELF);
+        assert!(following_pool.owner != sender(ctx), CANNOT_FOLLOW_SELF);
         let value = coin::value(&payment);
 
         let current_price = getPrice(following_pool.no_of_followers);
@@ -276,7 +277,7 @@ module mypost::profile {
         
         balance::join(&mut following_pool.balance, coin::into_balance(price_coin));
         //transfer::public_transfer(coin::split(&mut payment, current_price, ctx), object::uid_to_address(&pool.id));
-        transfer::public_transfer(coin::split(&mut payment, subjectFee, ctx), following_address);
+        transfer::public_transfer(coin::split(&mut payment, subjectFee, ctx), following_pool.owner);
         transfer::public_transfer(coin::split(&mut payment, protocolFee, ctx), protocol_destination);
         transfer::public_transfer(payment, tx_context::sender(ctx));
 
@@ -305,7 +306,7 @@ module mypost::profile {
             FollowCreated {
                 follower_id: inner_follower_id,
                 following_id: inner_following_id,
-                following: following_address,
+                following: following_pool.owner,
                 following_profile: following_pool.for,
                 follower: my_profile.owner,
                 follower_profile: object::uid_to_inner(&my_profile.id),
@@ -317,7 +318,7 @@ module mypost::profile {
         object_table::add(&mut following_pool.followers, sender(ctx), follower);
         following_pool.no_of_followers = following_pool.no_of_followers + 1;
         // update follower profile
-        object_table::add(&mut follower_pool.followings, following_address, following);
+        object_table::add(&mut follower_pool.followings, follower_pool.owner, following);
         follower_pool.no_of_followings = follower_pool.no_of_followings + 1;
         // update profile pool price
         following_pool.price = getPrice(following_pool.no_of_followers);
@@ -327,21 +328,20 @@ module mypost::profile {
     public entry fun unfollow(
         global: &Global, 
         protocol_destination: address,
-        following_address: address,
         follower_profile: &mut Profile, 
         following_pool: &mut ProfilePool, 
         follower_pool: &mut ProfilePool,
         ctx: &mut TxContext) {
             let follower = object_table::contains(&following_pool.followers, follower_profile.owner);
-            let following = object_table::contains(&follower_pool.followings, following_address);
+            let following = object_table::contains(&follower_pool.followings, following_pool.owner);
             assert!(follower, NOT_FOLLOWING);
             assert!(following, NOT_FOLLOWING);
-            let following_profile_exists = object_table::contains(&global.profiles, following_address);
+            let following_profile_exists = object_table::contains(&global.profiles, following_pool.owner);
             let follower_profile_exists = object_table::contains(&global.profiles, follower_profile.owner);
             assert!(following_profile_exists, PROFILE_NOT_EXISTS);
             assert!(follower_profile_exists, PROFILE_NOT_EXISTS);
 
-            let current_price = getPrice(following_pool.no_of_followers);
+            let current_price = getPrice(following_pool.no_of_followers - 1);
             let subjectFee = current_price * RPOFILE_OWNER_FEE_PERCENT / 100;
             let protocolFee = current_price * PROTOCOL_FEE_PERCENT / 100;
             // remove coin from pool
@@ -353,7 +353,7 @@ module mypost::profile {
             let protocol_coin = coin::from_balance(protocol, ctx);
 
             transfer::public_transfer(revenue_coin, sender(ctx));
-            transfer::public_transfer(subject_coin, following_address);
+            transfer::public_transfer(subject_coin, following_pool.owner);
             transfer::public_transfer(protocol_coin, protocol_destination);
 
             // update following profile
@@ -362,7 +362,7 @@ module mypost::profile {
             object::delete(follower_id);
             following_pool.no_of_followers = following_pool.no_of_followers - 1;
             // update follower profile
-            let followingnft = object_table::remove(&mut follower_pool.followings, following_address);
+            let followingnft = object_table::remove(&mut follower_pool.followings, following_pool.owner);
             let Following {id: following_id, following_profile: _, price: _, timestamp_ms: _} = followingnft;
             object::delete(following_id);
             follower_pool.no_of_followings = follower_pool.no_of_followings - 1;

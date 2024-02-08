@@ -48,16 +48,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     const accounts: Account[] = await accountsdb.json()
     
-    // const transactionsdb = await fetch(`${API_HOST}/api/transactionmeta/getlist`, {
-    //     method: 'POST',
-    //     headers: {
-    //     'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({ slug }),
-    // })
-
-    // const transactions = await transactionsdb.json();
-    // console.log(JSON.stringify(transactionsdb))
 
     return { props: { metadata,  profiledata , profilepool, accounts, slug } };
 };
@@ -67,6 +57,7 @@ const tabs = [
     // {id: 2, name: 'Assets', component: <MyAssets/>, url: '/profile/asset'},
     {id: 1, name: 'Followings'},
     {id: 2, name: 'Followers'},
+    {id: 3, name: 'Activities'}
 ]
 
 function Profile({metadata, session, profiledata, profilepool, accounts, slug} 

@@ -17,8 +17,8 @@ export default function ProfileSummary({ summary, pool, metadata, accounts, user
     let address = summary?.content?.fields?.owner
     let username = summary?.content?.fields?.name
     let bio = summary?.content?.fields?.bio
-    let followers = summary?.content?.fields?.no_of_followers
-    let followings = summary?.content?.fields?.no_of_followings
+    let followers = pool?.content?.fields?.no_of_followers
+    let followings = pool?.content?.fields?.no_of_followings
     let price = pool?.content?.fields?.price
     let timestamp = <time>{metadata?.create_at?.toString().substring(0,10)}</time>;
     let icons : string[] = [];

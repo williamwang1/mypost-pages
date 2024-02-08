@@ -97,14 +97,14 @@ export default function TransactionHistory({slug, profile, session, pool, txs}:
                 </p>
                 }
             >
-                <ul
+                <div
                 role="list"
                 className="divide-y divide-gray-100 mt-2 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl"
                  >
                     {items && items.map((transaction) => (
                         <TransactionHistoryItem transaction={transaction} key={transaction.id} profile={profile}/>
                     ))}
-                </ul>
+                </div>
             </InfiniteScroll>
             
         {/* </table> */}

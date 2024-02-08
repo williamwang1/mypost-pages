@@ -59,7 +59,7 @@ export default function FollowingItem({f} : {f: FollowData}) {
           </div>
       </li>
       <div className="text-sm leading-relaxed text-gray-900 mt-2">{bio}</div>
-          <p className="mt-1 text-xs leading-5 text-gray-500">
+          <p className="mt-1 text-xs leading-5 text-gray-500 px-2">
               submitted {timestamp}
           </p>
     </div>

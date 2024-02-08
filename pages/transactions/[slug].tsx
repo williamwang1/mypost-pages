@@ -12,6 +12,7 @@ import { Account } from "@/types/auth";
 import TransactionStepperPublic from '@/components/TransactionStepperPublic';
 import TransactionStepperPaid from '@/components/TransactionStepperPaid';
 import TransactionStepperPost from '@/components/TransactionStepperPost';
+import { useSession } from 'next-auth/react';
 
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -55,7 +56,8 @@ function Transactions({session, accounts, metadata } : {session: any, accounts: 
     const [digest, setDigest] = React.useState('');
     const [paid, setPaid] = React.useState('');
     const [price, setPrice] = React.useState(1);
-
+    const accountSession = useSession();
+    let email = accountSession.data?.user.email;
 
 
     const handleFreeChange = (newFree: string) => {
@@ -65,7 +67,7 @@ function Transactions({session, accounts, metadata } : {session: any, accounts: 
     }
 
     const handlePaiChange = (value: any) => {
-        console.log(value)
+        //console.log(value)
         setPaid(value)
     }
 

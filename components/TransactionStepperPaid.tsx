@@ -4,10 +4,6 @@ import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic';
 import Tiptap from './TipTap';
 
-const QuillNoSSRWrapper = dynamic(
-    () => import('react-quill'), // Replace 'react-quill' with your Quill import
-    { ssr: false } // This line is important. It disables server-side rendering for this component
-);
 
 export default function TransactionStepperPaid({paid, onPaidChange, step, onBackChange, onPaidNextChange, free}
      : {paid: string, onPaidChange: (newPaid: any) => void, 
@@ -16,20 +12,7 @@ export default function TransactionStepperPaid({paid, onPaidChange, step, onBack
         free: string
     }) {
 
-    const  modules  = {
-        toolbar: [
-            [{ font: [] }],
-            [{ header: [1, 2, 3, 4, 5, 6, false] }],
-            ["bold", "italic", "underline", "strike"],
-            [{ color: [] }, { background: [] }],
-            [{ script:  "sub" }, { script:  "super" }],
-            ["blockquote", "code-block"],
-            [{ list:  "ordered" }, { list:  "bullet" }],
-            [{ indent:  "-1" }, { indent:  "+1" }, { align: [] }],
-            ["link", "image", "video"],
-            ["clean"],
-        ],
-    };
+
     let digest = free + '<br/><br/>' + "<a href='www.mypost.money/transaction/<transaction digest>'>transaction digest</h1>"
 
 

@@ -64,14 +64,14 @@ export default function MyFollowings({slug}: {slug: string}) {
         <b>no more data</b>
       </p>}
     >
-    <ul
+    <div
       role="list"
       className="divide-y divide-gray-100 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl"
     >
       {items && items.map((f) => (
         <FollowingItem f={f} key={f.id}/>
       ))}
-    </ul>
+    </div>
     </InfiniteScroll>
   )
 }

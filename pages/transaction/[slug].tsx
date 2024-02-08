@@ -17,6 +17,8 @@ import Tiptap from '@/components/TipTap';
 import { AccessHistory } from '@/types/transaction';
 import { useBuyMutation, useSellMutation } from '@/lib/hooks/api';
 import {Drawer} from 'vaul';
+import { SUI_MIST } from '@/lib/constant';
+import { useSession } from 'next-auth/react';
 
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -73,7 +75,11 @@ function Transaction ({session, profiledata, txs, pooldata, transactiondata, slu
     let timestamp = <time>{txs[0].create_at?.toString().substring(0,10)}</time>;
     let summary = txs[0].summary;
     let public_content = txs[0].public_content;
-    let price = pooldata?.data?.content?.fields.price
+    let price = pooldata?.data?.content?.fields.price 
+    let decimalPrice = "0";
+    if (price > 0) {
+        decimalPrice = (price / SUI_MIST).toFixed(4)
+    }
     const [loading, setLoaiding] = useState(true);
     const [bought, setBought] = useState(false);
     const [unlock, setUnlock] = useState(false);
@@ -125,11 +131,14 @@ function Transaction ({session, profiledata, txs, pooldata, transactiondata, slu
             pool: txs[0].pool_id
         })
         console.log('in buy ' + JSON.stringify(buyMeta))
+        setBought(true)
         setLoaiding(false)
     }
 
     const handleSellConfirm = async () => {
+        console.log('in handle sell')
         setLoaiding(true)
+        console.log('in sell confirm ' + txs[0].pool_id + ' ' + txs[0].digest)
         let sellMeta = await sell({
             keyPair: localSession.ephemeralKeyPair,
             protocol_destination: user.wallet,
@@ -148,7 +157,7 @@ function Transaction ({session, profiledata, txs, pooldata, transactiondata, slu
         
     }
 
-    let private_content = (<button className='overflow-hidden break-words max-w-full underline' onClick={handleClick}>
+    let private_content = (<button className='overflow-hidden break-words max-w-full underline hover:text-gray-500' onClick={handleClick}>
                             {encrypt_content}
                             </button>)
     if (unlock) {
@@ -189,9 +198,28 @@ function Transaction ({session, profiledata, txs, pooldata, transactiondata, slu
                     <button className='bg-sky-400 rounded-3xl px-2 hover:bg-sky-800' onClick={handleReply}>
                         <span className='text-center text-white text-normal font-semibold leading-relaxed px-2 py-2'>Reply</span>
                     </button>
-                    <button className='bg-sky-400 rounded-3xl px-2 hover:bg-sky-800' onClick={() => setSellConfirm(true)}>
-                        <span className='text-center text-white text-normal font-semibold leading-relaxed px-2 py-2 '>Sell</span>
-                    </button>
+                    <Drawer.Root>
+                        <Drawer.Trigger>
+                            <button className='bg-sky-400 rounded-3xl px-2 hover:bg-sky-800' onClick={() => setSellConfirm(true)}>
+                                <span className='text-center text-white text-normal font-semibold leading-relaxed px-2 py-2 '>Sell</span>
+                            </button>
+                        </Drawer.Trigger>
+                        <Drawer.Portal>
+                            <Drawer.Overlay className="fixed inset-0 bg-black/40" />
+                                <Drawer.Content className="bg-zinc-100 flex flex-col rounded-t-[10px] h-[50%] fixed bottom-0 left-0 right-0">
+                                    <button className='p-4 bg-white'>
+                                        <div>bought price</div>
+                                        <div>current price</div>
+                                        <div className='bg-sky-500 rounded-3xl py-1 w-full hover:bg-sky-800'
+                                        onClick={handleSellConfirm}
+                                        >
+                                            <span className='text-white font-semibold'>Confirm</span>
+                                        </div>
+                                    </button>
+                                </Drawer.Content>
+                        </Drawer.Portal>
+                    </Drawer.Root>
+
                 </div>
     }
     if (loading) {
@@ -215,7 +243,7 @@ function Transaction ({session, profiledata, txs, pooldata, transactiondata, slu
                 </div>
                 <div className='bg-white rounded-3xl flex items-center px-2 gap-x-2'>
                     <Image src='/images/sui.png' alt='WW' width={25} height={25} className='py-1'/>
-                    <span className='text-center text-sky-500 text-base font-medium leading-relaxed'>{price}</span>
+                    <span className='text-center text-sky-500 text-base font-medium leading-relaxed'>{decimalPrice}</span>
                 </div>
             </div>
             <div className='mt-5 text-gray-900 leading-relaxed text-base w-4/5'>
@@ -226,13 +254,16 @@ function Transaction ({session, profiledata, txs, pooldata, transactiondata, slu
                 {public_content}
                 </div>
                 {private_content}
+                {JSON.stringify(pooldata.data.content.fields)}
             </div>
-            {trade}
-            <div className='flex justify-between items-center'>
+            <div className='flex mt-2 justify-end'>
+                {trade}
+            </div>
+            
+            <div className='flex justify-end items-center'>
                 <div className='mt-2 text-xs text-gray-500' >
                     created at {timestamp}
                 </div>
-               
             </div>
             <TransactionHistory slug={slug} profile={profiledata} session={session} pool={profiledata} txs={txs}/>
             {/* {JSON.stringify(transactiondata?.data?.content?.fields)} */}

@@ -39,7 +39,7 @@ const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {
         });
       },
     });
-    return { gaslessTxBytes, gasBudget: 500_000_000 };
+    return { gaslessTxBytes, gasBudget: 200_000_000 };
 };
 
 const parseTxRes: TransactionResponseParser<TransactionResponse> = async (_, txRes, user) => {
@@ -47,7 +47,7 @@ const parseTxRes: TransactionResponseParser<TransactionResponse> = async (_, txR
     const event = first(txRes.events);
     if (!event) throw new Error("Event missing from tx response");
 
-    let accessSold = txRes.events?.at(1)?.parsedJson as AccessSold;
+    let accessSold = txRes.events?.at(0)?.parsedJson as AccessSold;
     let soldbody = {
         digest: txRes.digest,
         access_id: accessSold.access_id,
