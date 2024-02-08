@@ -15,7 +15,6 @@ import {
 } from "@shinami/nextjs-zklogin/client";
 import { useRouter } from "next/router";
 import { Google, LoadingDots } from "@/components/icons";
-import Auth from "./Auth";
 import { API_HOST } from "@/lib/api/move";
 
 
