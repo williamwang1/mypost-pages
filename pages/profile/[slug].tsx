@@ -90,7 +90,7 @@ function Profile({metadata, session, profiledata, profilepool, accounts, slug}
                                 <button className={ selected ? 'text-sky-400 text-normal font-bold border-b-2 border-sky-500 focus:outline-none' : 'text-gray-900 text-normal font-normal leading-relaxed' }
                                     //onClick={() => router.push(`${tab.url}`)}
                                     onClick={() => {
-                                        console.log(tab.id)
+                                        //console.log(tab.id)
                                         setActiveIndex(tab.id)
                                     }}
                                 >

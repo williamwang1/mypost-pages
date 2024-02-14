@@ -40,13 +40,12 @@ const MyTransactions = ({slug}: {slug: string}) => {
   }
 
   useEffect(() => {
-    if (isInitialRender.current) {
-      isInitialRender.current = false;
-      return;
-    }
+    // if (isInitialRender.current) {
+    //   isInitialRender.current = false;
+    //   return;
+    // }
     const getData = async (currentPage: number) => {
-      //console.log('in fectch data ' + currentPage)
-      setLoading(true); 
+      console.log('in my transaction ' + currentPage)
       try {
       const transactionsdb = await fetch(`${API_HOST}/api/transactionmeta/getlist`, {
           method: 'POST',
@@ -64,6 +63,7 @@ const MyTransactions = ({slug}: {slug: string}) => {
           setItems((prevItems) => [...prevItems, ...newData]);
         }
         setPage((prevPage) => prevPage + 1)
+        console.log('in my transaction ' + JSON.stringify(newData))
       } catch (error) {
         console.error("Error fetching data:", error);
         // Handle error appropriately

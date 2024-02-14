@@ -10,7 +10,7 @@ export default async function handler(
         let offset = pageNumber * pageSzie;
 
         try {
-            //console.log(req.body.slug)
+            console.log('in transaction list ' + req.body.slug)
             let transactions = await prisma.$queryRaw`select t.id, t.Digest, t.Summary, t.Public_content, t.Address, 
             t.Profile_id, t.Create_at, tm.Transaction_id, tm.Pool_id, tm.address, tm.Package_id 
             from "Transaction" t, "TransactionMeta" tm
