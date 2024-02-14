@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import TransactionItem from "./TransactionItem";
 import { API_HOST } from '@/lib/api/move';
@@ -30,6 +30,7 @@ const MyTransactions = ({slug}: {slug: string}) => {
       } else {
         setItems((prevItems) => [...prevItems, ...newData]);
       }
+      setPage((prevPage) => prevPage + 1)
     } catch (error) {
       console.error("Error fetching data:", error);
       // Handle error appropriately
@@ -40,17 +41,44 @@ const MyTransactions = ({slug}: {slug: string}) => {
 
   useEffect(() => {
     if (isInitialRender.current) {
-        isInitialRender.current = false;
-        return;
+      isInitialRender.current = false;
+      return;
+    }
+    const getData = async (currentPage: number) => {
+      //console.log('in fectch data ' + currentPage)
+      setLoading(true); 
+      try {
+      const transactionsdb = await fetch(`${API_HOST}/api/transactionmeta/getlist`, {
+          method: 'POST',
+          headers: {
+          'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ slug, currentPage }),
+        })
+    
+        const newData : TransactionList[] = await transactionsdb.json();
+        //console.log('in fetch data ' + JSON.stringify(newData))
+        if (newData.length === 0) {
+          setHasMore(false);
+        } else {
+          setItems((prevItems) => [...prevItems, ...newData]);
+        }
+        setPage((prevPage) => prevPage + 1)
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        // Handle error appropriately
+      } finally {
+        setLoading(false); // Set loading to false after fetching data
       }
-    fetchData(page);
-  }, [page]);
+    }
+    getData(1);
+  }, [slug]);
 
 
   return (
     <InfiniteScroll
       dataLength={items.length}
-      next={() => setPage((prevPage) => prevPage + 1)}
+      next={() => fetchData(page)}
       hasMore={hasMore}
       loader={loading && <div>Loading</div>}
       endMessage={

@@ -9,7 +9,9 @@ import { ProfileMedata } from '@/types/profile';
 import { ACCOUNT_LIST_ROUTE, PROFILE_GET_ROUTE, TRANSACTION_MUTATEDB_ROUTE } from '@/lib/api/constant';
 import { API_HOST } from '@/lib/api/move';
 import { useRouter } from 'next/navigation'
+import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline'
 import Tiptap from './TipTap';
+import PriceTooltip from './PriceTooltip';
 
 
 export default function TransactionStepperPost({accounts, step, onBackChange , summary, digest, session, paid, metadata, free}
@@ -121,14 +123,14 @@ export default function TransactionStepperPost({accounts, step, onBackChange , s
         <div className='px-2'>
                  <StepperPreview/>
                  <div className="grid grid-cols-6 mt-2">
-                     <div className="col-start-1 col-end-7">
+                     {/* <div className="col-start-1 col-end-7">
                          <label htmlFor="summary" className="block text-base font-bold leading-6 text-gray-900">
                              Summary
                          </label>
                          <div className="mt-2">
                              <label>{summary}</label>
                          </div>
-                     </div>
+                     </div> */}
                  </div>
                  <div className='bg-white shadow-md'>
                      <Tab.Group defaultIndex={0} >
@@ -148,6 +150,9 @@ export default function TransactionStepperPost({accounts, step, onBackChange , s
                         <Tab.Panels className='pt-2'>
                         {tabs.map((tab) => (
                             <Tab.Panel key={tab.id}>
+                                <div className="mt-2">
+                                    <label>{summary}</label>
+                                </div>
                                 <div className='mt-2 pb-2'>
                                     <Tiptap content={digest} readOnly={true} onChange={undefined} />
                                 </div>
@@ -156,16 +161,21 @@ export default function TransactionStepperPost({accounts, step, onBackChange , s
                         </Tab.Panels>
                     </Tab.Group>
                 </div>
-                <div className="flex flex-1 items-center mt-2 gap-x-2">
+                <div className="flex mt-4 gap-x-2">
                     <label htmlFor="price" className="text-base font-bold leading-6 text-gray-900">
                         Price
                     </label>
                     <label htmlFor="price" className="text-base font-normal leading-6 text-gray-500">
-                        0.01
+                        0
                     </label>
                     <label htmlFor="price" className="text-base font-bold leading-6 text-gray-900">
                         SUI
                     </label>
+                    <div className=''>
+                    {/* <QuestionMarkCircleIcon className='h-5 w-5 shrink-0 text-sky-500'/> */}
+                    <PriceTooltip/>
+                    </div>
+                    
                 </div>
                 <div className="flex flex-col flex-1 mt-5">
                     <div className="flex justify-between mt-28 px-4 mb-16">

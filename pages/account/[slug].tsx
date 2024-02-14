@@ -40,6 +40,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         headers: {
         'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ slug }),
     })
     const accounts: Account[] = await accountsdb.json()
 
@@ -57,7 +58,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { props: { accounts, metadata} };
 }
 
-function NewAccount ({session, metadata} : { metadata: ProfileMedata, session: any}) {
+function NewAccount ({session, metadata, accounts} : { metadata: ProfileMedata, session: any, accounts: Account[]}) {
     const { isLoading, user, localSession } = session;
 
     const [data, setData] = useState<Account[]>([])
@@ -68,40 +69,44 @@ function NewAccount ({session, metadata} : { metadata: ProfileMedata, session: a
     const accountSession = useSession();
     const {mutateAsync: profile, isPending: isCreating } = useProfileMutation()
     const {mutateAsync: profileCheck, isPending: isChecking} = useProfileCheckMutation()
-    const [accounts, setAccounts] = useState<Account[]>([])
+    // const [accounts, setAccounts] = useState<Account[]>([])
     let image = "https://abs.twimg.com/sticky/default_profile_images/default_profile.png";
-    if (accountSession.data?.profile.profile_image_url_https) {
-        image = accountSession.data?.user.image
+    if (accounts && accounts.length > 0) {
+        image = accounts[0].image as string
     }
     let username = 'mm'
-    if(accountSession.data?.user.name) {
-        username = accountSession.data?.user.name
+    if(accounts && accounts.length > 0) {
+        username = accounts[0].name
     }
-    let bio = ''
-    if (accountSession.data?.profile?.description) {
-        bio = accountSession.data?.profile?.description
+    // let bio = ''
+    // if (accounts && accounts.length > 0) {
+    //     bio = accounts[0].
+    // }
+    let create_at = ''
+    if(accounts && accounts.length > 0) {
+        create_at = accounts[0].create_at.substring(0,10)
     }
-    let expire = accountSession.data?.expires;
-    let expireDate = new Date(expire + '').toLocaleDateString();
-    let status = accountSession.status;
-    let email = accountSession.data?.user.email;
+    // let expire = accounts[0].expires_at
+    // let expireDate = new Date(expire + '').toLocaleDateString();
+    // let status = accounts[0].status;
+    // let email = accounts[0].email;
 
-    useEffect(() => {
-        let fectchData = async () => {
-            console.log('in account fetch ' + email)
-            const accountsdb = await fetch(`${API_HOST}${ACCOUNT_LIST_ROUTE}`, {
-                method: 'POST',
-                headers: {
-                'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email }),
-            })
-            const accounts: Account[] = await accountsdb.json()
-            console.log(JSON.stringify(accounts))
-            setAccounts(accounts)
-        }
-        fectchData()
-    },[email])
+    // useEffect(() => {
+    //     let fectchData = async () => {
+    //         console.log('in account fetch ' + email)
+    //         const accountsdb = await fetch(`${API_HOST}${ACCOUNT_LIST_ROUTE}`, {
+    //             method: 'POST',
+    //             headers: {
+    //             'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify({email}),
+    //         })
+    //         const accounts: Account[] = await accountsdb.json()
+    //         //sconsole.log(JSON.stringify(accounts))
+    //         setAccounts(accounts)
+    //     }
+    //     fectchData()
+    // },[email])
 
 
     const handleNext = async (e: any) => {
@@ -119,6 +124,7 @@ function NewAccount ({session, metadata} : { metadata: ProfileMedata, session: a
             let body = {
                 package_id: `${MYPOST_MOVE_PACKAGE_ID}`,
                 profile_id: check.profile_id,
+                digest: check.txDigest,
                 profile_meta_id: check.meta_id,
                 profile_pool_id: check.pool_id,
                 global_id: `${GLOBAL_OBJECT_ID}`,
@@ -139,7 +145,7 @@ function NewAccount ({session, metadata} : { metadata: ProfileMedata, session: a
         } else {
             const result = await profile({
                 name: username,
-                bio: bio,
+                bio: '',
                 avatar: image,
                 global: `${GLOBAL_OBJECT_ID}`,
                 keyPair: localSession.ephemeralKeyPair,
@@ -192,29 +198,31 @@ function NewAccount ({session, metadata} : { metadata: ProfileMedata, session: a
             <div className=''>
                 <AccountHeader user={user}/>
                 <div className='grid grid-cols-1'>
-                {accounts?.map((a: Account) => (
+                {/* {accounts && JSON.stringify(accounts)} */}
+                {accounts && accounts.map((a: Account) => (
                     <div key={a.id} className='flex flex-1 gap-x-3 mt-3 items-center'>
                         <div className='w-12 h-12'>
-                            <Image alt='Avatar' src={'' + image}  width={40} height={40} className="rounded-full"/>
+                            <Image alt='Avatar' src={image}  width={40} height={40} className="rounded-full"/>
                         </div>
                         <div className='flex flex-1 justify-between items-center'>
                             <div>
                                 <div className="text-normal leading-relaxed ">{username}</div>
                                 <div className='text-xs text-pretty text-slate-900 leading-relaxed'>
-                                    expires at <time dateTime={expire + ''}>{expireDate}</time>
+                                    created at <time dateTime={create_at}>{create_at}</time>
                                 </div>
                             </div>
                             <div>
                                 <div className="text-normal font-semibold">{a.provider}</div>
-                                <div className="text-xs text-pretty text-slate-900 leading-relaxed ">{status}</div>
+                                {/* <div className="text-xs text-pretty text-slate-900 leading-relaxed ">{a.status}</div> */}
                             </div>
-                            
                         </div>
                     </div> 
                 ))}
                 </div>
                 <AccountAdd user={user}/>
             </div>
+            {/* {JSON.stringify(accounts[0].status)}
+            {JSON.stringify(accounts[0].expires_at)} */}
             <div className='flex flex-col gap-y-2 fixed bottom-0 w-4/5'>
                 <div className="flex flex-1 justify-between w-full">
                     <button className="px-4 py-2 bg-white rounded-md border border-gray-300 justify-center items-center gap-2.5 inline-flex text-sm font-semibold leading-6 text-gray-900">

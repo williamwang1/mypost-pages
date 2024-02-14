@@ -114,8 +114,11 @@ model Profile {
 
 model Account {
   id                String  @id @default(cuid())
-  userId            String
-  type              String
+  name              String?
+  email             String?
+  emailVerified     Boolean?
+  image             String?
+  type              String?
   provider          String
   oauth_token       String?
   oauth_token_secret String?
@@ -127,37 +130,14 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  address           String
+  create_at         DateTime
+  profile           String? @db.Text
   status            Boolean @default(true)
-
-  @@unique([provider, providerAccountId])
-  @@index([userId])
+  @@unique([providerAccountId, provider, address, status])
 }
 
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
-}
 
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-}
 
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
 
-  @@unique([identifier, token])
-}

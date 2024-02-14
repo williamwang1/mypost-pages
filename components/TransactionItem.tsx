@@ -14,21 +14,14 @@ export default function TransactionItem({t} : {t: TransactionDetails}) {
             <p className='text-sm leading-relaxed text-gray-900 mt-2 break-all'>
               {t.summary}
             </p>
-            <div className="flex flex-col">
+            <div className="flex justify-between">
               {/* <p className="text-sm leading-6 text-gray-900">{t.account}</p> */}
-              {t.create_at ? (
                 <p className="mt-1 text-xs leading-5 text-gray-500">
                   submitted {timestamp}
                   {/* submitted <time dateTime={t.create_at}>{t.create_at}</time> */}
                 </p>
-              ) : (
-                <div className="mt-1 flex items-center gap-x-1.5">
-                  <div className="flex-none rounded-full bg-emerald-500/20 p-1">
-                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  </div>
-                  <p className="text-xs leading-5 text-gray-500">submitted just now</p>
+                <div>
                 </div>
-              )}
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-x-4">

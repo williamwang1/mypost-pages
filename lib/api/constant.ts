@@ -2,6 +2,8 @@
 
 export const ACCOUNT_LIST_ROUTE = '/api/account/getlist';
 
+export const ACCOUNT_MUTATE_ROUTE = '/api/account/mutate';
+
 export const PROFILE_GET_ROUTE = '/api/profile/get';
 
 export const TRANSACTION_MUTATEDB_ROUTE = '/api/transaction/mutatedb'

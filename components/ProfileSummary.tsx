@@ -8,6 +8,7 @@ import { GetServerSideProps } from 'next';
 import { API_HOST } from '@/lib/api/move';
 import { ACCOUNT_LIST_ROUTE } from '@/lib/api/constant';
 import { Account } from '@/types/auth';
+import { SUI_MIST } from '@/lib/constant';
 
 
 export default function ProfileSummary({ summary, pool, metadata, accounts, user}: {summary: any, pool: any, metadata: ProfileMedata, accounts: Account[], user: any}) {
@@ -20,6 +21,9 @@ export default function ProfileSummary({ summary, pool, metadata, accounts, user
     let followers = pool?.content?.fields?.no_of_followers
     let followings = pool?.content?.fields?.no_of_followings
     let price = pool?.content?.fields?.price
+    if (price > 0) {
+        price = (price / SUI_MIST).toFixed(4)
+    }
     let timestamp = <time>{metadata?.create_at?.toString().substring(0,10)}</time>;
     let icons : string[] = [];
     if (accounts && accounts.length > 0) {

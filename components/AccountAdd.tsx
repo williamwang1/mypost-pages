@@ -43,7 +43,7 @@ export default function AccountAdd({ user }: { user: ZkLoginUser}) {
     }
 
     const handleConfirm = () => {
-        signIn("twitter", { callbackUrl: `${API_HOST}/account/${user.wallet}` })
+        signIn("twitter", { callbackUrl: `${API_HOST}/account/${user.wallet}`}, `${user.wallet}`)
     }
     let button = null
     // console.log('select' + JSON.stringify(selected))

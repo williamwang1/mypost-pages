@@ -25,8 +25,11 @@ declare module "next-auth" {
 
 interface Account {
   id: string,
-  userId: string,
-  type: string,
+  name: string,
+  email: string | null,
+  emailVerified: boolean | null,
+  image: string | null,
+  type: string | null,
   provider: string,
   oauth_token: string | null,
   oauth_token_secret: string | null,
@@ -38,6 +41,10 @@ interface Account {
   scope: string | null;
   id_token: string | null;
   session_state: string | null,
+  address: string,
+  create_at: string,
+  status: boolean
+
 }
 
 interface ProfileMetadata {

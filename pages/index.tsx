@@ -5,15 +5,12 @@ import { useZkLoginSession } from "@shinami/nextjs-zklogin/client";
 import { useSession } from "next-auth/react";
 
 export default function Home() {
-  const { user, isLoading } = useZkLoginSession();
-  const accountSession = useSession();
     return (
       <div className='flex flex-1 flex-col container w-screen'>
       {/* <ConnectWallet/> */}
         <HeaderMarketing/>
         <Hero/>
         <Footer/>
-        {JSON.stringify(accountSession.data?.user.email)}
       </div>
     )
 }

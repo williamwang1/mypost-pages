@@ -14,14 +14,11 @@ export default async function handler(
     // if (!session.user) {
     //     return res.status(401).json({ error: "Unauthorized" });
     // }
-    console.log('in account list ' + req.body.email)
-    let email = req.body.email
+    //console.log('in account list ' + req.body.slug)
+    let address = req.body.slug
     try {
-        let accounts = await prisma.$queryRaw`select u.email, u.image, a.id as "AccountId", a.type,
-        a.provider, a.status 
-        from "User" u, "Account" a
-        where a."userId" = u.id and u.email = ${email} and a.status = true;
-        `
+        let accounts = await prisma.$queryRaw`select *
+        from "Account" a where address = ${address} and status =true`
         //const accounts: Account[] = await prisma.account.findMany();
         res.status(200).json( accounts )
       } catch (err) {

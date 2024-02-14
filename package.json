@@ -17,6 +17,7 @@
     "@prisma/client": "5.7.1",
     "@radix-ui/react-icons": "^1.3.0",
     "@radix-ui/react-popover": "^1.0.7",
+    "@radix-ui/react-tooltip": "^1.0.7",
     "@shinami/clients": "^0.7.2",
     "@shinami/nextjs-zklogin": "^0.2.2",
     "@tanstack/react-query": "^5.17.5",

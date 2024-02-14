@@ -75,10 +75,11 @@ function Transaction ({session, profiledata, txs, pooldata, transactiondata, slu
     let timestamp = <time>{txs[0].create_at?.toString().substring(0,10)}</time>;
     let summary = txs[0].summary;
     let public_content = txs[0].public_content;
-    let price = pooldata?.data?.content?.fields.price 
+    let initialPrice = pooldata?.data?.content?.fields.price
+    //let numberofBought = pooldata?.data?.content?.fields.no_of_accessors
     let decimalPrice = "0";
-    if (price > 0) {
-        decimalPrice = (price / SUI_MIST).toFixed(4)
+    if (initialPrice > 0) {
+        decimalPrice = (initialPrice / SUI_MIST).toFixed(4)
     }
     const [loading, setLoaiding] = useState(true);
     const [bought, setBought] = useState(false);
@@ -86,6 +87,8 @@ function Transaction ({session, profiledata, txs, pooldata, transactiondata, slu
     const [plaintext, setPlaintext] = useState('');
     const [sellConfirm, setSellConfirm] = useState(false);
     const [inbalance, setInbalance] = useState(false);
+    const [price, setPrice] = useState(initialPrice)
+    const [numberofBought, setnumberofBought] = useState(1)
     const {mutateAsync: buy, isPending: isCreating } = useBuyMutation();
     const {mutateAsync: sell, isPending: isSellCreating } = useSellMutation();
     let encrypt_content = transactiondata?.data?.content?.fields?.content
@@ -178,20 +181,43 @@ function Transaction ({session, profiledata, txs, pooldata, transactiondata, slu
                 body: JSON.stringify(checkBody),
             })
             const accessCheck : AccessHistory[] = await accessCheckB.json();
-            console.log('in history client ' + JSON.stringify(accessCheck))
+            //console.log('in history client ' + JSON.stringify(accessCheck))
             if (accessCheck.length > 0) {
                 setBought(true)
+            }
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            pooldata = await sui.getObject({
+                id: txs[0].pool_id,
+                options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 
+            })
+            if (pooldata) {
+                console.log('in transaction ' + pooldata?.data?.content?.fields.price)
+                console.log('in transaction ' + pooldata?.data?.content?.fields.no_of_accessors)
+                setPrice(pooldata?.data?.content?.fields.price)
+                setnumberofBought(pooldata?.data?.content?.fields.no_of_accessors)
             }
             setLoaiding(false);
         }
         fetchData()
     }, [slug, user.wallet])
 
-    let trade = <button className='bg-sky-400 rounded-3xl px-2 hover:bg-sky-800' onClick={handleBuy}>
-                <span className='text-center text-white text-normal font-semibold leading-relaxed px-2 py-2'>Buy</span>
-            </button>
+    let trade = <div className='flex gap-x-2'>
+                    <button className='bg-sky-200 disable rounded-3xl px-2' onClick={handleRepost}>
+                        <span className='text-center text-white text-normal font-semibold leading-relaxed px-2 py-2 '>Repost</span>
+                    </button>
+                    <button className='bg-sky-200 disable rounded-3xl px-2' onClick={handleReply}>
+                        <span className='text-center text-white text-normal font-semibold leading-relaxed px-2 py-2'>Reply</span>
+                    </button>
+                    <button className='bg-sky-200 disable rounded-3xl px-2' onClick={() => setSellConfirm(true)}>
+                        <span className='text-center text-white text-normal font-semibold leading-relaxed px-2 py-2 '>Sell</span>
+                    </button>
+                    <button className='bg-sky-400 rounded-3xl px-2 hover:bg-sky-800' onClick={handleBuy}>
+                        <span className='text-center text-white text-normal font-semibold leading-relaxed px-2 py-2'>Buy</span>
+                    </button>
+                </div>
+
     if (bought) {
-        trade = <div className='flex gap-x-2'>
+        trade = <div className='flex gap-x-2 justify-evenly'>
                     <button className='bg-sky-400 rounded-3xl px-2 hover:bg-sky-800' onClick={handleRepost}>
                         <span className='text-center text-white text-normal font-semibold leading-relaxed px-2 py-2 '>Repost</span>
                     </button>
@@ -219,7 +245,9 @@ function Transaction ({session, profiledata, txs, pooldata, transactiondata, slu
                                 </Drawer.Content>
                         </Drawer.Portal>
                     </Drawer.Root>
-
+                    <button className='bg-sky-200 rounded-3xl px-2 disable'>
+                        <span className='text-center text-white text-normal font-semibold leading-relaxed px-2 py-2'>Buy</span>
+                    </button>
                 </div>
     }
     if (loading) {
@@ -233,18 +261,26 @@ function Transaction ({session, profiledata, txs, pooldata, transactiondata, slu
     return (
         <Nav bottomIndex={-1} leftIndex={-1} user={user}>
             <div className='px-2 mt-2'>
-            <div className='flex flex-1 justify-between'>
-                <div className='flex flex-1 gap-x-2'>
+            <div className='flex justify-between'>
+                <div className='flex gap-x-2'>
                     <Image src={avatar} alt='WW' width={50} height={50} className='rounded-full border-white'/>
                     <div>
                         <div className='text-sm font-semibold leading-6 text-gray-900'>{name}</div>
                         <div className='text-gray-500 text-xs font-normal leading-relaxed truncate max-w-20'>{address}</div>
                     </div>
                 </div>
-                <div className='bg-white rounded-3xl flex items-center px-2 gap-x-2'>
-                    <Image src='/images/sui.png' alt='WW' width={25} height={25} className='py-1'/>
-                    <span className='text-center text-sky-500 text-base font-medium leading-relaxed'>{decimalPrice}</span>
+                <div>
+                    <div className='bg-white rounded-3xl flex items-center px-2 gap-x-2'>
+                        <Image src='/images/sui.png' alt='WW' width={25} height={25} className='py-1'/>
+                        <span className='text-center text-sky-500 text-base font-medium leading-relaxed'>{decimalPrice}</span>
+                    </div>
+                     <div className='flex pl-3 gap-x-2'>
+                        <div className='text-sky-500 text-base font-medium leading-relaxed'>{numberofBought}</div>
+                        <div className='text-base font-semibold leading-relaxed text-gray-400'>bought</div>
+                    </div>
                 </div>
+
+                
             </div>
             <div className='mt-5 text-gray-900 leading-relaxed text-base w-4/5'>
                 <div className='flex text-clip'>
@@ -254,16 +290,15 @@ function Transaction ({session, profiledata, txs, pooldata, transactiondata, slu
                 {public_content}
                 </div>
                 {private_content}
-                {JSON.stringify(pooldata.data.content.fields)}
-            </div>
-            <div className='flex mt-2 justify-end'>
-                {trade}
-            </div>
-            
-            <div className='flex justify-end items-center'>
+                {/* {JSON.stringify(pooldata.data.content.fields)} */}
+            </div>            
+            <div className='flex items-center'>
                 <div className='mt-2 text-xs text-gray-500' >
                     created at {timestamp}
                 </div>
+            </div>
+            <div className='flex mt-2 justify-center'>
+                {trade}
             </div>
             <TransactionHistory slug={slug} profile={profiledata} session={session} pool={profiledata} txs={txs}/>
             {/* {JSON.stringify(transactiondata?.data?.content?.fields)} */}

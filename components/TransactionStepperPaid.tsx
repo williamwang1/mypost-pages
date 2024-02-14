@@ -3,6 +3,7 @@ import StepperPaid from '@/components/StepperPaid';
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic';
 import Tiptap from './TipTap';
+import PriceTooltip from './PriceTooltip';
 
 
 export default function TransactionStepperPaid({paid, onPaidChange, step, onBackChange, onPaidNextChange, free}
@@ -43,11 +44,14 @@ export default function TransactionStepperPaid({paid, onPaidChange, step, onBack
                 Price
             </label>
             <label htmlFor="price" className="text-base font-normal leading-6 text-gray-500">
-                0.01
+                0
             </label>
             <label htmlFor="price" className="text-base font-bold leading-6 text-gray-900">
                 SUI
             </label>
+            <div className=''>
+                <PriceTooltip/>
+            </div>
         </div>
         <div className="flex flex-col flex-1 mt-5">
             <label htmlFor="content" className="block text-base font-bold leading-6 text-gray-900">

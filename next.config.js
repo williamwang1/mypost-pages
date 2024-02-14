@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+const prod = process.env.NODE_ENV === 'production'
 const nextConfig = {
   reactStrictMode: true,
   images: {
@@ -14,7 +15,8 @@ const nextConfig = {
 }
 
 const withPWA = require('next-pwa')({
-  dest: 'public'
+  dest: 'public',
+  disable: prod ? false : true
 })
 
 module.exports = withPWA(nextConfig)

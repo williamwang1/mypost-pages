@@ -31,6 +31,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         headers: {
         'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ slug }),
     })
     const accounts: Account[] = await accountsdb.json()
 
@@ -77,7 +78,7 @@ function Transactions({session, accounts, metadata } : {session: any, accounts: 
     }
 
     const onPaidNextChange = (newDigest: string, newStep: number) => {
-        let digest = free + '<br/><br/>' + "<a href='www.mypost.money/transaction/<transaction digest>'>transaction digest</h1>"
+        let digest = free + '<br/>' + "<a href='www.mypost.money/transaction/<transaction digest>'>transaction digest</h1>"
         setDigest(newDigest);
         setStep(newStep);
     }
