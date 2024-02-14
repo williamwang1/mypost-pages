@@ -45,7 +45,7 @@ const MyTransactions = ({slug}: {slug: string}) => {
     //   return;
     // }
     const getData = async (currentPage: number) => {
-      console.log('in my transaction ' + currentPage)
+      //console.log('in my transaction ' + currentPage)
       try {
       const transactionsdb = await fetch(`${API_HOST}/api/transactionmeta/getlist`, {
           method: 'POST',
@@ -62,8 +62,8 @@ const MyTransactions = ({slug}: {slug: string}) => {
         } else {
           setItems((prevItems) => [...prevItems, ...newData]);
         }
+        //console.log('in my transaction ' + JSON.stringify(newData))
         setPage((prevPage) => prevPage + 1)
-        console.log('in my transaction ' + JSON.stringify(newData))
       } catch (error) {
         console.error("Error fetching data:", error);
         // Handle error appropriately

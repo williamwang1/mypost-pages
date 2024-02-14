@@ -36,22 +36,6 @@ export default function TransactionHistory({slug, profile, session, pool, txs}:
             body: JSON.stringify({ slug, currentPage }),
           })
           const newData : AccessHistory[] = await accessdb.json();
-          // let checkBody = {
-          //   slug: slug,
-          //   address: user.wallet
-          // }
-          // const accessCheckB = await fetch(`${API_HOST}${ACCESS_CHECK_ROUTE}`, {
-          //   method: 'POST',
-          //   headers: {
-          //   'Content-Type': 'application/json',
-          //   },
-          //   body: JSON.stringify(checkBody),
-          // })
-          // const accessCheck : AccessHistory[] = await accessCheckB.json();
-          // console.log('in history client ' + JSON.stringify(accessCheck))
-          // if (accessCheck.length > 0) {
-          //     setBought(true)
-          // }
           //console.log('in fetch data ' + JSON.stringify(newData))
           if (newData.length === 0) {
             setHasMore(false);
@@ -59,24 +43,50 @@ export default function TransactionHistory({slug, profile, session, pool, txs}:
             //console.log('tx history ' + JSON.stringify(newData))
             setItems((prevItems) => [...prevItems, ...newData]);
           }
+          setPage((prevPage) => prevPage + 1)
         } catch (error) {
           console.error("Error fetching data:", error);
           // Handle error appropriately
         } finally {
           setLoading(false); // Set loading to false after fetching data
         }
-    
     }
 
 
     useEffect(() => {
-        if (isInitialRender.current) {
-            isInitialRender.current = false;
-            return;
+        // if (isInitialRender.current) {
+        //     isInitialRender.current = false;
+        //     return;
+        //   }
+        const getData = async (currentPage: number) => {
+          //console.log('in fectch data ' + currentPage)
+          setLoading(true); 
+          try {
+            const accessdb = await fetch(`${API_HOST}${ACCESS_HISTORY_LIST_ROUTE}`, {
+              method: 'POST',
+              headers: {
+              'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ slug, currentPage }),
+            })
+            const newData : AccessHistory[] = await accessdb.json();
+            //console.log('in fetch data ' + JSON.stringify(newData))
+            if (newData.length === 0) {
+              setHasMore(false);
+            } else {
+              //console.log('tx history ' + JSON.stringify(newData))
+              setItems((prevItems) => [...prevItems, ...newData]);
+            }
+            setPage((prevPage) => prevPage + 1)
+          } catch (error) {
+            console.error("Error fetching data:", error);
+            // Handle error appropriately
+          } finally {
+            setLoading(false); // Set loading to false after fetching data
           }
-        fetchData(page);
-
-    }, [page])
+      }
+      getData(1);
+    }, [slug])
 
 
     return (
@@ -88,7 +98,7 @@ export default function TransactionHistory({slug, profile, session, pool, txs}:
             </div>
             <InfiniteScroll
                 dataLength={items.length}
-                next={() => setPage((prevPage) => prevPage + 1)}
+                next={() => fetchData(page)}
                 hasMore={hasMore}
                 loader={loading && <h1>Loading...</h1>}
                 endMessage={

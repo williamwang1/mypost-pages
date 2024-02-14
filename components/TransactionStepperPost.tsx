@@ -59,15 +59,15 @@ export default function TransactionStepperPost({accounts, step, onBackChange , s
             content: enpaid.ciphertext
         })
 
-        let text = summary + '\n' + free +  '\n' + `Check this out: https://www.example.com/transaction/${ txmetadata.txDigest }`
+        let text = summary + '\n' + free +  '\n' + `Check this out: https://mypost.money/transaction/${ txmetadata.txDigest }`
 
-        // const response = await fetch('/api/tweet', {
-        //     method: 'POST',
-        //     headers: {
-        //       'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({ text }),
-        //   });
+        const response = await fetch('/api/tweet', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ text }),
+          });
         let txbody = {
             digest: txmetadata.txDigest,
             profile_id: metadata.profile_id,

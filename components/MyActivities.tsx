@@ -1,24 +1,21 @@
-import { ChevronRightIcon, EllipsisVerticalIcon } from '@heroicons/react/20/solid'
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { FollowData } from '@/types/follow';
+import TransactionItem from "./TransactionItem";
 import { API_HOST } from '@/lib/api/move';
-import { useRouter } from 'next/navigation'
-import { FOLLOW_FOLLOWER_LIST_ROUTE } from '@/lib/api/constant'
-import FollowerItem from './FollowerItem';
+import { TransactionList } from "@/types/transaction";
 
-export default function MyFollowers({slug}: {slug: string}) {
-  const [items, setItems] = useState<FollowData[]>([]);
+const MyActivities = ({slug}: {slug: string}) => {
+  const [items, setItems] = useState<TransactionList[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const isInitialRender = useRef(true);
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
 
   const fetchData = async (currentPage: number) => {
     //console.log('in fectch data ' + currentPage)
     setLoading(true); 
     try {
-      const transactionsdb = await fetch(`${API_HOST}${FOLLOW_FOLLOWER_LIST_ROUTE}`, {
+    const transactionsdb = await fetch(`${API_HOST}/api/transactionmeta/getlist`, {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json',
@@ -26,14 +23,14 @@ export default function MyFollowers({slug}: {slug: string}) {
         body: JSON.stringify({ slug, currentPage }),
       })
   
-      const newData : FollowData[] = await transactionsdb.json();
+      const newData : TransactionList[] = await transactionsdb.json();
       //console.log('in fetch data ' + JSON.stringify(newData))
       if (newData.length === 0) {
         setHasMore(false);
       } else {
         setItems((prevItems) => [...prevItems, ...newData]);
       }
-      setPage((prevPage) => prevPage + 1)
+      // setPage((prevPage) => prevPage + 1)
     } catch (error) {
       console.error("Error fetching data:", error);
       // Handle error appropriately
@@ -44,14 +41,13 @@ export default function MyFollowers({slug}: {slug: string}) {
 
   useEffect(() => {
     // if (isInitialRender.current) {
-    //     isInitialRender.current = false;
-    //     return;
-    //   }
+    //   isInitialRender.current = false;
+    //   return;
+    // }
     const getData = async (currentPage: number) => {
-      //console.log('in fectch data ' + currentPage)
-      setLoading(true); 
+      //console.log('in my transaction ' + currentPage)
       try {
-        const transactionsdb = await fetch(`${API_HOST}${FOLLOW_FOLLOWER_LIST_ROUTE}`, {
+      const transactionsdb = await fetch(`${API_HOST}/api/transactionmeta/getlist`, {
           method: 'POST',
           headers: {
           'Content-Type': 'application/json',
@@ -59,14 +55,14 @@ export default function MyFollowers({slug}: {slug: string}) {
           body: JSON.stringify({ slug, currentPage }),
         })
     
-        const newData : FollowData[] = await transactionsdb.json();
+        const newData : TransactionList[] = await transactionsdb.json();
         //console.log('in fetch data ' + JSON.stringify(newData))
         if (newData.length === 0) {
           setHasMore(false);
         } else {
           setItems((prevItems) => [...prevItems, ...newData]);
         }
-        setPage((prevPage) => prevPage + 1)
+        console.log('in my transaction ' + JSON.stringify(newData))
       } catch (error) {
         console.error("Error fetching data:", error);
         // Handle error appropriately
@@ -74,7 +70,7 @@ export default function MyFollowers({slug}: {slug: string}) {
         setLoading(false); // Set loading to false after fetching data
       }
     }
-    getData(1)
+    getData(1);
   }, [slug]);
 
 
@@ -83,21 +79,21 @@ export default function MyFollowers({slug}: {slug: string}) {
       dataLength={items.length}
       next={() => fetchData(page)}
       hasMore={hasMore}
-      loader={loading && <h1>Loading...</h1>}
+      loader={loading && <div>Loading</div>}
       endMessage={
-      <p style={{ textAlign: 'center' }}>
-        <b>no more data</b>
-      </p>
-  }
-  >
-    <ul
-      role="list"
-      className="divide-y divide-gray-100 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl"
+        <p style={{ textAlign: 'center' }}>
+          <b>no more data</b>
+        </p>}
     >
-      {items && items.map((f) => (
-          <FollowerItem f={f} key={f.id}/>
-      ))}
-    </ul>
+      <div
+        role="list"
+        className="divide-y divide-gray-100 mt-2 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl"
+      >
+            {items &&
+              items.map((item) => <TransactionItem key={item.id} t={item}/>)}
+      </div>
     </InfiniteScroll>
-  )
-}
+  );
+};
+
+export default MyActivities;
