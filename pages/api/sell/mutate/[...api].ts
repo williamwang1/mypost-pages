@@ -13,7 +13,7 @@ import { mask, validate } from "superstruct";
 import { CommonResponse, SellRequest, TransactionRequest, TransactionResponse} from "@/lib/shared/interfaces";
 import { ProfileMetadataCreated } from '@/types/profile'
 import { FollowMetaData, FollowData } from "@/types/follow";
-import { AccessEvent, AccessSold, TransactionCreated } from "@/types/transaction";
+import { AccessSold, TransactionCreated } from "@/types/transaction";
 import { ACCESS_BUY_ROUTE, ACCESS_MUTATE_FALSE_ROUTE, ACCESS_MUTATE_ROUTE, ACCESS_SELL_FALSE_ROUTE, TRANSACTION_MUTATEDB_ROUTE } from "@/lib/api/constant";
 
 

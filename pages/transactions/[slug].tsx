@@ -2,8 +2,6 @@ import React, { Fragment, useState, useRef } from 'react' ;
 import { ZkLoginSession, withZkLoginSessionRequired } from "@shinami/nextjs-zklogin/client";
 import Nav from '@/components/Nav';
 import { ProfileMedata } from "@/types/profile";
-import 'react-quill/dist/quill.snow.css';
-import 'react-quill/dist/quill.bubble.css';
 import { useRouter } from 'next/navigation'
 import { GetServerSideProps } from 'next';
 import { ACCOUNT_LIST_ROUTE, PROFILE_GET_ROUTE, TRANSACTION_MUTATEDB_ROUTE } from '@/lib/api/constant';

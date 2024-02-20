@@ -13,7 +13,7 @@ import { mask, validate } from "superstruct";
 import { CommonResponse, TransactionRequest, TransactionResponse} from "@/lib/shared/interfaces";
 import { ProfileMetadataCreated } from '@/types/profile'
 import { FollowMetaData, FollowData } from "@/types/follow";
-import { AccessEvent, AccesstData, TransactionCreated } from "@/types/transaction";
+import { AccessBought, AccesstData, TransactionCreated } from "@/types/transaction";
 import { ACCESS_BUY_ROUTE, ACCESS_MUTATE_FALSE_ROUTE, ACCESS_MUTATE_ROUTE, ACCESS_SELL_FALSE_ROUTE, TRANSACTION_MUTATEDB_ROUTE } from "@/lib/api/constant";
 
 
@@ -92,7 +92,7 @@ const parseTxRes: TransactionResponseParser<CommonResponse> = async (_, txRes, u
     let profileJson = await txMetaRes.json()
     //console.log(profileJson)
     // update access data in db
-    let accessBought = txRes.events?.at(1)?.parsedJson as AccessEvent;
+    let accessBought = txRes.events?.at(1)?.parsedJson as AccessBought;
     let acessSellBody = {
         transaction_digest: accessBought.transaction_digest,
         address: accessBought.buyer,

@@ -6,8 +6,6 @@ import StepperPaid from '@/components/StepperPaid';
 import StepperPublic from '@/components/StepperPublic';
 import StepperPreview from '@/components/StepperPost';
 import dynamic from 'next/dynamic';
-import 'react-quill/dist/quill.snow.css';
-import 'react-quill/dist/quill.bubble.css';
 import { useRouter } from 'next/navigation'
 import { Tab } from '@headlessui/react';
 import { GetServerSideProps } from 'next';
@@ -15,12 +13,7 @@ import { ACCOUNT_LIST_ROUTE, PROFILE_GET_ROUTE } from '@/lib/api/constant';
 import { API_HOST } from '@/lib/api/move';
 import { Account } from "@/types/auth";
 
-import ReactQuill from 'react-quill';
 
-const QuillNoSSRWrapper = dynamic(
-    () => import('react-quill'), // Replace 'react-quill' with your Quill import
-    { ssr: false } // This line is important. It disables server-side rendering for this component
-);
 
 // const tabs = [
 //     {id: 1, name: 'Twiiter', component: <h1></h1>, url: '/profile'},
@@ -196,12 +189,6 @@ function Transaction({session, accounts} : {session: ZkLoginSession, accounts: A
                     </label>
                 </div>
                 <div className="flex flex-col flex-1 mt-5">
-                    <label htmlFor="content" className="block text-base font-bold leading-6 text-gray-900">
-                        Paid Content
-                    </label>
-                    <div className='mt-2'>
-                        <QuillNoSSRWrapper theme="snow" modules={modules} value={paid} onChange={handlePaiChange} className='h-48 max-h-60'/>
-                    </div>
                     
 
                     {/* <div className="relative mt-2 rounded-md shadow-sm">
@@ -278,9 +265,9 @@ function Transaction({session, accounts} : {session: ZkLoginSession, accounts: A
                                     <QuillNoSSRWrapper theme="bubble" modules={modules} value={content} className='h-20'/>
                                 </div> */}
                                 {/* <label>{free}</label> */}
-                                <div className='mt-2 pb-2'>
+                                {/* <div className='mt-2 pb-2'>
                                     <QuillNoSSRWrapper theme="bubble" modules={modules} value={digest} className='h-20'/>
-                                </div>
+                                </div> */}
                             </Tab.Panel>
                         ))}
                         </Tab.Panels>
