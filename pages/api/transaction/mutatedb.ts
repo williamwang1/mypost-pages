@@ -1,54 +1,77 @@
-
 import prisma from "@/lib/prisma";
-import { ProfileMedata } from "@/types/profile";
-import { TransactionDetails } from "@/types/transaction";
 import type { NextApiRequest, NextApiResponse } from 'next'
-
 
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse) {
 
+
     // if (!session.user) {
     //     return res.status(401).json({ error: "Unauthorized" });
     // }
-    let result;
-    try {
-        console.log('address in transaction mutatedb ' + req.body.address)
-        const transaction: any = await prisma.transaction.findUnique({
+    //console.log('in transaction mutatedb ' + req.body.address)
+    // let address = req.body.address;
+    // let accountId = req.body.providerAccountId;
+    // let provider = req.body.provider;
+    if (req.method === 'POST') {
+        const {
+            digest,
+            summary,
+            public_content,
+            address,
+            profile_id,
+            transaction_id, 
+            pool_id,      
+            package_id,   
+            post_id, 
+            type,
+            create_at,
+        } = req.body;
+        console.log('in transaction save or update ' + JSON.stringify(req.body))
+    
+        try {
+          const tx = await prisma.transaction.upsert({
             where: {
-                digest: req.body.digest,
-            }
-        });
-        console.log('mutatedb transaction db ' + JSON.stringify(transaction))
-        if (transaction) {
-            result = await prisma.transaction.update({
-                where: {
-                    digest: transaction.digest
-                },
-                data: {
-                    profile_id: req.body.profile_id,
-                    summary: req.body.summary,
-                    public_content: req.body.public_content,
-                    address: req.body.address,
-                }
-            })
-        } else {
-            result = await prisma.transaction.create({
-                data: {
-                    digest: req.body.digest,
-                    profile_id: req.body.profile_id,
-                    summary: req.body.summary,
-                    public_content: req.body.public_content,
-                    address: req.body.address,
-                    create_at: new Date()
-                }
-
-            })
+              // Use your @@unique fields here as a composite identifier
+              digest: digest
+            },
+            update: {
+              // Fields to update if the account exists
+              summary,
+              public_content,
+              address,
+              profile_id,
+              transaction_id, 
+              pool_id,      
+              package_id,   
+              post_id, 
+              type,
+              create_at,
+            },
+            create: {
+              // Fields to create a new account if it doesn't exist
+              digest,
+              summary,
+              public_content,
+              address,
+              profile_id,
+              transaction_id, 
+              pool_id,      
+              package_id,   
+              post_id, 
+              type,
+              create_at,
+            },
+          });
+          res.status(200).json(tx);
+        } catch (error) {
+          console.error("Failed to upsert account:", error);
+          res.status(500).json({ error: "Failed to upsert transaction" });
         }
-        res.status(200).json( result )
-      } catch (err) {
-        res.status(500).json({ err })
+      } else {
+        // Handle any other HTTP methods
+        res.setHeader('Allow', ['POST']);
+        res.status(405).end(`Method ${req.method} Not Allowed`);
       }
 
 }

@@ -28,7 +28,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
         body: JSON.stringify({ slug }),
     })
-    const metadata: ProfileMedata = await metadatadb.json()
+    const metadata: ProfileMedata = await metadatadb.json();
+    console.log('in profile ' + JSON.stringify(metadata))
+    if (!metadata) {
+        return {
+            redirect: {
+              destination: `${API_HOST}/account`, // Redirect destination
+              permanent: true, // Temporary redirect
+            },
+        }
+    }
     
     const profiledata: SuiObjectResponse = await sui.getObject({
         id: metadata.profile_id,

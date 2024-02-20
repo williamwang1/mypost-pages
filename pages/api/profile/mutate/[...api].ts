@@ -11,7 +11,7 @@ import {
     zkLoginTxExecHandler,
 } from "@shinami/nextjs-zklogin/server/pages";
 import { mask, validate } from "superstruct";
-import { ProfileRequest, TransactionResponse} from "@/lib/shared/interfaces";
+import { CommonResponse, ProfileRequest, TransactionResponse} from "@/lib/shared/interfaces";
 import { ProfileMetadataCreated } from '@/types/profile'
 import { FollowMetaData, FollowData } from "@/types/follow";
 
@@ -47,7 +47,7 @@ const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {
     return { gaslessTxBytes, gasBudget: 100_000_000 };
 };
 
-const parseTxRes: TransactionResponseParser<TransactionResponse> = async (_, txRes, user) => {
+const parseTxRes: TransactionResponseParser<CommonResponse> = async (_, txRes, user) => {
     // Requires "showEvents: true" in tx response options.
     const event = first(txRes.events);
     if (!event) throw new Error("Event missing from tx response");
@@ -98,6 +98,7 @@ const parseTxRes: TransactionResponseParser<TransactionResponse> = async (_, txR
         following_profile: followEventData.following_profile,
         following_id: followEventData.following_id,
         price: followEventData.price,
+        type: 'follow',
         digest: txRes.digest,
         create_at: new Date()
     }

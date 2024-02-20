@@ -8,16 +8,12 @@ export default async function handler(
         let pageSize = 5;
         let pageNumber = req.body.currentPage - 1;
         let offset = pageNumber * pageSize;
-        //console.log(req.body.slug)
+        console.log('in access lit ' + req.body.currentPage)
         try {
             //console.log(req.body.slug)
             let accesses = await prisma.$queryRaw`SELECT *
-            FROM (
-                select * from "AccessBought" at where at.Transaction_digest = ${req.body.slug} and at.status = true
-                UNION ALL
-                select * from "AccessSold" at where at.Transaction_digest = ${req.body.slug} and at.status = true
-            ) AS access
-            ORDER BY access.Create_at DESC
+            FROM "Access" at where at.Transaction_digest = ${req.body.slug}
+            ORDER BY at.Create_at DESC
             LIMIT ${pageSize} OFFSET ${offset};`
             
             //console.log('in get list' + JSON.stringify(accesses))

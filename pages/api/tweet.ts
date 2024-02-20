@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     // Extract the tweet text from the request body
-    const { text } = req.body;
+    const { text, slug } = req.body;
     if (!text) {
       return res.status(400).json({ message: 'Tweet text is required' });
     }
@@ -20,6 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         headers: {
         'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ slug }),
     })
     const accounts: Account[] = await accountsdb.json()
 
@@ -34,7 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const rwClient = twitterClient.readWrite;
     // Post the tweet
     const response = await rwClient.v2.tweet(text);
-    console.log(JSON.stringify(response))
+    console.log('in twiiter api ' + JSON.stringify(response))
     res.status(200).json({ success: true, data: response });
   } catch (error: any) {
     res.status(500).json({ error: error.message });

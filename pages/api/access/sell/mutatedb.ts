@@ -14,35 +14,34 @@ export default async function handler(
     // }
     let result;
     try {
-        // const sold: AccesstData | null = await prisma.access.findUnique({
-        //     where: {
-        //         transaction_digest_type_address_status: {
-        //             transaction_digest: req.body.transaction_digest,
-        //             address: req.body.address,
-        //             type: 'sell',
-        //             status: true
-        //         } 
-        //     }
-        // });
-        // console.log('in buy mutatedb ' + JSON.stringify(sold))
-        // if (sold) {
-        //     await prisma.access.update({
-        //         where: {
-        //           transaction_digest_type_address_status: {
-        //             transaction_digest: req.body.transaction_digest,
-        //             address: req.body.address,
-        //             type: 'sell',
-        //             status: true
-        //         } 
-        //         },
-        //         data: {
-        //             status: false
-        //         }
-        //     })
-        // } 
-        //else {
-        //     res.status(500).json({ error: "Failed to upsert transaction" });
-        // }
+        const bought: AccesstData | null = await prisma.access.findUnique({
+            where: {
+                transaction_digest_type_address_status: {
+                    transaction_digest: req.body.digest,
+                    address: req.body.address,
+                    type: 'buy',
+                    status: true
+                } 
+            }
+        });
+        console.log('in sell mutatedb ' + JSON.stringify(bought))
+        if (bought) {
+            await prisma.access.update({
+                where: {
+                  transaction_digest_type_address_status: {
+                    transaction_digest: req.body.digest,
+                    address: req.body.address,
+                    type: 'buy',
+                    status: true
+                } 
+                },
+                data: {
+                    status: false
+                }
+            })
+        } else {
+            res.status(500).json({ error: "Failed to upsert transaction" });
+        }
         if (req.method === 'POST') {
             const {
                 digest,
@@ -57,16 +56,16 @@ export default async function handler(
                 package_id,   
                 create_at,
             } = req.body;
-            console.log('in buy save or update ' + JSON.stringify(req.body))
+            console.log('in sell save or update ' + JSON.stringify(req.body))
         
             try {
               const tx = await prisma.access.upsert({
                 where: {
                   // Use your @@unique fields here as a composite identifier
                   transaction_digest_type_address_status: {
-                    transaction_digest: transaction_digest,
+                    transaction_digest: digest,
                     address: address,
-                    type: type,
+                    type: 'sell',
                     status: true
                   } 
                 },
@@ -109,6 +108,7 @@ export default async function handler(
             res.setHeader('Allow', ['POST']);
             res.status(405).end(`Method ${req.method} Not Allowed`);
         }
+
         res.status(200).json( result )
       } catch (err) {
         res.status(500).json({ err })

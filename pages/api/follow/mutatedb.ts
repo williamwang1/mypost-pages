@@ -56,6 +56,7 @@ export default async function handler(
                     following_profile: req.body.following_profile,
                     following_id: req.body.following_id,
                     price: req.body.price,
+                    type: req.body.type,
                     create_at: new Date(),
                     status: true
                 }

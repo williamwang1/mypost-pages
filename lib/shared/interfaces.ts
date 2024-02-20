@@ -60,7 +60,16 @@ export type SellRequest = Infer<typeof SellRequest>
 
 export const TransactionResponse = object({
   txDigest: string(),
+  transaction_id: string(),
+  profile_id: string(),
+  pool_id: string()
 });
+
+export const CommonResponse = object({
+  txDigest: string(),
+})
+
+export type CommonResponse = Infer<typeof CommonResponse>
 
 export type TransactionResponse = Infer<typeof TransactionResponse>
 

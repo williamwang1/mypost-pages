@@ -11,9 +11,18 @@ interface AccessBought {
     access_id: string,
     transaction_id: string,
     profile_id: string,
-    accessor_profile: string,
     price: string,
     buyer: string,
+    transaction_digest: string,
+    timestamp_ms: string
+}
+
+interface AccessSold {
+    access_id: string,
+    transaction_id: string,
+    profile_id: string,
+    price: string,
+    seller: string,
     transaction_digest: string,
     timestamp_ms: string
 }
@@ -29,7 +38,7 @@ interface TransactionMetaData {
     create_at: Date,
 }
 
-interface AccessBoughtData {
+interface AccesstData {
     id: string,
     digest: string,
     access_id: string,
@@ -43,6 +52,8 @@ interface AccessBoughtData {
     create_at: Date,
     status: boolean
 }
+
+
 
 interface AccessHistory {
     id: string,
@@ -84,4 +95,5 @@ interface TransactionList {
     package_id: string,
 }
 
-export type { TransactionCreated, AccessBought, TransactionMetaData, AccessBoughtData, TransactionDetails, TransactionList, AccessHistory}
+export type { TransactionCreated, AccessBought, AccessSold, TransactionMetaData, AccesstData,
+    TransactionDetails, TransactionList, AccessHistory}

@@ -74,12 +74,24 @@ module mypost::profile {
         timestamp_ms: u64
     }
 
+    struct UnFollowCreated has copy, drop {
+        following_id: ID,
+        follower_id: ID,
+        following_profile: ID,
+        following: address,
+        follower: address,
+        follower_profile: ID,
+        price: u64,
+        timestamp_ms: u64
+    }
+
 
     struct ProfilePool has key {
         id: UID,
         for: ID,
         initial_price: u64,
         price: u64,
+        last_price: u64,
         balance: Balance<SUI>,
         owner: address,
         no_of_followers: u64,
@@ -127,12 +139,12 @@ module mypost::profile {
             owner: tx_context::sender(ctx),
             profiles: object_table::new(ctx)
         };
-        debug::print(&global_profiles);
+        //debug::print(&global_profiles);
         transfer::share_object(global_profiles);
     }
 
     #[lint_allow(self_transfer)]
-    entry fun create_profile_pool(
+    public entry fun create_profile_pool(
         name: vector<u8>,
         bio: vector<u8>,
         avatar: vector<u8>,
@@ -160,6 +172,7 @@ module mypost::profile {
             for: inner_id,
             initial_price: 0,
             price: 0,
+            last_price: 0,
             balance: balance::zero(),
             owner: sender(ctx),
             no_of_followers: 0,
@@ -315,12 +328,15 @@ module mypost::profile {
             }
         );
         // update following profile
+        //debug::print(&following_pool.owner);
         object_table::add(&mut following_pool.followers, sender(ctx), follower);
         following_pool.no_of_followers = following_pool.no_of_followers + 1;
         // update follower profile
-        object_table::add(&mut follower_pool.followings, follower_pool.owner, following);
+        //debug::print(&follower_pool.owner);
+        object_table::add(&mut follower_pool.followings, following_pool.owner, following);
         follower_pool.no_of_followings = follower_pool.no_of_followings + 1;
         // update profile pool price
+        following_pool.last_price = current_price;
         following_pool.price = getPrice(following_pool.no_of_followers);
     }
 
@@ -331,6 +347,7 @@ module mypost::profile {
         follower_profile: &mut Profile, 
         following_pool: &mut ProfilePool, 
         follower_pool: &mut ProfilePool,
+        clock: &Clock,
         ctx: &mut TxContext) {
             let follower = object_table::contains(&following_pool.followers, follower_profile.owner);
             let following = object_table::contains(&follower_pool.followings, following_pool.owner);
@@ -346,27 +363,43 @@ module mypost::profile {
             let protocolFee = current_price * PROTOCOL_FEE_PERCENT / 100;
             // remove coin from pool
             let revenue = balance::split(&mut following_pool.balance, current_price -  subjectFee -  protocolFee);
-            let revenue_coin = coin::from_balance(revenue, ctx);
-            let subject = balance::split(&mut following_pool.balance, subjectFee);
+            
+            let subject = balance::split(&mut revenue, subjectFee);
             let subject_coin = coin::from_balance(subject, ctx);
-            let protocol = balance::split(&mut following_pool.balance, subjectFee);
+            let protocol = balance::split(&mut revenue, protocolFee);
             let protocol_coin = coin::from_balance(protocol, ctx);
+            let revenue_coin = coin::from_balance(revenue, ctx);
 
             transfer::public_transfer(revenue_coin, sender(ctx));
             transfer::public_transfer(subject_coin, following_pool.owner);
             transfer::public_transfer(protocol_coin, protocol_destination);
-
+            
             // update following profile
             let followernft = object_table::remove(&mut following_pool.followers, follower_profile.owner);
             let Follower {id: follower_id, follower_profile: _, price: _, timestamp_ms: _} = followernft;
+            let inner_follower_id = object::uid_to_inner(&follower_id);
             object::delete(follower_id);
             following_pool.no_of_followers = following_pool.no_of_followers - 1;
             // update follower profile
             let followingnft = object_table::remove(&mut follower_pool.followings, following_pool.owner);
             let Following {id: following_id, following_profile: _, price: _, timestamp_ms: _} = followingnft;
+            let inner_following_id = object::uid_to_inner(&following_id);
             object::delete(following_id);
-            follower_pool.no_of_followings = follower_pool.no_of_followings - 1;
-            following_pool.price = getPrice(following_pool.no_of_followers);
+            event::emit(
+            UnFollowCreated {
+                follower_id: inner_follower_id,
+                following_id: inner_following_id,
+                following: following_pool.owner,
+                following_profile: following_pool.for,
+                follower: follower_profile.owner,
+                follower_profile: object::uid_to_inner(&follower_profile.id),
+                price: current_price,
+                timestamp_ms: clock::timestamp_ms(clock),
+            }
+        );
+        follower_pool.no_of_followings = follower_pool.no_of_followings - 1;
+        following_pool.last_price = current_price;
+        following_pool.price = getPrice(following_pool.no_of_followers);
     }
 
 

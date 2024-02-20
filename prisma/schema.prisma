@@ -22,60 +22,26 @@ model Follow {
   follower_id       String
   follower_profile  String
   price             String
-  type              String @default("follow")
+  type              String
   create_at         DateTime
   status            Boolean @default(true)
-  @@unique([follower, following, status])
+  @@unique([follower, following, type, status])
 }
 
-model Unfollow {
-  id                String  @id @default(cuid())
-  digest            String
-  follower          String  
-  following         String
-  following_id      String
-  following_profile String
-  follower_id       String
-  follower_profile  String
-  price             String
-  type              String @default("unfollow")
-  create_at         DateTime
-  status            Boolean @default(true)
-  @@unique([follower, following, status])
-}
-
-model AccessBought {
+model Access {
   id                   String  @id @default(cuid())
   digest               String  @unique
-  access_id            String  @unique
-  transaction_id       String
+  access_id            String  
+  transaction_id       String 
   transaction_digest   String
   profile_id           String
   accessor_profile     String
   price                String
-  type                 String  @default("buy")
+  type                 String 
   address              String
   package_id           String
   create_at            DateTime
-  status               Boolean @default(true) 
-  @@unique([transaction_digest, address, status])         
-}
-
-model AccessSold {
-  id                   String  @id @default(cuid())
-  digest               String  @unique
-  access_id            String  @unique
-  transaction_id       String
-  transaction_digest   String
-  profile_id           String
-  accessor_profile     String
-  price                String
-  type                 String  @default("sell")
-  address              String
-  package_id           String
-  create_at            DateTime
-  status               Boolean @default(true) 
-  @@unique([transaction_digest, address, status])         
+  status               Boolean @default(true)         
 }
 
 model Transaction {
@@ -85,18 +51,12 @@ model Transaction {
   public_content   String  @db.Text
   address          String
   profile_id       String
+  transaction_id   String  @unique
+  pool_id          String  @unique
+  package_id       String
+  post_id          String
+  type             String
   create_at        DateTime
-}
-
-model TransactionMeta {
-  id                String  @id @default(cuid())
-  digest            String  @unique
-  transaction_id    String  @unique
-  pool_id           String  @unique
-  profile_id        String
-  address           String
-  package_id        String
-  create_at         DateTime
 }
 
 

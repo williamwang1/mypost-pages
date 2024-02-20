@@ -3,6 +3,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import TransactionItem from "./TransactionItem";
 import { API_HOST } from '@/lib/api/move';
 import { TransactionList } from "@/types/transaction";
+import { TRANSACTION_GET_LIST_ROUTE, TRANSACTION_MUTATEDB_ROUTE } from "@/lib/api/constant";
 
 const MyTransactions = ({slug}: {slug: string}) => {
   const [items, setItems] = useState<TransactionList[]>([]);
@@ -15,7 +16,7 @@ const MyTransactions = ({slug}: {slug: string}) => {
     //console.log('in fectch data ' + currentPage)
     setLoading(true); 
     try {
-    const transactionsdb = await fetch(`${API_HOST}/api/transactionmeta/getlist`, {
+    const transactionsdb = await fetch(`${API_HOST}${TRANSACTION_GET_LIST_ROUTE}`, {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json',
@@ -47,7 +48,7 @@ const MyTransactions = ({slug}: {slug: string}) => {
     const getData = async (currentPage: number) => {
       //console.log('in my transaction ' + currentPage)
       try {
-      const transactionsdb = await fetch(`${API_HOST}/api/transactionmeta/getlist`, {
+      const transactionsdb = await fetch(`${API_HOST}${TRANSACTION_GET_LIST_ROUTE}`, {
           method: 'POST',
           headers: {
           'Content-Type': 'application/json',
@@ -56,14 +57,14 @@ const MyTransactions = ({slug}: {slug: string}) => {
         })
     
         const newData : TransactionList[] = await transactionsdb.json();
-        //console.log('in fetch data ' + JSON.stringify(newData))
+        console.log('in fetch data ' + JSON.stringify(newData))
         if (newData.length === 0) {
           setHasMore(false);
         } else {
           setItems((prevItems) => [...prevItems, ...newData]);
         }
         //console.log('in my transaction ' + JSON.stringify(newData))
-        setPage((prevPage) => prevPage + 1)
+        //setPage((prevPage) => prevPage + 1)
       } catch (error) {
         console.error("Error fetching data:", error);
         // Handle error appropriately

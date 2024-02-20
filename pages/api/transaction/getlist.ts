@@ -8,13 +8,13 @@ export default async function handler(
         let pageSzie = 5;
         let pageNumber = req.body.currentPage - 1;
         let offset = pageNumber * pageSzie;
-
+        console.log('in transaction getlist ' + req.body.currentPage)
         try {
-            console.log('in transaction list ' + req.body.slug)
+            //console.log('in transaction list ' + req.body.slug)
             let transactions = await prisma.$queryRaw`select t.id, t.Digest, t.Summary, t.Public_content, t.Address, 
-            t.Profile_id, t.Create_at, tm.Transaction_id, tm.Pool_id, tm.address, tm.Package_id 
-            from "Transaction" t, "TransactionMeta" tm
-            where t.digest = tm.digest and t.address = ${req.body.slug} order by t.Create_at desc limit ${pageSzie} offset ${offset};`
+            t.Profile_id, t.Create_at, t.Transaction_id, t.Pool_id, t.address, t.Package_id 
+            from "Transaction" t
+            where t.address = ${req.body.slug} order by t.Create_at desc limit ${pageSzie} offset ${offset};`
             
             //console.log('in get list' + JSON.stringify(transactions))
 

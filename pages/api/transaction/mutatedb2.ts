@@ -1,7 +1,7 @@
 
 import prisma from "@/lib/prisma";
 import { ProfileMedata } from "@/types/profile";
-import { TransactionMetaData } from "@/types/transaction";
+import { TransactionDetails } from "@/types/transaction";
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 
@@ -14,39 +14,37 @@ export default async function handler(
     // }
     let result;
     try {
-        const tx: TransactionMetaData | null = await prisma.transactionMeta.findUnique({
+        console.log('address in transaction mutatedb ' + req.body.address)
+        const transaction: any = await prisma.transaction.findUnique({
             where: {
                 digest: req.body.digest,
             }
         });
-        console.log('mutatedb transaction meata db ' + JSON.stringify(tx))
-        if (tx) {
-            result = await prisma.transactionMeta.update({
+        console.log('mutatedb transaction db ' + JSON.stringify(transaction))
+        if (transaction) {
+            result = await prisma.transaction.update({
                 where: {
-                    digest: tx.digest
+                    digest: transaction.digest
                 },
                 data: {
-                    package_id: req.body.package_id,
                     profile_id: req.body.profile_id,
-                    pool_id: req.body.pool_id,
-                    transaction_id: req.body.transaction_id,
-                    digest: req.body.digest,
+                    summary: req.body.summary,
+                    public_content: req.body.public_content,
                     address: req.body.address,
                 }
             })
         } else {
-            result = await prisma.transactionMeta.create({
+            result = await prisma.transaction.create({
                 data: {
-                    package_id: req.body.package_id,
-                    profile_id: req.body.profile_id,
-                    pool_id: req.body.pool_id,
-                    transaction_id: req.body.transaction_id,
                     digest: req.body.digest,
+                    profile_id: req.body.profile_id,
+                    summary: req.body.summary,
+                    public_content: req.body.public_content,
                     address: req.body.address,
                     create_at: new Date()
                 }
+
             })
-            //console.log(JSON.stringify(result))
         }
         res.status(200).json( result )
       } catch (err) {

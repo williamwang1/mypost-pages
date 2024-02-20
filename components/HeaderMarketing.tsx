@@ -10,7 +10,7 @@ export default function HeaderMarketing() {
     return (
         <header className='flex flex-1 justify-between px-5 py-2 shadow-xl items-center w-screen'>
             <div className='flex flex-1 items-center'>
-                <Image className="h-8 w-8 mr-4" src="/images/logo.png" width={500} height={500} alt="TF" />
+                <Image className="h-8 w-8 mr-2" src="/images/logo.png" width={500} height={500} alt="MM" />
                 <span className='text-normal font-semibold leading-relaxed'>mypost</span>
                 <span className='text-sky-500 text-normal font-semibold leading-relaxed'>.money</span> 
             </div>

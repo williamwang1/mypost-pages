@@ -17,9 +17,9 @@ module mypost::transaction {
 
 
     const RPOFILE_OWNER_FEE_PERCENT: u64 = 5;
-    const RPOFILE_OWNER_BUY_FEE_PERCENT: u64 = 3;
+    const RPOFILE_OWNER_BUY_FEE_PERCENT: u64 = 4;
     const PROTOCOL_FEE_PERCENT: u64 = 1;
-    const PROTOCOL_BUT_FEE_PERCENT: u64 = 0;
+    const PROTOCOL_BUY_FEE_PERCENT: u64 = 1;
 
     const INSUFFICIENT_FUND: u64 = 1;
     const NOT_ALLOWED_BOUGHT: u64 = 2;
@@ -38,21 +38,20 @@ module mypost::transaction {
         transaction_id: ID,
         profile_id: ID,
         accessor_address: address,
+        // protocol_fee: u64,
+        // subject_fee: u64,
         price: u64,
         timestamp_ms: u64
     }
-
-    // struct Content has store {
-    //     content: String,
-    //     for: ID
-    // }
 
     struct TransactionPool has key {
         id: UID,
         for: ID,
         initial_price: u64,
         price: u64,
+        last_price: u64,
         owner: address,
+        cofficient: u64,
         owner_profile: ID,
         no_of_accessors: u64,
         accessors: ObjectTable<address, Access>,
@@ -89,9 +88,10 @@ module mypost::transaction {
     }
 
     #[lint_allow(self_transfer)]
-    entry fun create (
+    public entry fun create (
         profile_pool: &mut ProfilePool,
         content: vector<u8>,
+        coffient: u64,
         transaction_digest: vector<u8>,
         clock: &Clock,
         ctx: &mut TxContext
@@ -119,6 +119,8 @@ module mypost::transaction {
             for: inner_id,
             initial_price: 0,
             price: 0,
+            last_price: 0,
+            cofficient: coffient,
             owner: sender(ctx),
             owner_profile: profile_id,
             balance: balance::zero(),
@@ -139,6 +141,8 @@ module mypost::transaction {
             profile_id: profile_id,
             accessor_address: sender(ctx),
             price: 0,
+            // protocol_fee: 0,
+            // subject_fee: 0,
             timestamp_ms: clock::timestamp_ms(clock)
         };
         event::emit(
@@ -157,84 +161,26 @@ module mypost::transaction {
         profile::add_transaction(profile_pool, inner_id, inner_pool_id, profile_id, 0, clock, ctx);
         object_table::add(&mut pool.accessors, sender(ctx), access);
         pool.no_of_accessors = 1;
-        pool.price = getPrice(1);
+        pool.price = getPrice(1, coffient);
         transfer::transfer( transaction, sender(ctx));
         transfer::share_object(pool);
     }
 
-    fun getPrice(no_of_accessors: u64): u64 {
+    fun getPrice(no_of_accessors: u64, cofficient: u64): u64 {
         //let initial_price: u64 = 10000000; // 0.01 SUI
-        let price = no_of_accessors * no_of_accessors * SUI_MIST / 5000;
+        let price = no_of_accessors * no_of_accessors * SUI_MIST / cofficient;
         // pool.price = price;
         (price)
     }
 
-    // entry fun buy (
-    //     payment: vector<Coin<SUI>>, 
-    //     protocol_destination: address,
-    //     transaction_digest: vector<u8>,
-    //     pool: &mut TransactionPool,
-    //     clock: &Clock,
-    //     ctx: &mut TxContext
-    // ) {
-    //     // check bought access or not
-    //     let bought = object_table::contains(&pool.accessors, sender(ctx));
-    //     assert!(!bought, NOT_ALLOWED_BOUGHT);
-    //     // balance is ennough 
-    //     let current_price = getPrice(pool.no_of_accessors);
-    //     let len = vector::length(&payment);
-    //     let result = vector::remove(&mut payment, 0);
-    //     let i = 1;
-    //     while (i < len) {
-    //         let icoin = vector::remove(&mut payment, i);
-    //         coin::join(&mut result, icoin);
-    //         i = i + 1;
-    //     };
-    //     vector::destroy_empty(payment);
+    public fun get_no_of_accessors(tpool: &TransactionPool): u64 {
+        (tpool.no_of_accessors)
+    }
 
-    //     let value = coin::value(&result);
-    //     assert!(value >= current_price, INSUFFICIENT_FUND);
-    //     let subjectFee = current_price * RPOFILE_OWNER_FEE_PERCENT / 100;
-    //     let subject_coin = coin::split(&mut result, subjectFee, ctx);
-    //     transfer::public_transfer(subject_coin, sender(ctx));
-    //     let protocolFee = current_price * PROTOCOL_FEE_PERCENT / 100;
-    //     let protocol_coin = coin::split(&mut result, protocolFee, ctx);
-    //     transfer::public_transfer(protocol_coin, protocol_destination);
-    //     let price_coin = coin::split(&mut result, current_price - subjectFee - subjectFee, ctx);
-    //     balance::join(&mut pool.balance, coin::into_balance(price_coin));
 
-    //     transfer::public_transfer(result, sender(ctx));
-
-    //     let access_id = object::new(ctx);
-    //     let access_inner_id = object::uid_to_inner(&access_id);
-    //     // let transaction_id = object::uid_to_inner(&transaction.id);
-    //     let owner_profile_id = pool.owner_profile;
-    //     let access = Access {
-    //         id: access_id,
-    //         transaction_id: pool.for,
-    //         profile_id: owner_profile_id,
-    //         accessor_address: sender(ctx),
-    //         price: current_price,
-    //         timestamp_ms: clock::timestamp_ms(clock)
-    //     };
-    //     event::emit(
-    //         AccessBought{
-    //             access_id: access_inner_id,
-    //             transaction_id: pool.for,
-    //             profile_id: owner_profile_id,
-    //             //accessor_profile: profile_id,
-    //             price: current_price,
-    //             transaction_digest: string::utf8(transaction_digest),
-    //             buyer: sender(ctx),
-    //             timestamp_ms: clock::timestamp_ms(clock)
-    //         }
-    //     );
-    //     object_table::add(&mut pool.accessors, protocol_destination, access);
-    //     pool.no_of_accessors = pool.no_of_accessors + 1;
-    //     pool.price = getPrice(pool.no_of_accessors);
-    // }
-
-    entry fun buy (
+    public entry fun buy (
+        // protocol_fee: u64,
+        // subject_fee: u64,
         payment: Coin<SUI>, 
         protocol_destination: address,
         transaction_digest: vector<u8>,
@@ -246,16 +192,16 @@ module mypost::transaction {
         let bought = object_table::contains(&pool.accessors, sender(ctx));
         assert!(!bought, NOT_ALLOWED_BOUGHT);
         // balance is ennough 
-        let current_price = getPrice(pool.no_of_accessors);
+        let current_price = getPrice(pool.no_of_accessors, pool.cofficient);
         let value = coin::value(&payment);
         assert!(value >= current_price, INSUFFICIENT_FUND);
         let subjectFee = current_price * RPOFILE_OWNER_BUY_FEE_PERCENT / 100;
         let subject_coin = coin::split(&mut payment, subjectFee, ctx);
         transfer::public_transfer(subject_coin, sender(ctx));
-        let protocolFee = current_price * PROTOCOL_BUT_FEE_PERCENT / 100;
+        let protocolFee = current_price * PROTOCOL_BUY_FEE_PERCENT / 100;
         let protocol_coin = coin::split(&mut payment, protocolFee, ctx);
         transfer::public_transfer(protocol_coin, protocol_destination);
-        let price_coin = coin::split(&mut payment, current_price - subjectFee - subjectFee, ctx);
+        let price_coin = coin::split(&mut payment, current_price - subjectFee - protocolFee, ctx);
         balance::join(&mut pool.balance, coin::into_balance(price_coin));
 
         transfer::public_transfer(payment, sender(ctx));
@@ -286,14 +232,15 @@ module mypost::transaction {
         );
         object_table::add(&mut pool.accessors, protocol_destination, access);
         pool.no_of_accessors = pool.no_of_accessors + 1;
-        pool.price = getPrice(pool.no_of_accessors);
+        pool.last_price = current_price;
+        pool.price = getPrice(pool.no_of_accessors, pool.cofficient);
     }
 
     #[lint_allow(self_transfer)]
     entry fun sell (
+        // protocol_fee: u64,
+        // subject_fee: u64,
         protocol_destination: address,
-        // transaction: &mut Transaction,
-        //owner_profile: vector<u8>,
         transaction_digest: vector<u8>,
         pool: &mut TransactionPool,
         clock: &Clock,
@@ -303,30 +250,30 @@ module mypost::transaction {
         let bought = object_table::contains(&pool.accessors, sender(ctx));
         assert!(bought, NOT_BOUGHT);
 
-        let sold_price = getPrice(pool.no_of_accessors - 1);
-        debug::print(&sold_price);
-        debug::print(&pool.balance);
+        let sold_price = getPrice(pool.no_of_accessors - 1, pool.cofficient);
+        //debug::print(&sold_price);
+        //debug::print(&pool.balance);
 
         let subject_fee = sold_price * RPOFILE_OWNER_FEE_PERCENT / 100;
         let protocol_fee = sold_price * PROTOCOL_FEE_PERCENT / 100;
 
-        let notenough = balance::value(&pool.balance) < sold_price - subject_fee - protocol_fee;
-        debug::print(&notenough);
 
-        let subject_fee_balance = balance::split(&mut pool.balance, subject_fee);
-        let protocol_fee_balance = balance::split(&mut pool.balance, protocol_fee);
-        let price = balance::split(&mut pool.balance, sold_price - subject_fee - protocol_fee);
-
+        let revenue = balance::split(&mut pool.balance, sold_price - subject_fee - protocol_fee);
+        let subject_fee_balance = balance::split(&mut revenue, subject_fee);
+        let protocol_fee_balance = balance::split(&mut revenue, protocol_fee);
 
         let subject_coin = coin::from_balance(subject_fee_balance, ctx);
         transfer::public_transfer(subject_coin, sender(ctx));
         let protocol_coin = coin::from_balance(protocol_fee_balance, ctx);
         transfer::public_transfer(protocol_coin, protocol_destination);
-        let price_coin = coin::from_balance(price, ctx);
-        transfer::public_transfer(price_coin, sender(ctx));
+        let revenue_coin = coin::from_balance(revenue, ctx);
+        //debug::print(&revenue_coin);
+        transfer::public_transfer(revenue_coin, sender(ctx));
+        debug::print(&pool.balance);
         let access = object_table::remove(&mut pool.accessors, sender(ctx));
         let Access{id: access_id, accessor_address:_, 
-        price: _, profile_id: _, transaction_id: _, timestamp_ms: _ } = access;
+        price: _, profile_id: _, 
+        transaction_id: _, timestamp_ms: _} = access;
         let owner_profile_id = pool.owner_profile;
         //let owner_profile_id = object::id_from_bytes(owner_profile);
         event::emit(
@@ -343,7 +290,8 @@ module mypost::transaction {
         );
         object::delete(access_id);
         pool.no_of_accessors = pool.no_of_accessors - 1;
-        pool.price = getPrice(pool.no_of_accessors);
+        pool.last_price = sold_price;
+        pool.price = getPrice(pool.no_of_accessors, pool.cofficient);
     }
 
 }

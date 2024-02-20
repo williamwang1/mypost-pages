@@ -10,9 +10,9 @@ export default async function handler(
         try {
             //console.log(req.body.slug)
             let transactions = await prisma.$queryRaw`select t.id, t.Digest, t.Summary, t.Public_content, t.Address, 
-            t.Profile_id, t.Create_at, tm.Transaction_id, tm.Pool_id, tm.address, tm.Package_id 
-            from "Transaction" t, "TransactionMeta" tm
-            where t.digest = tm.digest and tm.digest=${digest};`
+            t.Profile_id, t.Create_at, t.Transaction_id, t.Pool_id, t.address, t.Package_id 
+            from "Transaction" t
+            where t.digest=${digest};`
             
             //console.log('in get ' + JSON.stringify(transactions))
 

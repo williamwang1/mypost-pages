@@ -57,18 +57,13 @@ export default async function handler(
                 package_id,   
                 create_at,
             } = req.body;
-            console.log('in buy save or update ' + JSON.stringify(req.body))
+            console.log('in access save or update ' + JSON.stringify(req.body))
         
             try {
               const tx = await prisma.access.upsert({
                 where: {
                   // Use your @@unique fields here as a composite identifier
-                  transaction_digest_type_address_status: {
-                    transaction_digest: transaction_digest,
-                    address: address,
-                    type: type,
-                    status: true
-                  } 
+                  digest: digest
                 },
                 update: {
                   // Fields to update if the account exists

@@ -38,7 +38,7 @@ export default async function handler(
           profile,
           status,
         } = req.body;
-        console.log('in account save or update ' + JSON.stringify(req.body))
+       // console.log('in account save or update ' + JSON.stringify(req.body))
     
         try {
           const account = await prisma.account.upsert({

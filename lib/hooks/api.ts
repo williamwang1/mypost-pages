@@ -22,6 +22,7 @@ import {
   CheckProfileResponse,
   BuyRequest,
   SellRequest,
+  CommonResponse,
 } from "../shared/interfaces";
 import { ProfileMetadataCreated, ProfileEvents } from '@/types/profile'
 import { MYPOST_MOVE_PACKAGE_ID, GLOBAL_OBJECT_ID } from '@/lib/api/move'
@@ -56,7 +57,7 @@ export function useAddMutation(): UseMutationResult<
 }
 
 export function useProfileMutation(): UseMutationResult<
-  TransactionResponse,
+  CommonResponse,
   ApiError,
   ProfileRequest & WithKeyPair
 > {
@@ -65,7 +66,7 @@ export function useProfileMutation(): UseMutationResult<
     mutationFn: apiTxExecMutationFn({
       baseUri: () => `${PROFILE_MUTATE_ROUTE}`,
       body: ({ keyPair, ...req }) => req,
-      resultSchema: TransactionResponse,
+      resultSchema: CommonResponse,
     }),
     onSuccess: ({txDigest}) => {
       console.log('success ' + txDigest)
@@ -120,25 +121,25 @@ export function useTransactionMutation(): UseMutationResult<
 }
 
 export function useBuyMutation(): UseMutationResult<
-  TransactionResponse, ApiError, BuyRequest & WithKeyPair
+CommonResponse, ApiError, BuyRequest & WithKeyPair
 > {
   return useMutation({
     mutationFn: apiTxExecMutationFn({
       baseUri: () => `${BUY_MUTATE_ROUTE}`,
       body: ({ keyPair, ...req }) => req,
-      resultSchema: TransactionResponse,
+      resultSchema: CommonResponse,
     })
   })
 }
 
 export function useSellMutation(): UseMutationResult<
-  TransactionResponse, ApiError, SellRequest & WithKeyPair
+  CommonResponse, ApiError, SellRequest & WithKeyPair
 > {
   return useMutation({
     mutationFn: apiTxExecMutationFn({
       baseUri: () => `${SELL_MUTATE_ROUTE}`,
       body: ({ keyPair, ...req }) => req,
-      resultSchema: TransactionResponse,
+      resultSchema: CommonResponse,
     })
   })
 }

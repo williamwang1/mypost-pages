@@ -19,6 +19,7 @@ export default async function handler(
                 address: req.body.slug,
             }
         });
+        console.log('in profile get api ' + JSON.stringify(profile))
         res.status(200).json( profile )
       } catch (err) {
         res.status(500).json({ err })

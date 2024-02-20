@@ -10,11 +10,11 @@ import {
     zkLoginTxExecHandler,
 } from "@shinami/nextjs-zklogin/server/pages";
 import { mask, validate } from "superstruct";
-import { SellRequest, TransactionRequest, TransactionResponse} from "@/lib/shared/interfaces";
+import { CommonResponse, SellRequest, TransactionRequest, TransactionResponse} from "@/lib/shared/interfaces";
 import { ProfileMetadataCreated } from '@/types/profile'
 import { FollowMetaData, FollowData } from "@/types/follow";
-import { AccessBought, TransactionCreated } from "@/types/transaction";
-import { AccessSold } from "@prisma/client";
+import { AccessEvent, AccessSold, TransactionCreated } from "@/types/transaction";
+import { ACCESS_BUY_ROUTE, ACCESS_MUTATE_FALSE_ROUTE, ACCESS_MUTATE_ROUTE, ACCESS_SELL_FALSE_ROUTE, TRANSACTION_MUTATEDB_ROUTE } from "@/lib/api/constant";
 
 
 const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {
@@ -39,15 +39,28 @@ const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {
         });
       },
     });
-    return { gaslessTxBytes, gasBudget: 200_000_000 };
+    return { gaslessTxBytes, gasBudget: 100_000_000 };
 };
 
-const parseTxRes: TransactionResponseParser<TransactionResponse> = async (_, txRes, user) => {
+const parseTxRes: TransactionResponseParser<CommonResponse> = async (_, txRes, user) => {
     // Requires "showEvents: true" in tx response options.
     const event = first(txRes.events);
     if (!event) throw new Error("Event missing from tx response");
 
     let accessSold = txRes.events?.at(0)?.parsedJson as AccessSold;
+    let acessBoughtBody = {
+        transaction_digest: accessSold.transaction_digest,
+        address: accessSold.seller,
+        type: 'buy',
+    }
+    const boughtRes = await fetch(`${API_HOST}${ACCESS_MUTATE_FALSE_ROUTE}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(acessBoughtBody)
+    })
+    let boughtJson = await boughtRes.json()
     let soldbody = {
         digest: txRes.digest,
         access_id: accessSold.access_id,
@@ -56,10 +69,12 @@ const parseTxRes: TransactionResponseParser<TransactionResponse> = async (_, txR
         profile_id: accessSold.profile_id,
         accessor_profile: accessSold.profile_id,
         price: accessSold.price,
+        type: 'sell',
         address: user.wallet,
         package_id: `${MYPOST_MOVE_PACKAGE_ID}`,
+        create_at: new Date()
     }
-    const accessRes = await fetch(`${API_HOST}/api/access/sell/mutatedb`, {
+    const accessRes = await fetch(`${API_HOST}${ACCESS_MUTATE_ROUTE}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

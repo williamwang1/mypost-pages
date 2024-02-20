@@ -7,7 +7,7 @@ import { Google, LoadingDots } from "@/components/icons";
 import { useTransactionMutation } from '@/lib/hooks/api';
 import { ProfileMedata } from '@/types/profile';
 import { ACCOUNT_LIST_ROUTE, PROFILE_GET_ROUTE, TRANSACTION_MUTATEDB_ROUTE } from '@/lib/api/constant';
-import { API_HOST } from '@/lib/api/move';
+import { API_HOST, MYPOST_MOVE_PACKAGE_ID } from '@/lib/api/move';
 import { useRouter } from 'next/navigation'
 import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline'
 import Tiptap from './TipTap';
@@ -59,21 +59,30 @@ export default function TransactionStepperPost({accounts, step, onBackChange , s
             content: enpaid.ciphertext
         })
 
-        let text = summary + '\n' + free +  '\n' + `Check this out: https://mypost.money/transaction/${ txmetadata.txDigest }`
-
+        let text = free +  '\n' + `Check this out: https://www.mypost.money/transaction/${ txmetadata.txDigest }`
+        let slug = `${user.wallet}`;
         const response = await fetch('/api/tweet', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ text }),
+            body: JSON.stringify({ text, slug }),
           });
+        let tweetRes = await response.json()
+        //console.log('in transaction post data ' + JSON.stringify(tweetRes.data))
+       // console.log('in transaction post data ' + JSON.stringify(tweetRes.data.data.id))
         let txbody = {
             digest: txmetadata.txDigest,
-            profile_id: metadata.profile_id,
             summary: summary,
             public_content: free,
             address: `${user.wallet}`,
+            profile_id: metadata.profile_id,
+            transaction_id: txmetadata.transaction_id,
+            pool_id: txmetadata.pool_id,
+            package_id: `${MYPOST_MOVE_PACKAGE_ID}`,
+            post_id: tweetRes.data.data.id,
+            type: 'post',
+            create_at: new Date()
         }
         let tx = await fetch(`${API_HOST}${TRANSACTION_MUTATEDB_ROUTE}`, {
             method: 'POST',
@@ -82,7 +91,6 @@ export default function TransactionStepperPost({accounts, step, onBackChange , s
             },
             body: JSON.stringify(txbody),
         })
-        
         router.push('/profile')
         //   if (data.success) {
         //     console.log('Tweet posted successfully:', data.data.id);

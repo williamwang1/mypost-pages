@@ -38,7 +38,7 @@ export const authOptions: NextAuthOptions = {
     callbacks: {
       async signIn({ user, account, profile}) {
           // console.log('in sigin callback ' + JSON.stringify(user))
-          console.log('in sigin callback ' + JSON.stringify(account))
+          //console.log('in sigin callback ' + JSON.stringify(account))
           // console.log('in sigin callback ' + JSON.stringify(profile))
           // console.log('in sigin callback ' + JSON.stringify(email))
           provider = account?.provider as string

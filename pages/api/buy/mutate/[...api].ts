@@ -10,10 +10,11 @@ import {
     zkLoginTxExecHandler,
 } from "@shinami/nextjs-zklogin/server/pages";
 import { mask, validate } from "superstruct";
-import { BuyRequest, TransactionRequest, TransactionResponse} from "@/lib/shared/interfaces";
+import { BuyRequest, CommonResponse, TransactionRequest, TransactionResponse} from "@/lib/shared/interfaces";
 import { ProfileMetadataCreated } from '@/types/profile'
 import { FollowMetaData, FollowData } from "@/types/follow";
-import { AccessBought, TransactionCreated } from "@/types/transaction";
+import { AccessBought, AccessEvent, TransactionCreated } from "@/types/transaction";
+import { ACCESS_MUTATE_ROUTE, ACCESS_MUTATE_FALSE_ROUTE } from "@/lib/api/constant";
 
 
 const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {
@@ -58,14 +59,28 @@ const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {
     return { gaslessTxBytes, gasBudget: 200_000_000 };
 };
 
-const parseTxRes: TransactionResponseParser<TransactionResponse> = async (req, txRes, user) => {
+const parseTxRes: TransactionResponseParser<CommonResponse> = async (req, txRes, user) => {
     // Requires "showEvents: true" in tx response options.
     const event = first(txRes.events);
     if (!event) throw new Error("Event missing from tx response");
 
-    console.log('in buy mutate ' + JSON.stringify(req.body))
+    //console.log('in buy mutate ' + JSON.stringify(req.body))
     // update access data in db
     let accessBought = txRes.events?.at(0)?.parsedJson as AccessBought;
+    let acessSellBody = {
+        transaction_digest: accessBought.transaction_digest,
+        address: accessBought.buyer,
+        type: 'sell',
+    }
+    const sellRes = await fetch(`${API_HOST}${ACCESS_MUTATE_FALSE_ROUTE}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(acessSellBody)
+    })
+    let sellJson = await sellRes.json()
+
     let accessBoughtBody = {
         digest: txRes.digest,
         access_id: accessBought.access_id,
@@ -74,18 +89,20 @@ const parseTxRes: TransactionResponseParser<TransactionResponse> = async (req, t
         profile_id: accessBought.profile_id,
         accessor_profile: accessBought.profile_id,
         price: accessBought.price,
+        type: 'buy',
         address: accessBought.buyer,
         package_id: `${MYPOST_MOVE_PACKAGE_ID}`,
+        create_at: new Date()
     }
-    console.log('in buy mutate ' + JSON.stringify(accessBoughtBody))
-    const accessRes = await fetch(`${API_HOST}/api/buy/mutatedb`, {
+    //console.log('in buy mutate ' + JSON.stringify(accessBoughtBody))
+    const boughtRes = await fetch(`${API_HOST}${ACCESS_MUTATE_ROUTE}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(accessBoughtBody)
     })
-    let followJson = await accessRes.json()
+    let boughtJson = await boughtRes.json()
 
     return { txDigest: txRes.digest };
 };
