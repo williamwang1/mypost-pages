@@ -3,81 +3,66 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import TransactionItem from "./TransactionItem";
 import { API_HOST } from '@/lib/api/move';
 import { TransactionList } from "@/types/transaction";
+import { TRANSACTION_GET_LIST_ROUTE, TRANSACTION_MUTATEDB_ROUTE } from "@/lib/api/constant";
+import axios from "axios";
 
 const MyActivities = ({slug}: {slug: string}) => {
   const [items, setItems] = useState<TransactionList[]>([]);
   const [hasMore, setHasMore] = useState(true);
-  const [page, setPage] = useState(1);
-  const isInitialRender = useRef(true);
+  const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(true);
 
-  const fetchData = async (currentPage: number) => {
-    //console.log('in fectch data ' + currentPage)
-    setLoading(true); 
-    try {
-    const transactionsdb = await fetch(`${API_HOST}/api/transactionmeta/getlist`, {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ slug, currentPage }),
+  const fetchMoreData = () => {
+    axios
+      .post(`${API_HOST}${TRANSACTION_GET_LIST_ROUTE}`, { slug: slug,  currentPage: page })
+      .then((res) => {
+        console.log('in my transaction ' + JSON.stringify(res.data))
+        //setItems(res.data)
+        if (res.data.length === 0) {
+          setHasMore(false);
+        }  else {
+          setItems((prevItems) => [...prevItems, ...res.data]);
+        }
       })
-  
-      const newData : TransactionList[] = await transactionsdb.json();
-      //console.log('in fetch data ' + JSON.stringify(newData))
-      if (newData.length === 0) {
-        setHasMore(false);
-      } else {
-        setItems((prevItems) => [...prevItems, ...newData]);
-      }
-      // setPage((prevPage) => prevPage + 1)
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      // Handle error appropriately
-    } finally {
-      setLoading(false); // Set loading to false after fetching data
-    }
-  }
+      .catch((err) => console.log(err));
+      setLoading(false)
+    setPage((prevPage) => prevPage + 1);
+};
+
+
 
   useEffect(() => {
     // if (isInitialRender.current) {
     //   isInitialRender.current = false;
     //   return;
     // }
-    const getData = async (currentPage: number) => {
+    const getData = async () => {
       //console.log('in my transaction ' + currentPage)
-      try {
-      const transactionsdb = await fetch(`${API_HOST}/api/transactionmeta/getlist`, {
-          method: 'POST',
-          headers: {
-          'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ slug, currentPage }),
-        })
-    
-        const newData : TransactionList[] = await transactionsdb.json();
-        //console.log('in fetch data ' + JSON.stringify(newData))
-        if (newData.length === 0) {
-          setHasMore(false);
-        } else {
-          setItems((prevItems) => [...prevItems, ...newData]);
-        }
-        console.log('in my transaction ' + JSON.stringify(newData))
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        // Handle error appropriately
-      } finally {
-        setLoading(false); // Set loading to false after fetching data
-      }
+      axios
+          .post(`${API_HOST}${TRANSACTION_GET_LIST_ROUTE}`, { slug: slug,  currentPage: 1 })
+          .then((res) =>{
+            if (res.data.length === 0) {
+              setHasMore(false);
+            }  else {
+              setItems(res.data);
+            }
+              setLoading(false)
+          })
+          .catch((err) => console.log(err));
     }
-    getData(1);
+
+    getData();
   }, [slug]);
+
+  const handleLoading = (loading: boolean) => {
+    setLoading(loading)
+  }
 
 
   return (
     <InfiniteScroll
       dataLength={items.length}
-      next={() => fetchData(page)}
+      next={fetchMoreData}
       hasMore={hasMore}
       loader={loading && <div>Loading</div>}
       endMessage={
@@ -90,7 +75,7 @@ const MyActivities = ({slug}: {slug: string}) => {
         className="divide-y divide-gray-100 mt-2 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl"
       >
             {items &&
-              items.map((item) => <TransactionItem key={item.id} t={item}/>)}
+              items.map((item) => <TransactionItem key={item.id} t={item} onLoadingChange={handleLoading}/>)}
       </div>
     </InfiniteScroll>
   );

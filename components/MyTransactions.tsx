@@ -33,34 +33,6 @@ const MyTransactions = ({slug}: {slug: string}) => {
     setPage((prevPage) => prevPage + 1);
 };
 
-  // const fetchData = async (currentPage: number) => {
-  //   //console.log('in fectch data ' + currentPage)
-  //   setLoading(true); 
-  //   try {
-  //   const transactionsdb = await fetch(`${API_HOST}${TRANSACTION_GET_LIST_ROUTE}`, {
-  //       method: 'POST',
-  //       headers: {
-  //       'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ slug, currentPage }),
-  //     })
-  
-  //     const newData : TransactionList[] = await transactionsdb.json();
-  //     //console.log('in fetch data ' + JSON.stringify(newData))
-  //     if (newData.length === 0) {
-  //       setHasMore(false);
-  //     } else {
-  //       setItems((prevItems) => [...prevItems, ...newData]);
-  //     }
-  //     setPage((prevPage) => prevPage + 1)
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //     // Handle error appropriately
-  //   } finally {
-  //     setLoading(false); // Set loading to false after fetching data
-  //   }
-  // }
-
   useEffect(() => {
     const getData = async () => {
       //console.log('in my transaction ' + currentPage)
