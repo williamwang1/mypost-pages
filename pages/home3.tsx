@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from "react";
+import { GetServerSideProps } from 'next';
 import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
 import { AccessHistory, TransactionList } from '@/types/transaction';
-import TransactionHistoryItem from './TransactionHistoryItem';
 import { API_HOST } from '@/lib/api/move';
 import { useRouter } from 'next/navigation'
 import { ACCESS_HISTORY_LIST_ROUTE, ACCESS_CHECK_ROUTE } from '@/lib/api/constant'
 
-function TradingHistory (
-    {slug, profile, session, pool, txs}: 
-  {slug: string, profile: any, session: any, pool: any, txs: TransactionList[]}
+export const getServerSideProps: GetServerSideProps = async (context) => {
+    const { slug } = context.params as { slug: string };
+
+    return { props: {slug} };
+}
+
+function Home3 (
+    {slug}: 
+  {slug: string}
 ) {
   const [items, setItems] = useState<AccessHistory[]>([]);
   const [hasMore, setHasMore] = useState(true);
@@ -63,7 +69,8 @@ function TradingHistory (
         className="divide-y divide-gray-100 mt-2 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl"
          >
             {items && items.map((transaction) => (
-                <TransactionHistoryItem transaction={transaction} key={transaction.id} profile={profile}/>
+                // <TransactionHistoryItem transaction={transaction} key={transaction.id}/>
+                <div key={transaction.id}>{transaction.id}</div>
             ))}
         </div>
     </InfiniteScroll>
@@ -71,4 +78,4 @@ function TradingHistory (
   );
 };
 
-export default TradingHistory;
+export default Home3;

@@ -3,25 +3,27 @@ import React, { Fragment, useState, useRef } from 'react' ;
 import { GetServerSideProps, NextPage } from 'next';
 import { withZkLoginSessionRequired, ZkLoginSession } from "@shinami/nextjs-zklogin/client";
 import { Tab } from '@headlessui/react'
+import ExploreProfiles from "@/components/ExploreProfiles";
+import ExploreTransactions from "@/components/ExploreTransactions";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-
-    return {props: {}}
+    const { slug } = context.params as { slug: string };
+    return {props: {slug}}
 }
 
 const tabs = [
-    {id: 0, name: 'Following'},
+    {id: 0, name: 'Profiles'},
     // {id: 2, name: 'Assets', component: <MyAssets/>, url: '/profile/asset'},
-    {id: 1, name: 'For you'},
+    {id: 1, name: 'Transactions'},
 ]
 
 
-function Home({session}: {session: any}) {
+function Home({session, slug}: {session: any, slug: string}) {
     const { isLoading, user, localSession } = session;
     const [activeIndex, setActiveIndex] = useState(0);
 
     return (
-    <Nav bottomIndex={0} leftIndex={-1} user={user}>
+    <Nav bottomIndex={3} leftIndex={-1} user={user}>
         <Tab.Group defaultIndex={activeIndex} >
             <Tab.List className='flex flex-1 justify-around mt-4 px-2'>
                 {tabs.map((tab) => (
@@ -44,12 +46,11 @@ function Home({session}: {session: any}) {
             {tabs.map((tab) => (
                 <Tab.Panel key={tab.id}>
                     {tab.id == 0 && (
-                        // <MyTransactions slug={slug}/>
-                        <h1>Following</h1>
+                        <ExploreProfiles slug={slug}/>
+                        
                     )}
                     {tab.id == 1 && (
-                        // <MyFollowings slug={slug}/>
-                        <h1>For you</h1>
+                        <ExploreTransactions slug={slug}/>
                     )}
 
                 </Tab.Panel>

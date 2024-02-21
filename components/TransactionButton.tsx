@@ -11,10 +11,13 @@ import { InformationCircleIcon } from "@heroicons/react/20/solid";
 
 
 export default function TransactionButton (
-    {session, poolData, onPoolDataChange, txs, slug, accessData, onAccessChange, bought, onBoughtchange, onLoadingChange} : 
-    {session: any, poolData: any, accessData: any, onPoolDataChange: (poolData: any) => void
-        txs: TransactionList[], slug: string, onAccessChange: (accessData: any) => void
-    bought: boolean, onBoughtchange: (bought: boolean) => void, onLoadingChange: (loading: boolean) => void}
+    {session, poolData, onPoolDataChange, txs, slug, accessData, onAccessChange, bought, 
+        onBoughtchange, onLoadingChange, onUnlockchange} 
+        : 
+    {session: any, poolData: any, accessData: any, onPoolDataChange: (poolData: any) => void,
+    txs: TransactionList[], slug: string, onAccessChange: (accessData: any) => void
+    bought: boolean, onBoughtchange: (bought: boolean) => void, onLoadingChange: (loading: boolean) => void,
+    onUnlockchange: (unlock: boolean) => void}
 ) {
     const { isLoading, user, localSession } = session;
     //const [bought, setBought] = useState(false)
@@ -113,7 +116,7 @@ export default function TransactionButton (
         onPoolDataChange(data);
         onAccessChange(undefined)
         onBoughtchange(false)
-        //onUnlockchange(false)
+        onUnlockchange(false)
         //setSellConfirm(false)
         onLoadingChange(false)
     }
@@ -128,6 +131,7 @@ export default function TransactionButton (
 
 
     if (bought) {
+        //console.log('in transaction button bought ' + bought)
         return (
             <div className='flex gap-x-2 justify-between mt-2'>
                 <button className='bg-sky-400 rounded-3xl px-2 hover:bg-sky-800' onClick={handleRepost}>

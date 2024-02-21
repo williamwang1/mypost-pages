@@ -4,11 +4,9 @@ import Nav from '@/components/Nav';
 import { ACCESS_CHECK_ROUTE, ACCESS_HISTORY_LIST_ROUTE, PROFILE_GET_ROUTE, TRANSACTION_GET } from '@/lib/api/constant';
 import { API_HOST } from '@/lib/api/move';
 import { sui } from '@/lib/api/shinami'
-import { Square3Stack3DIcon, InboxStackIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline'
+import { EllipsisVerticalIcon } from '@heroicons/react/24/outline'
 import { TransactionList } from '@/types/transaction';
 import Image from 'next/image';
-import TransactionHistory from '@/components/TransactionHistory';
-import TradingHistory from '@/components/TradingHIstory';
 import { useEffect, useState } from 'react';
 import Tiptap from '@/components/TipTap';
 import { AccessHistory } from '@/types/transaction';
@@ -16,6 +14,9 @@ import {Drawer} from 'vaul';
 import { SUI_MIST } from '@/lib/constant';
 import PriceTooltip from '@/components/PriceTooltip';
 import TransactionButton from '@/components/TransactionButton';
+import InfiniteScroll from "react-infinite-scroll-component";
+import axios from "axios";
+import TransactionHistoryItem from '@/components/TransactionHistoryItem';
 
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -85,6 +86,7 @@ function Transaction ({session, profiledata, txs,transactiondata, slug}
     let public_content = txs[0].public_content;
 
     const [loading, setLoaiding] = useState(true);
+    const [itemLoading, setItemLoading] = useState(true);
     const [access, setAccess] = useState<AccessHistory>();
     const [bought, setBought] = useState(false);
     const [unlock, setUnlock] = useState(false);
@@ -93,6 +95,8 @@ function Transaction ({session, profiledata, txs,transactiondata, slug}
     // const [numberofBought, setnumberofBought] = useState(1)
     const [poolData, setPoolData] = useState<any>()
     const [items, setItems] = useState<AccessHistory[]>([]);
+    const [hasMore, setHasMore] = useState(true);
+    const [page, setPage] = useState(2);
     let encrypt_content = transactiondata?.data?.content?.fields?.content
     let boughtPrice = ''
     if (access) {
@@ -147,72 +151,70 @@ function Transaction ({session, profiledata, txs,transactiondata, slug}
         setBought(bought)
     }
 
-    const handleItemsChange = (items: AccessHistory[]) => {
-        if (items) {
-           (prevItems: any) => [...prevItems, ...items]
-        }
-        setItems(items)
+    const handleUnlock = (unlcok: boolean) => {
+        setUnlock(unlcok)
     }
 
     const handleLoading = (loading: boolean) => {
         setLoaiding(loading)
     }
 
-    let private_content = (<button className='overflow-hidden break-words max-w-full underline hover:text-gray-500' onClick={handleClick}>
-                            {encrypt_content}
-                            </button>)
+    let private_content = (<div className='overflow-hidden break-words max-w-full underline hover:text-gray-500' onClick={handleClick}>
+                            <Tiptap content={encrypt_content} readOnly={true} onChange={undefined}/>
+                            </div>)
     if (unlock) {
         private_content = <Tiptap content={plaintext} readOnly={true} onChange={undefined}/>
     }
 
     useEffect(() => {
         const fetchData = async () => {
-            let checkBody = {
-                slug: slug,
-                address: user.wallet
-            }
-            const accessCheckB = await fetch(`${API_HOST}${ACCESS_CHECK_ROUTE}`, {
-                method: 'POST',
-                headers: {
-                'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(checkBody),
-            })
-            const accessCheck : AccessHistory[] = await accessCheckB.json();
-            //console.log('in history client ' + JSON.stringify(accessCheck))
-            if (accessCheck.length > 0) {
-                //console.log('in transaction access check ' + JSON.stringify(accessCheck))
-                setBought(true)
-                setAccess(accessCheck[0]);
-            }
-            // eslint-disable-next-line react-hooks/exhaustive-deps
+            axios
+                .post(`${API_HOST}${ACCESS_CHECK_ROUTE}`, { slug: slug,  address: user.wallet })
+                .then((res) =>{
+                    //console.log('in transaction slug ' + JSON.stringify(res.data))
+                    if (res.data.length > 0) {
+                        //console.log('in transaction access check ' + JSON.stringify(accessCheck))
+                        setBought(true)
+                        setAccess(res.data[0]);
+                    }
+                })
+                .catch((err) => console.log(err));
             let data: any = await sui.getObject({
                 id: txs[0].pool_id,
                 options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 
             })
             setPoolData(data);
-            const accessdb = await fetch(`${API_HOST}${ACCESS_HISTORY_LIST_ROUTE}`, {
-                method: 'POST',
-                headers: {
-                'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ slug: slug, currentPage: 1 }),
-              })
-              const newData : AccessHistory[] = await accessdb.json();
-              setItems(newData)
-            if (data) {
-                console.log('in transaction ' + txs[0].pool_id)
-                console.log('in transaction ' + JSON.stringify(data?.data?.content?.fields.price))
-                //console.log('in transaction ' + data?.data?.content?.fields.no_of_accessors)
-                // setPrice(pooldata?.data?.content?.fields.price)
-                // setnumberofBought(pooldata?.data?.content?.fields.no_of_accessors)
-                // setPoolData({price: data?.data?.content?.fields.price, 
-                //     numberofBought: data?.data?.content?.fields.no_of_accessors})
-            }
+            
+            axios
+                .post(`${API_HOST}${ACCESS_HISTORY_LIST_ROUTE}`, { slug: slug,  currentPage: 1 })
+                .then((res) =>{
+                    setItems(res.data)
+                    setItemLoading(false)
+                })
+                .catch((err) => console.log(err));
+            
+            // if (data) {
+            //     console.log('in transaction ' + txs[0].pool_id)
+            //     console.log('in transaction ' + JSON.stringify(data?.data?.content?.fields.price))
+            //     //console.log('in transaction ' + data?.data?.content?.fields.no_of_accessors)
+            // }
             setLoaiding(false);
         }
         fetchData()
     }, [slug, txs, user.wallet])
+
+    const fetchMoreData = () => {
+        axios
+          .post(`${API_HOST}${ACCESS_HISTORY_LIST_ROUTE}`, { slug: slug,  currentPage: page })
+          .then((res) => {
+            setItems((prevItems) => [...prevItems, ...res.data]);
+            //setItems(res.data)
+            res.data.length > 0 ? setHasMore(true) : setHasMore(false);
+          })
+          .catch((err) => console.log(err));
+          setItemLoading(false)
+        setPage((prevPage) => prevPage + 1);
+    };
 
 
     if (loading) {
@@ -268,11 +270,39 @@ function Transaction ({session, profiledata, txs,transactiondata, slug}
                 <TransactionButton session={session} poolData={poolData} 
                 onPoolDataChange={handlePoolDataChange} txs={txs} slug={slug}
                 accessData={access} onAccessChange={handleAccessDataChange}  bought={bought} 
-                onBoughtchange={handleBoughtChange} onLoadingChange={handleLoading}/>
-                {/* {trade} */}
-                {/* <TransactionHistory slug={slug} profile={profiledata} session={session} pool={profiledata} txs={txs}/> */}
-                <TransactionHistory slug={slug} profile={profiledata} 
-                session={session} pool={profiledata} txs={txs} items={items} onItemsChange={handleItemsChange}/>
+                onBoughtchange={handleBoughtChange} onLoadingChange={handleLoading} onUnlockchange={handleUnlock}/>
+                {/* <TransactionHistory slug={slug} profile={profiledata} 
+                session={session} pool={profiledata} txs={txs} items={items} onItemsChange={handleItemsChange}/> */}
+                {/* <TradingHistory slug={slug} profile={profiledata} 
+                session={session} pool={profiledata} txs={txs} items={items} onFirstItemsChange={handleFirstItemsChange} onNextItemsChange={handleNextItemsChange}/> */}
+                <div className=' bg-white w-auto h-auto mt-2 overflow-y-auto'>
+                <div className='mt-2 flex justify-between items-center'>
+                    <div className='text-black text-lg font-bold leading-7'>
+                        Trading History
+                    </div>
+                </div>
+                <InfiniteScroll
+                    dataLength={items.length}
+                    next={fetchMoreData}
+                    hasMore={hasMore}
+                    loader={itemLoading && <h1>Loading...</h1>}
+                    endMessage={
+                    <p style={{ textAlign: 'center' }}>
+                        <b>no more data</b>
+                    </p>
+                    }
+                >
+                    <div
+                    role="list"
+                    className="divide-y divide-gray-100 mt-2 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl"
+                    >
+                        {items && items.map((transaction) => (
+                            <TransactionHistoryItem transaction={transaction} key={transaction.id} profile={profiledata}/>
+                        ))}
+                    </div>
+                </InfiniteScroll>
+            </div>
+
                 {/* {JSON.stringify(transactiondata?.data?.content?.fields)} */}
                 {/* {sellConfirm &&
                     <Drawer.Root>

@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { SUI_MIST } from '@/lib/constant';
 
 
-export default function TransactionItem({t} : {t: TransactionList}) {
+export default function TransactionItem({t, onLoadingChange} : {t: TransactionList, onLoadingChange: (loading: boolean) => void}) {
     const router = useRouter()
     let timestamp = <time>{t.create_at.toString().substring(0,10)}</time>;
     const [pool, setPool] = useState<any>()
@@ -29,15 +29,15 @@ export default function TransactionItem({t} : {t: TransactionList}) {
     }, [t.pool_id])
 
     const handleClick = () => {
-      setLoading(true)
+      onLoadingChange(true)
       router.push(`/transaction/${t.digest}`)
     }
 
-    if (loading) {
-      return (
-        <div>Loaidng</div>
-      )
-    }
+    // if (loading) {
+    //   return (
+    //     <div>Loaidng</div>
+    //   )
+    // }
 
     return (
       <li key={t.id} className="relative flex group justify-between gap-x-6 hover:bg-gray-50" onClick={handleClick}>

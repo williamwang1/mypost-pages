@@ -3,20 +3,22 @@ import React, { Fragment, useState, useRef } from 'react' ;
 import { GetServerSideProps, NextPage } from 'next';
 import { withZkLoginSessionRequired, ZkLoginSession } from "@shinami/nextjs-zklogin/client";
 import { Tab } from '@headlessui/react'
+import MyHomeFollowing from "@/components/MyHomeFollowing";
+import MyHomeRecommend from "@/components/MyHomeRecommend";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-
-    return {props: {}}
+    const { slug } = context.params as { slug: string };
+    return {props: {slug}}
 }
 
 const tabs = [
     {id: 0, name: 'Following'},
     // {id: 2, name: 'Assets', component: <MyAssets/>, url: '/profile/asset'},
-    {id: 1, name: 'For you'},
+    {id: 1, name: 'Recommend'},
 ]
 
 
-function Home({session}: {session: any}) {
+function Home({session, slug}: {session: any, slug: string}) {
     const { isLoading, user, localSession } = session;
     const [activeIndex, setActiveIndex] = useState(0);
 
@@ -44,12 +46,10 @@ function Home({session}: {session: any}) {
             {tabs.map((tab) => (
                 <Tab.Panel key={tab.id}>
                     {tab.id == 0 && (
-                        // <MyTransactions slug={slug}/>
-                        <h1>Following</h1>
+                        <MyHomeFollowing slug={slug} />
                     )}
                     {tab.id == 1 && (
-                        // <MyFollowings slug={slug}/>
-                        <h1>For you</h1>
+                        <MyHomeRecommend slug={slug}/>
                     )}
 
                 </Tab.Panel>

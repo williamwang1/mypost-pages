@@ -17,7 +17,7 @@ export default async function handler(
         //console.log('in chcek ' + req.body.address)
         let accesses = await prisma.$queryRaw`SELECT * from "Access" at 
         where at.Address=${req.body.address} 
-        and at.Transaction_digest=${req.body.slug} and Status=true and Type='buy' ORDER BY at.Create_at DESC`
+        and at.Transaction_digest=${req.body.slug} and at.Status=true and at.Type='buy' ORDER BY at.Create_at DESC`
         res.status(200).json( accesses )
       } catch (err) {
         res.status(500).json({ err })
