@@ -5,9 +5,14 @@ import { API_HOST } from '@/lib/api/move';
 import { TransactionList } from "@/types/transaction";
 import { TRANSACTION_GET_LIST_ROUTE, TRANSACTION_MUTATEDB_ROUTE } from "@/lib/api/constant";
 import axios from "axios";
+import TokenItem from "./TokenItem";
 
-const MyActivities = ({slug}: {slug: string}) => {
-  const [items, setItems] = useState<TransactionList[]>([]);
+const items = [
+    {id:1, name: 'SUI', imageURL: '/images/sui.png'}
+]
+
+const MyTokens = ({slug}: {slug: string}) => {
+  //const [items, setItems] = useState<TransactionList[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(true);
@@ -21,7 +26,7 @@ const MyActivities = ({slug}: {slug: string}) => {
         if (res.data.length === 0) {
           setHasMore(false);
         }  else {
-          setItems((prevItems) => [...prevItems, ...res.data]);
+          //setItems((prevItems) => [...prevItems, ...res.data]);
         }
       })
       .catch((err) => console.log(err));
@@ -41,13 +46,14 @@ const MyActivities = ({slug}: {slug: string}) => {
             if (res.data.length === 0) {
               setHasMore(false);
             }  else {
-              setItems(res.data);
+              //setItems(res.data);
             }
-              setLoading(false)
+            setLoading(false)
           })
           .catch((err) => console.log(err));
     }
-    getData();
+    setLoading(false)
+    //getData();
   }, [slug]);
 
   const handleLoading = (loading: boolean) => {
@@ -68,13 +74,13 @@ const MyActivities = ({slug}: {slug: string}) => {
     >
       <div
         role="list"
-        className="divide-y divide-gray-100 mt-2 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl"
+        className="divide-y divide-gray-100 mt-2 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 px-2 rounded-md"
       >
             {items &&
-              items.map((item) => <TransactionItem key={item.id} t={item} onLoadingChange={handleLoading}/>)}
+              items.map((item) => <TokenItem key={item.id} slug={slug} item={item}/>)}
       </div>
     </InfiniteScroll>
   );
 };
 
-export default MyActivities;
+export default MyTokens;

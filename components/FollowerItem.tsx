@@ -1,6 +1,5 @@
 import { FollowData } from "@/types/follow";
 import React, { useEffect, useState , useRef} from 'react'
-import { SuiObjectResponse } from "@mysten/sui.js/client";
 import { sui } from '@/lib/api/shinami'
 import { ChevronRightIcon, EllipsisVerticalIcon } from '@heroicons/react/20/solid'
 import { useRouter } from 'next/navigation'
@@ -10,13 +9,13 @@ import Image from 'next/image';
 export default function FollowerItem({f}: {f: FollowData}) {
   const [profile, setProfile] = useState<any>({})
   const router = useRouter()
-  const isInitialRender = useRef(true);
+  //const isInitialRender = useRef(true);
 
   useEffect(() => {
-    if (isInitialRender.current) {
-      isInitialRender.current = false;
-      return;
-    }
+    // if (isInitialRender.current) {
+    //   isInitialRender.current = false;
+    //   return;
+    // }
     const getProfile = async () => {
       const profiledata: any = await sui.getObject({
           id: f.follower_profile,
@@ -27,10 +26,6 @@ export default function FollowerItem({f}: {f: FollowData}) {
       getProfile()
   }, [f.follower_profile])
 
-
-  if(!profile) {
-    return <div>Loading2</div>
-  }
 
   let avatar = profile.data?.content?.fields?.avatar
   let address = profile.data?.content?.fields?.owner
@@ -64,11 +59,11 @@ export default function FollowerItem({f}: {f: FollowData}) {
             </div>
             <ChevronRightIcon className="h-5 w-5 flex-none text-gray-400 align-middle pr-2" aria-hidden="true"/>
           </div>
-      </li>
-      <div className="text-sm leading-relaxed text-gray-900 mt-2">{bio}</div>
-          <p className="mt-1 text-xs leading-5 text-gray-500 pl-2">
-              submitted {timestamp}
-          </p>
-    </div>
+        </li>
+        <div className="text-sm leading-relaxed text-gray-900 mt-2">{bio}</div>
+            <p className="mt-1 text-xs leading-5 text-gray-500 pl-2">
+                submitted {timestamp}
+            </p>
+        </div>
     )
 }

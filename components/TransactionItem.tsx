@@ -33,11 +33,6 @@ export default function TransactionItem({t, onLoadingChange} : {t: TransactionLi
       router.push(`/transaction/${t.digest}`)
     }
 
-    // if (loading) {
-    //   return (
-    //     <div>Loaidng</div>
-    //   )
-    // }
 
     return (
       <li key={t.id} className="relative flex group justify-between gap-x-6 hover:bg-gray-50" onClick={handleClick}>

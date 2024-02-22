@@ -5,7 +5,7 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse) {
         
-        let pageSize = 5;
+        let pageSize = 20;
         let pageNumber = req.body.currentPage - 1;
         let offset = pageNumber * pageSize;
         console.log('in access lit ' + req.body.currentPage)

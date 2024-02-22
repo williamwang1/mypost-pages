@@ -5,7 +5,7 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse) {
         
-        let pageSzie = 5;
+        let pageSzie = 20;
         let pageNumber = req.body.currentPage - 1;
         let offset = pageNumber * pageSzie;
         console.log('in transaction getlist ' + req.body.currentPage)
