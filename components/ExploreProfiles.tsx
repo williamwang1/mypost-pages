@@ -3,18 +3,22 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import TransactionItem from "./TransactionItem";
 import { API_HOST } from '@/lib/api/move';
 import { TransactionList } from "@/types/transaction";
-import { TRANSACTION_GET_LIST_ROUTE, TRANSACTION_MUTATEDB_ROUTE } from "@/lib/api/constant";
+import { EXPLORE_PROFILES_ROUTE, TRANSACTION_GET_LIST_ROUTE, TRANSACTION_MUTATEDB_ROUTE } from "@/lib/api/constant";
 import axios from "axios";
+import FollowerItem from "./FollowerItem";
+import { FollowData } from "@/types/follow";
+import ProfileItem from "./ProfileItem";
+import { ProfileMedata } from "@/types/profile";
 
 const ExploreProfiles = ({slug}: {slug: string}) => {
-  const [items, setItems] = useState<TransactionList[]>([]);
+  const [items, setItems] = useState<ProfileMedata[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(true);
 
   const fetchMoreData = () => {
     axios
-      .post(`${API_HOST}${TRANSACTION_GET_LIST_ROUTE}`, { slug: slug,  currentPage: page })
+      .post(`${API_HOST}${EXPLORE_PROFILES_ROUTE}`, { slug: slug,  currentPage: page })
       .then((res) => {
         console.log('in my transaction ' + JSON.stringify(res.data))
         //setItems(res.data)
@@ -39,7 +43,7 @@ const ExploreProfiles = ({slug}: {slug: string}) => {
     const getData = async () => {
       //console.log('in my transaction ' + currentPage)
       axios
-          .post(`${API_HOST}${TRANSACTION_GET_LIST_ROUTE}`, { slug: slug,  currentPage: 1 })
+          .post(`${API_HOST}${EXPLORE_PROFILES_ROUTE}`, { slug: slug,  currentPage: 1 })
           .then((res) =>{
             if (res.data.length === 0) {
               setHasMore(false);
@@ -75,7 +79,8 @@ const ExploreProfiles = ({slug}: {slug: string}) => {
         className="divide-y divide-gray-100 mt-2 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl"
       >
             {items &&
-              items.map((item) => <TransactionItem key={item.id} t={item} onLoadingChange={handleLoading}/>)}
+              items.map((p) => <ProfileItem p={p} key={p.id} onLoadingChange={handleLoading}/> )
+            }
       </div>
     </InfiniteScroll>
   );

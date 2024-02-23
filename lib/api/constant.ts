@@ -29,7 +29,9 @@ export const FOLLOW_FOLLOWING_LIST_ROUTE = '/api/follow/followingslist'
 
 export const FOLLOW_FOLLOWER_LIST_ROUTE = '/api/follow/followerslist'
 
-export const ACCESS_HISTORY_LIST_ROUTE = '/api/access/getlist'
+export const ACCESS_HISTORY_LIST_ROUTE = '/api/access/gettxlist'
+
+export const ACCESS_PROFILE_LIST_ROUTE = '/api/access/getprofilelist'
 
 export const ACCESS_CHECK_ROUTE = '/api/access/check'
 
@@ -52,5 +54,13 @@ export const FOLLOW_MUTATEFALSE_ROUTE = '/api/follow/mutatefalse'
 export const UNFOLLOW_MUTATEDB_ROUTE = '/api/unfollow/mutatedb'
 
 export const UNFOLLOW_MUTATEFALSE_ROUTE = '/api/unfollow/mutatefalse'
+
+export const HOME_LIST_ROUTE = '/api/home/getlist'
+
+export const HOME_RECOMMEND_ROUTE = '/api/home/getrecommend'
+
+export const EXPLORE_PROFILES_ROUTE = '/api/explore/profiles'
+
+export const EXPLORE_TRANSACTIONS_ROUTE = '/api/explore/transactions'
 
 

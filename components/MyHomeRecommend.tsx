@@ -3,7 +3,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import TransactionItem from "./TransactionItem";
 import { API_HOST } from '@/lib/api/move';
 import { TransactionList } from "@/types/transaction";
-import { TRANSACTION_GET_LIST_ROUTE, TRANSACTION_MUTATEDB_ROUTE } from "@/lib/api/constant";
+import { HOME_RECOMMEND_ROUTE } from "@/lib/api/constant";
 import axios from "axios";
 
 const MyHomeRecommend = ({slug}: {slug: string}) => {
@@ -14,10 +14,9 @@ const MyHomeRecommend = ({slug}: {slug: string}) => {
 
   const fetchMoreData = () => {
     axios
-      .post(`${API_HOST}${TRANSACTION_GET_LIST_ROUTE}`, { slug: slug,  currentPage: page })
+      .post(`${API_HOST}${HOME_RECOMMEND_ROUTE}`, { slug: slug,  currentPage: page })
       .then((res) => {
         console.log('in my transaction ' + JSON.stringify(res.data))
-        //setItems(res.data)
         if (res.data.length === 0) {
           setHasMore(false);
         }  else {
@@ -27,19 +26,16 @@ const MyHomeRecommend = ({slug}: {slug: string}) => {
       .catch((err) => console.log(err));
       setLoading(false)
     setPage((prevPage) => prevPage + 1);
-};
+  };
 
 
 
   useEffect(() => {
-    // if (isInitialRender.current) {
-    //   isInitialRender.current = false;
-    //   return;
-    // }
+
     const getData = async () => {
       //console.log('in my transaction ' + currentPage)
       axios
-          .post(`${API_HOST}${TRANSACTION_GET_LIST_ROUTE}`, { slug: slug,  currentPage: 1 })
+          .post(`${API_HOST}${HOME_RECOMMEND_ROUTE}`, { slug: slug,  currentPage: 1 })
           .then((res) =>{
             if (res.data.length === 0) {
               setHasMore(false);

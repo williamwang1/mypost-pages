@@ -6,6 +6,7 @@ import { API_HOST } from '@/lib/api/move';
 import { useRouter } from 'next/navigation'
 import { FOLLOW_FOLLOWER_LIST_ROUTE } from '@/lib/api/constant'
 import FollowerItem from './FollowerItem';
+import axios from 'axios';
 
 export default function MyFollowers({slug}: {slug: string}) {
   const [items, setItems] = useState<FollowData[]>([]);
@@ -14,74 +15,77 @@ export default function MyFollowers({slug}: {slug: string}) {
   const isInitialRender = useRef(true);
   const [loading, setLoading] = useState(true)
 
-  const fetchData = async (currentPage: number) => {
-    //console.log('in fectch data ' + currentPage)
-    setLoading(true); 
-    try {
-      const transactionsdb = await fetch(`${API_HOST}${FOLLOW_FOLLOWER_LIST_ROUTE}`, {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ slug, currentPage }),
-      })
+  // const fetchData = async (currentPage: number) => {
+  //   //console.log('in fectch data ' + currentPage)
+  //   setLoading(true); 
+  //   try {
+  //     const transactionsdb = await fetch(`${API_HOST}${FOLLOW_FOLLOWER_LIST_ROUTE}`, {
+  //       method: 'POST',
+  //       headers: {
+  //       'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ slug, currentPage }),
+  //     })
   
-      const newData : FollowData[] = await transactionsdb.json();
-      //console.log('in fetch data ' + JSON.stringify(newData))
-      if (newData.length === 0) {
-        setHasMore(false);
-      } else {
-        setItems((prevItems) => [...prevItems, ...newData]);
-      }
-      setPage((prevPage) => prevPage + 1)
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      // Handle error appropriately
-    } finally {
-      setLoading(false); // Set loading to false after fetching data
-    }
-  }
+  //     const newData : FollowData[] = await transactionsdb.json();
+  //     //console.log('in fetch data ' + JSON.stringify(newData))
+  //     if (newData.length === 0) {
+  //       setHasMore(false);
+  //     } else {
+  //       setItems((prevItems) => [...prevItems, ...newData]);
+  //     }
+  //     setPage((prevPage) => prevPage + 1)
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //     // Handle error appropriately
+  //   } finally {
+  //     setLoading(false); // Set loading to false after fetching data
+  //   }
+  // }
+
+  const fetchMoreData = () => {
+    axios
+      .post(`${API_HOST}${FOLLOW_FOLLOWER_LIST_ROUTE}`, { slug: slug,  currentPage: page })
+      .then((res) => {
+        console.log('in my followers ' + JSON.stringify(res.data))
+        if (res.data.length === 0) {
+          setHasMore(false);
+        }  else {
+          setItems((prevItems) => [...prevItems, ...res.data]);
+        }
+      })
+      .catch((err) => console.log(err));
+      setLoading(false)
+    setPage((prevPage) => prevPage + 1);
+  };
 
   useEffect(() => {
-    // if (isInitialRender.current) {
-    //     isInitialRender.current = false;
-    //     return;
-    //   }
-    const getData = async (currentPage: number) => {
-      //console.log('in fectch data ' + currentPage)
-      setLoading(true); 
-      try {
-        const transactionsdb = await fetch(`${API_HOST}${FOLLOW_FOLLOWER_LIST_ROUTE}`, {
-          method: 'POST',
-          headers: {
-          'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ slug, currentPage }),
-        })
-    
-        const newData : FollowData[] = await transactionsdb.json();
-        //console.log('in fetch data ' + JSON.stringify(newData))
-        if (newData.length === 0) {
-          setHasMore(false);
-        } else {
-          setItems((prevItems) => [...prevItems, ...newData]);
-        }
-        setPage((prevPage) => prevPage + 1)
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        // Handle error appropriately
-      } finally {
-        setLoading(false); // Set loading to false after fetching data
-      }
+    const getData = async () => {
+      //console.log('in my transaction ' + currentPage)
+      axios
+          .post(`${API_HOST}${FOLLOW_FOLLOWER_LIST_ROUTE}`, { slug: slug,  currentPage: 1 })
+          .then((res) =>{
+            if (res.data.length === 0) {
+              setHasMore(false);
+            }  else {
+              setItems(res.data);
+            }
+              setLoading(false)
+          })
+          .catch((err) => console.log(err));
     }
-    getData(1)
+
+    getData()
   }, [slug]);
 
+  const handleLoading = (loading: boolean) => {
+    setLoading(loading)
+  }
 
   return (
     <InfiniteScroll
       dataLength={items.length}
-      next={() => fetchData(page)}
+      next={fetchMoreData}
       hasMore={hasMore}
       loader={loading && <h1>Loading...</h1>}
       endMessage={
@@ -90,14 +94,14 @@ export default function MyFollowers({slug}: {slug: string}) {
       </p>
   }
   >
-    <ul
+    <div
       role="list"
       className="divide-y divide-gray-100 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl"
     >
-      {items && items.map((f) => (
-          <FollowerItem f={f} key={f.id}/>
-      ))}
-    </ul>
+      {items && items.map((f) => 
+          <FollowerItem f={f} key={f.id} onLoadingChange={handleLoading}/>
+      )}
+    </div>
     </InfiniteScroll>
   )
 }

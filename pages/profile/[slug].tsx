@@ -7,7 +7,6 @@ import { ProfileMetadataCreated, ProfileMedata, ProfileData } from "@/types/prof
 import { Tab } from '@headlessui/react'
 import { useRouter } from 'next/navigation'
 import MyTransactions from '@/components/MyTransactions';
-import MyAssets from '@/components/MyAssets';
 import MyFollowings from '@/components/MyFollowings';
 import MyFollowers from '@/components/MyFollowers';
 import { API_HOST } from '@/lib/api/move';
@@ -15,6 +14,7 @@ import { ACCOUNT_LIST_ROUTE, PROFILE_GET_ROUTE } from '@/lib/api/constant';
 import { Account } from '@/types/auth';
 import { GetServerSideProps, NextPage } from 'next';
 import ProfileSummary from "@/components/ProfileSummary";
+import MyAcesses from "@/components/MyAcesses";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     // Extract the id from context.params
@@ -66,7 +66,7 @@ const tabs = [
     // {id: 2, name: 'Assets', component: <MyAssets/>, url: '/profile/asset'},
     {id: 1, name: 'Followings'},
     {id: 2, name: 'Followers'},
-    {id: 3, name: 'Activities'}
+    {id: 3, name: 'Acesses'}
 ]
 
 function Profile({metadata, session, profiledata, profilepool, accounts, slug} 
@@ -120,6 +120,9 @@ function Profile({metadata, session, profiledata, profilepool, accounts, slug}
                             )}
                             {tab.id == 2 && (
                                 <MyFollowers slug={slug}/>
+                            )}
+                            {tab.id == 3 && (
+                                <MyAcesses slug={slug}/>
                             )}
 
                         </Tab.Panel>

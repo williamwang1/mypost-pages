@@ -116,7 +116,6 @@ const parseTxRes: TransactionResponseParser<CommonResponse> = async (_, txRes, u
     }
     let followJson = await followRes.json()
     console.log('in profile mutate ' + JSON.stringify(followJson))
-
     return { txDigest: txRes.digest };
 };
 

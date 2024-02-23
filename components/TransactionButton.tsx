@@ -4,7 +4,7 @@ import { sui } from '@/lib/api/shinami'
 import Image from 'next/image';
 import { AccessHistory, TransactionList } from "@/types/transaction";
 import { useBuyMutation, useSellMutation } from '@/lib/hooks/api';
-import { ACCESS_CHECK_ROUTE, ACCESS_HISTORY_LIST_ROUTE, PROFILE_GET_ROUTE, TRANSACTION_GET } from '@/lib/api/constant';
+import { ACCESS_CHECK_ROUTE } from '@/lib/api/constant';
 import { API_HOST } from '@/lib/api/move';
 import { SUI_MIST } from '@/lib/constant';
 import { InformationCircleIcon } from "@heroicons/react/20/solid";

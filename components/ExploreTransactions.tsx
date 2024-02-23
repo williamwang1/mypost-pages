@@ -3,7 +3,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import TransactionItem from "./TransactionItem";
 import { API_HOST } from '@/lib/api/move';
 import { TransactionList } from "@/types/transaction";
-import { TRANSACTION_GET_LIST_ROUTE, TRANSACTION_MUTATEDB_ROUTE } from "@/lib/api/constant";
+import { EXPLORE_TRANSACTIONS_ROUTE } from "@/lib/api/constant";
 import axios from "axios";
 
 const ExploreTransactions = ({slug}: {slug: string}) => {
@@ -19,7 +19,7 @@ const ExploreTransactions = ({slug}: {slug: string}) => {
 
   const fetchMoreData = () => {
     axios
-      .post(`${API_HOST}${TRANSACTION_GET_LIST_ROUTE}`, { slug: slug,  currentPage: page })
+      .post(`${API_HOST}${EXPLORE_TRANSACTIONS_ROUTE}`, { slug: slug,  currentPage: page })
       .then((res) => {
         console.log('in my transaction ' + JSON.stringify(res.data))
         //setItems(res.data)
@@ -40,7 +40,7 @@ const ExploreTransactions = ({slug}: {slug: string}) => {
     const getData = async () => {
       //console.log('in my transaction ' + currentPage)
       axios
-          .post(`${API_HOST}${TRANSACTION_GET_LIST_ROUTE}`, { slug: slug,  currentPage: 1 })
+          .post(`${API_HOST}${EXPLORE_TRANSACTIONS_ROUTE}`, { slug: slug,  currentPage: 1 })
           .then((res) =>{
             if (res.data.length === 0) {
               setHasMore(false);

@@ -66,12 +66,12 @@ export default function MyApp({ Component, pageProps : { session, ...pageProps }
         <SessionProvider session={session}>
           <Head>
           <meta name="viewport" content="width=device-width,initial-scale=1" />
-          <title>My awesome PWA app</title>
-          <meta name="description" content="Best PWA app in the world!" />
+          <title>Mypost</title>
+          <meta name="description" content="Moneitize your any content in any social media more" />
           <link rel="shortcut icon" href="/favicon.ico" />
-          <link rel="mask-icon" href="/icons/mask-icon.svg" color="#FFFFFF" />
+          {/* <link rel="mask-icon" href="/icons/mask-icon.svg" color="#FFFFFF" /> */}
           <meta name="theme-color" content="#ffffff" />
-          <link rel="apple-touch-icon" href="/icons/touch-icon-iphone.png" />
+          {/* <link rel="apple-touch-icon" href="/icons/touch-icon-iphone.png" />
           <link
             rel="apple-touch-icon"
             sizes="152x152"
@@ -86,22 +86,22 @@ export default function MyApp({ Component, pageProps : { session, ...pageProps }
             rel="apple-touch-icon"
             sizes="167x167"
             href="/icons/touch-icon-ipad-retina.png"
-          />
+          /> */}
           <link rel="manifest" href="/manifest.json" />
-          <meta name="twitter:card" content="summary" />
-          <meta name="twitter:url" content="https://yourdomain.com" />
-          <meta name="twitter:title" content="My awesome PWA app" />
-          <meta name="twitter:description" content="Best PWA app in the world!" />
-          <meta name="twitter:image" content="/icons/twitter.png" />
-          <meta name="twitter:creator" content="@DavidWShadow" />
+          <meta name="twitter:card" content="Moneitize your any content in any social media more" />
+          <meta name="twitter:url" content="https://mypost.money" />
+          <meta name="twitter:title" content="Mypost" />
+          <meta name="twitter:description" content="Moneitize your any content in any social media more" />
+          <meta name="twitter:image" content="/images/logo.png" />
+          <meta name="twitter:creator" content="@Mypost" />
           <meta property="og:type" content="website" />
-          <meta property="og:title" content="My awesome PWA app" />
-          <meta property="og:description" content="Best PWA app in the world!" />
-          <meta property="og:site_name" content="My awesome PWA app" />
-          <meta property="og:url" content="https://yourdomain.com" />
-          <meta property="og:image" content="/icons/og.png" />
+          <meta property="og:title" content="Mypost" />
+          <meta property="og:description" content="Moneitize your any content in any social media more" />
+          <meta property="og:site_name" content="Mypost" />
+          <meta property="og:url" content="https://mypost.money" />
+          <meta property="og:image" content="/images/logo.png" />
           {/* add the following only if you want to add a startup image for Apple devices. */}
-          <link
+          {/* <link
             rel="apple-touch-startup-image"
             href="/images/apple_splash_2048.png"
             sizes="2048x2732"
@@ -135,7 +135,7 @@ export default function MyApp({ Component, pageProps : { session, ...pageProps }
             rel="apple-touch-startup-image"
             href="/images/apple_splash_640.png"
             sizes="640x1136"
-          />
+          /> */}
         </Head>
           <Component {...pageProps} />
         </SessionProvider>

@@ -4,7 +4,7 @@ import { ChevronRightIcon } from '@heroicons/react/20/solid'
 import Image from 'next/image'
 
 
-export default function TransactionHistoryItem({transaction, profile}: {transaction: AccessHistory, profile: any}) {
+export default function AccessItem({transaction, profile}: {transaction: AccessHistory, profile: any}) {
     let avatar = profile?.data?.content?.fields?.avatar
     let name = profile?.data?.content?.fields?.name
     // let address = profile?.data?.content?.fields?.owner
