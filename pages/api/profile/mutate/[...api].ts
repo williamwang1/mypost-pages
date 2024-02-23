@@ -89,6 +89,7 @@ const parseTxRes: TransactionResponseParser<CommonResponse> = async (_, txRes, u
         throw new Error(`Error: ${profileRes.status}`);
     }
     let profileJson = await profileRes.json()
+    console.log('in profile mutate ' + JSON.stringify(profileJson))
     // update follow data in db
     let followEventData = txRes.events?.at(1)?.parsedJson as FollowData;
     let followBody = {
@@ -110,8 +111,11 @@ const parseTxRes: TransactionResponseParser<CommonResponse> = async (_, txRes, u
         },
         body: JSON.stringify(followBody)
     })
+    if (!followRes.ok) {
+        throw new Error(`Error: ${profileRes.status}`);
+    }
     let followJson = await followRes.json()
-
+    console.log('in profile mutate ' + JSON.stringify(followJson))
 
     return { txDigest: txRes.digest };
 };

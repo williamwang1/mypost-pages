@@ -61,7 +61,7 @@ const parseTxRes: TransactionResponseParser<CommonResponse> = async (_, txRes, u
     })
     // console.log(events?.length)
     let data = txRes.events?.at(0)?.parsedJson as TransactionCreated;
-    console.log('transaction metadata ' + JSON.stringify(data))
+    //console.log('transaction metadata ' + JSON.stringify(data))
     let body = {
         digest: txRes.digest,
         summary: '',
@@ -89,8 +89,8 @@ const parseTxRes: TransactionResponseParser<CommonResponse> = async (_, txRes, u
     if (!txMetaRes.ok) {
         throw new Error(`Error: ${txMetaRes.statusText}`);
     }
-    let profileJson = await txMetaRes.json()
-    //console.log(profileJson)
+    let txJson = await txMetaRes.json()
+    console.log('in transaction mutate ' + JSON.stringify(txJson))
     // update access data in db
     let accessBought = txRes.events?.at(1)?.parsedJson as AccessBought;
     let acessSellBody = {
@@ -106,6 +106,7 @@ const parseTxRes: TransactionResponseParser<CommonResponse> = async (_, txRes, u
         body: JSON.stringify(acessSellBody)
     })
     let sellJson = await sellRes.json()
+    console.log('in transaction mutate ' + JSON.stringify(sellJson))
     let accessBoughtBody = {
         digest: txRes.digest,
         access_id: accessBought.access_id,
@@ -127,7 +128,7 @@ const parseTxRes: TransactionResponseParser<CommonResponse> = async (_, txRes, u
         body: JSON.stringify(accessBoughtBody)
     })
     let followJson = await accessRes.json()
-
+    console.log('in transaction mutate ' + JSON.stringify(followJson))
 
     return { txDigest: txRes.digest, transaction_id: data.transaction_id,  profile_id: data.profile_id, pool_id: data.pool_id};
 };

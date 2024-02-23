@@ -17,11 +17,33 @@ CREATE TABLE "Follow" (
 );
 
 -- CreateTable
+CREATE TABLE "RelyAccess" (
+    "id" TEXT NOT NULL,
+    "digest" TEXT NOT NULL,
+    "access_id" TEXT NOT NULL,
+    "reply_id" TEXT NOT NULL,
+    "reply_pool_id" TEXT NOT NULL,
+    "reply_digest" TEXT NOT NULL,
+    "transaction_digest" TEXT NOT NULL,
+    "profile_id" TEXT NOT NULL,
+    "accessor_profile" TEXT NOT NULL,
+    "price" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "address" TEXT NOT NULL,
+    "package_id" TEXT NOT NULL,
+    "create_at" TIMESTAMP(3) NOT NULL,
+    "status" BOOLEAN NOT NULL DEFAULT true,
+
+    CONSTRAINT "RelyAccess_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Access" (
     "id" TEXT NOT NULL,
     "digest" TEXT NOT NULL,
     "access_id" TEXT NOT NULL,
     "transaction_id" TEXT NOT NULL,
+    "pool_id" TEXT,
     "transaction_digest" TEXT NOT NULL,
     "profile_id" TEXT NOT NULL,
     "accessor_profile" TEXT NOT NULL,
@@ -36,10 +58,29 @@ CREATE TABLE "Access" (
 );
 
 -- CreateTable
+CREATE TABLE "Reply" (
+    "id" TEXT NOT NULL,
+    "digest" TEXT NOT NULL,
+    "transaction_digest" TEXT NOT NULL,
+    "public_content" TEXT NOT NULL,
+    "address" TEXT NOT NULL,
+    "profile_id" TEXT NOT NULL,
+    "reply_id" TEXT NOT NULL,
+    "pool_id" TEXT NOT NULL,
+    "package_id" TEXT NOT NULL,
+    "reply_post_id" TEXT NOT NULL,
+    "transaction_post_id" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "create_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Reply_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Transaction" (
     "id" TEXT NOT NULL,
     "digest" TEXT NOT NULL,
-    "summary" TEXT NOT NULL,
+    "summary" TEXT,
     "public_content" TEXT NOT NULL,
     "address" TEXT NOT NULL,
     "profile_id" TEXT NOT NULL,
@@ -96,10 +137,22 @@ CREATE TABLE "Account" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Follow_follower_following_type_status_key" ON "Follow"("follower", "following", "type", "status");
+CREATE UNIQUE INDEX "Follow_digest_key" ON "Follow"("digest");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "RelyAccess_digest_key" ON "RelyAccess"("digest");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Access_digest_key" ON "Access"("digest");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Reply_digest_key" ON "Reply"("digest");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Reply_reply_id_key" ON "Reply"("reply_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Reply_pool_id_key" ON "Reply"("pool_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Transaction_digest_key" ON "Transaction"("digest");

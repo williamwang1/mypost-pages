@@ -75,9 +75,13 @@ export default withNewZkLoginSession(
                         } flex w-full items-center justify-center space-x-3 text-sm transition-all duration-75 focus:outline-none`}
                         onClick={() => {
                             setSignInClicked(true);
-                            // signIn("google", { callbackUrl: 'http://localhost:3000/account' });
-                            // handleGoogle
                             console.log(callbackBaseUrl)
+                            // getGoogleAuthUrl(
+                            //   session,
+                            //   GOOGLE_CLIENT_ID!,
+                            //   new URL("google", callbackBaseUrl),
+                            //   `${API_HOST}/account`
+                            //   )
                             router.replace(
                                 getGoogleAuthUrl(
                                 session,
