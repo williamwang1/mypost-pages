@@ -1,5 +1,3 @@
-import exp from "constants";
-
 
 export const ACCOUNT_LIST_ROUTE = '/api/account/getlist';
 
@@ -46,3 +44,13 @@ export const ACCESS_SELL_FALSE_ROUTE = '/api/sell/mutatefalse'
 export const ACCESS_MUTATE_FALSE_ROUTE = '/api/access/mutatefalse'
 
 export const ACCESS_MUTATE_ROUTE = '/api/access/mutatedb'
+
+export const FOLLOW_MUTATEDB_ROUTE = '/api/follow/mutatedb'
+
+export const FOLLOW_MUTATEFALSE_ROUTE = '/api/follow/mutatefalse'
+
+export const UNFOLLOW_MUTATEDB_ROUTE = '/api/unfollow/mutatedb'
+
+export const UNFOLLOW_MUTATEFALSE_ROUTE = '/api/unfollow/mutatefalse'
+
+

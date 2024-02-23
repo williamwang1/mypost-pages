@@ -8,7 +8,7 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse) {
 
-    // if (!session.user) {
+    // if (!req.session.user) {
     //     return res.status(401).json({ error: "Unauthorized" });
     // }
     let result;

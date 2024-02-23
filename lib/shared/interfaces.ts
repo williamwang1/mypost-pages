@@ -8,6 +8,27 @@ export const ProfileRequest = object({
 })
 export type ProfileRequest = Infer<typeof ProfileRequest>
 
+export const FollowRequest = object({
+  price: string(),
+  budget: string(),
+  coin_count: string(),
+  protocol_destination: string(),
+  global: string(),
+  my_profile: string(),
+  following_pool: string(),
+  follower_pool: string()
+})
+export type FollowRequest = Infer<typeof FollowRequest>
+
+export const UnFollowRequest = object({
+  protocol_destination: string(),
+  global: string(),
+  my_profile: string(),
+  following_pool: string(),
+  follower_pool: string()
+})
+export type UnFollowRequest = Infer<typeof UnFollowRequest>
+
 export const CheckProfileRequest = object({
   address: string(),
   global: string()
@@ -41,6 +62,13 @@ export const TransactionRequest = object({
 })
 export type TransactionRequest = Infer<typeof TransactionRequest>
 
+export const ReplyRequest = object({
+  profile_pool: string(),
+  content: string()
+})
+
+export type ReplyRequest = Infer<typeof ReplyRequest>
+
 export const BuyRequest = object({
   price: string(),
   budget: string(),
@@ -64,6 +92,7 @@ export const TransactionResponse = object({
   profile_id: string(),
   pool_id: string()
 });
+export type TransactionResponse = Infer<typeof TransactionResponse>
 
 export const CommonResponse = object({
   txDigest: string(),
@@ -71,7 +100,7 @@ export const CommonResponse = object({
 
 export type CommonResponse = Infer<typeof CommonResponse>
 
-export type TransactionResponse = Infer<typeof TransactionResponse>
+
 
 export const AddRequest = object({
   x: integer(),

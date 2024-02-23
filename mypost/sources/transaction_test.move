@@ -1,4 +1,5 @@
 #[test_only]
+#[allow(unused_use)]
 module mypost::transaction_test {
     use sui::test_scenario as ts;
     use mypost::transaction::{Self, TransactionPool, Transaction, Access};

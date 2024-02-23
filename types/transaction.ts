@@ -7,6 +7,14 @@ interface TransactionCreated {
     timestamp_ms: string
 }
 
+interface ReplyCreated {
+    reply_id: string,
+    pool_id: string,
+    profile_id: string,
+    transaction_digest: string,
+    timestamp_ms: string,
+}
+
 interface AccessBought {
     access_id: string,
     transaction_id: string,
@@ -96,4 +104,4 @@ interface TransactionList {
 }
 
 export type { TransactionCreated, AccessBought, AccessSold, TransactionMetaData, AccesstData,
-    TransactionDetails, TransactionList, AccessHistory}
+    TransactionDetails, TransactionList, AccessHistory, ReplyCreated}

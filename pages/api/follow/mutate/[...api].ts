@@ -2,7 +2,6 @@ import { gas, sui } from "@/lib/api/shinami";
 import { MYPOST_MOVE_PACKAGE_ID, GLOBAL_OBJECT_ID, API_HOST } from '@/lib/api/move'
 import { buildGaslessTransactionBytes } from "@shinami/clients";
 import { first } from "@/lib/shared/utils";
-import prisma from "@/lib/prisma";
 import {
     GaslessTransactionBytesBuilder,
     InvalidRequest,
@@ -11,35 +10,47 @@ import {
     zkLoginTxExecHandler,
 } from "@shinami/nextjs-zklogin/server/pages";
 import { mask, validate } from "superstruct";
-import { CommonResponse, ProfileRequest, TransactionResponse} from "@/lib/shared/interfaces";
+import { FollowRequest, CommonResponse, } from "@/lib/shared/interfaces";
 import { ProfileMetadataCreated } from '@/types/profile'
 import { FollowMetaData, FollowData } from "@/types/follow";
-import { FOLLOW_MUTATEDB_ROUTE, PROFILE_MUTATEDB_ROUTE } from "@/lib/api/constant";
+import { AccessBought, TransactionCreated } from "@/types/transaction";
+import { ACCESS_MUTATE_ROUTE, ACCESS_MUTATE_FALSE_ROUTE, FOLLOW_MUTATEDB_ROUTE, UNFOLLOW_MUTATEFALSE_ROUTE } from "@/lib/api/constant";
 
-// interface ProfileMeataEvent {
-//     id:             string
-//     for:            string 
-//     pool:           string
-// }
 
 const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {
-    const [error, body] = validate(req.body, ProfileRequest);
+    const [error, body] = validate(req.body, FollowRequest);
     if (error) throw new InvalidRequest(error.message);
   
-    console.log("Preparing create profile tx for zkLogin wallet", wallet);
-  
+    console.log("Preparing create buy tx for zkLogin wallet", wallet);
+
+    let coindata = await sui.getCoins({owner: wallet})
+
+ 
     const gaslessTxBytes = await buildGaslessTransactionBytes({
       sui,
       build: async (txb) => {
-        // Source code for this example Move function:
-        // https://github.com/shinamicorp/shinami-typescript-sdk/blob/90f19396df9baadd71704a0c752f759c8e7088b4/move_example/sources/math.move#L13
+        // if multip coins, merget into 1 coin first
+        if (parseInt(body.coin_count) > 1) {
+            let len = coindata.data.length;
+            let i = 1;
+            let base = coindata.data[0].coinObjectId;
+            while (i < len) {
+                let tobeMerged = coindata.data[i].coinObjectId;
+                txb.mergeCoins(txb.object(base), [txb.object(tobeMerged)]);
+                i = i + 1;   
+            }
+        }
+
+        console.log('arguments 1st argument ' + coindata.data[0].coinObjectId + ' ')
         txb.moveCall({
-            target: `${MYPOST_MOVE_PACKAGE_ID}::profile::create_profile_pool`,
+            target: `${MYPOST_MOVE_PACKAGE_ID}::profile::follow`,
             arguments: [
-                txb.pure(body.name),
-                txb.pure(body.bio),
-                txb.pure(body.avatar),
+                txb.object(coindata.data[0].coinObjectId),
+                txb.pure.address(wallet),
                 txb.object(body.global),
+                txb.object(body.my_profile),
+                txb.object(body.following_pool),
+                txb.object(body.follower_pool),
                 txb.object('0x6')
             ],
         });
@@ -48,49 +59,25 @@ const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {
     return { gaslessTxBytes, gasBudget: 100_000_000 };
 };
 
-const parseTxRes: TransactionResponseParser<CommonResponse> = async (_, txRes, user) => {
+const parseTxRes: TransactionResponseParser<CommonResponse> = async (req, txRes, user) => {
     // Requires "showEvents: true" in tx response options.
     const event = first(txRes.events);
     if (!event) throw new Error("Event missing from tx response");
 
-    let events = txRes.events?.filter((event) => {
-        let result = false
-        if(event.type === `${MYPOST_MOVE_PACKAGE_ID}::profile::ProfileMetaDataCreated`) {
-            result = true
-        }
-        //event.type == `${MYPOST_MOVE_PACKAGE_ID}::profile::ProfileMetaDataCreated`
-        // let type2 = event.type.includes('::profile::ProfileMetaDataCreated')
-        // let type3 = event.type.endsWith('::profile::ProfileMetaDataCreated');
-        // console.log(event.type + ' ' + " " + type2 + ' ' + type3)
-        return result
-    })
-    // console.log(events?.length)
-    let data = txRes.events?.at(0)?.parsedJson as ProfileMetadataCreated;
-    //console.log('profile metadata ' + JSON.stringify(data))
+    let followEventData = txRes.events?.at(0)?.parsedJson as FollowData;
     let body = {
-        package_id: `${MYPOST_MOVE_PACKAGE_ID}`,
-        profile_id: data.for,
-        profile_meta_id: data.id,
-        profile_pool_id: data.pool,
-        global_id: `${GLOBAL_OBJECT_ID}`,
-        address: user.wallet,
-        digest: txRes.digest,
-        create_at: new Date()
+        follower: followEventData.follower,
+        following: followEventData.following,
+        type: 'unfollow',
     }
-    // update profile data in db
-    const profileRes = await fetch(`${API_HOST}${PROFILE_MUTATEDB_ROUTE}`, {
+    const sellRes = await fetch(`${API_HOST}${UNFOLLOW_MUTATEFALSE_ROUTE}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            },
+        },
         body: JSON.stringify(body)
     })
-    if (!profileRes.ok) {
-        throw new Error(`Error: ${profileRes.status}`);
-    }
-    let profileJson = await profileRes.json()
-    // update follow data in db
-    let followEventData = txRes.events?.at(1)?.parsedJson as FollowData;
+    let sellJson = await sellRes.json()
     let followBody = {
         follower: followEventData.follower,
         following: followEventData.following,
@@ -111,7 +98,6 @@ const parseTxRes: TransactionResponseParser<CommonResponse> = async (_, txRes, u
         body: JSON.stringify(followBody)
     })
     let followJson = await followRes.json()
-
 
     return { txDigest: txRes.digest };
 };

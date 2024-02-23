@@ -1,4 +1,5 @@
 #[test_only]
+#[allow(unused_use)]
 module mypost::profile_test {
     use sui::test_scenario as ts;
     use sui::tx_context;

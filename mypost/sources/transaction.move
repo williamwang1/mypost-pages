@@ -11,6 +11,7 @@ module mypost::transaction {
     use sui::clock::{Self, Clock};
     use sui::balance::{Self, Balance};
     use mypost::profile::{Self, Profile, ProfilePool};
+    use mypost::price::{Self};
     use sui::transfer;
     use std::vector;
     use std::debug;
@@ -25,7 +26,7 @@ module mypost::transaction {
     const NOT_ALLOWED_BOUGHT: u64 = 2;
     const NOT_BOUGHT: u64 = 3;
     const NOT_ENOUGH_BALANCE: u64 = 4;
-    const SUI_MIST: u64 = 1000000000;
+    // const SUI_MIST: u64 = 1000000000;
 
     struct Transaction has key, store {
         id: UID,
@@ -62,7 +63,7 @@ module mypost::transaction {
         transaction_id: ID,
         pool_id: ID,
         profile_id: ID,
-        timestamp_ms: u64
+        timestamp_ms: u64,
     }
 
     struct AccessBought has copy, drop {
@@ -104,10 +105,6 @@ module mypost::transaction {
         let acessor_inner_id = object::uid_to_inner(&acessor_id);
         let profile_id = profile::get_profile_id(profile_pool);
 
-        // let content = Content{
-        //     for: inner_id,
-        //     content: string::utf8(content),
-        // };
         let transaction = Transaction{
             id: id,
             content: string::utf8(content),
@@ -157,21 +154,20 @@ module mypost::transaction {
                 timestamp_ms: clock::timestamp_ms(clock)
             }
         );
-
         profile::add_transaction(profile_pool, inner_id, inner_pool_id, profile_id, 0, clock, ctx);
         object_table::add(&mut pool.accessors, sender(ctx), access);
         pool.no_of_accessors = 1;
-        pool.price = getPrice(1, coffient);
+        pool.price = price::getTransactionPrice(1, coffient);
         transfer::transfer( transaction, sender(ctx));
         transfer::share_object(pool);
     }
 
-    fun getPrice(no_of_accessors: u64, cofficient: u64): u64 {
-        //let initial_price: u64 = 10000000; // 0.01 SUI
-        let price = no_of_accessors * no_of_accessors * SUI_MIST / cofficient;
-        // pool.price = price;
-        (price)
-    }
+    // fun getPrice(no_of_accessors: u64, cofficient: u64): u64 {
+    //     //let initial_price: u64 = 10000000; // 0.01 SUI
+    //     let price = no_of_accessors * no_of_accessors * SUI_MIST / cofficient;
+    //     // pool.price = price;
+    //     (price)
+    // }
 
     public fun get_no_of_accessors(tpool: &TransactionPool): u64 {
         (tpool.no_of_accessors)
@@ -192,7 +188,7 @@ module mypost::transaction {
         let bought = object_table::contains(&pool.accessors, sender(ctx));
         assert!(!bought, NOT_ALLOWED_BOUGHT);
         // balance is ennough 
-        let current_price = getPrice(pool.no_of_accessors, pool.cofficient);
+        let current_price = price::getTransactionPrice(pool.no_of_accessors, pool.cofficient);
         let value = coin::value(&payment);
         assert!(value >= current_price, INSUFFICIENT_FUND);
         let subjectFee = current_price * RPOFILE_OWNER_BUY_FEE_PERCENT / 100;
@@ -230,10 +226,10 @@ module mypost::transaction {
                 timestamp_ms: clock::timestamp_ms(clock)
             }
         );
-        object_table::add(&mut pool.accessors, protocol_destination, access);
+        object_table::add(&mut pool.accessors, sender(ctx), access);
         pool.no_of_accessors = pool.no_of_accessors + 1;
         pool.last_price = current_price;
-        pool.price = getPrice(pool.no_of_accessors, pool.cofficient);
+        pool.price = price::getTransactionPrice(pool.no_of_accessors, pool.cofficient);
     }
 
     #[lint_allow(self_transfer)]
@@ -250,7 +246,7 @@ module mypost::transaction {
         let bought = object_table::contains(&pool.accessors, sender(ctx));
         assert!(bought, NOT_BOUGHT);
 
-        let sold_price = getPrice(pool.no_of_accessors - 1, pool.cofficient);
+        let sold_price = price::getTransactionPrice(pool.no_of_accessors - 1, pool.cofficient);
         //debug::print(&sold_price);
         //debug::print(&pool.balance);
 
@@ -291,7 +287,7 @@ module mypost::transaction {
         object::delete(access_id);
         pool.no_of_accessors = pool.no_of_accessors - 1;
         pool.last_price = sold_price;
-        pool.price = getPrice(pool.no_of_accessors, pool.cofficient);
+        pool.price = price::getTransactionPrice(pool.no_of_accessors, pool.cofficient);
     }
 
 }

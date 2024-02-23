@@ -2,6 +2,7 @@
 #[lint_allow(self_transfer)]
 module mypost::profile {
     friend mypost::transaction;
+    friend mypost::reply;
     use std::option::{Self, Option};
     use std::string::{Self, String};
     use sui::coin::{Self, Coin};
@@ -15,6 +16,7 @@ module mypost::profile {
     use sui::url::{Self, Url};
     use sui::object_table::{Self, ObjectTable};
     use mypost::transaction::{Self, Transaction};
+    use mypost::price::{Self};
     use sui::event;
     use std::debug;
 
@@ -27,7 +29,7 @@ module mypost::profile {
 
     const RPOFILE_OWNER_FEE_PERCENT: u64 = 5;
     const PROTOCOL_FEE_PERCENT: u64 = 1;
-    const SUI_MIST: u64 = 1000000000;
+    // const SUI_MIST: u64 = 1000000000;
 
 
     struct Profile has key {
@@ -233,7 +235,7 @@ module mypost::profile {
         object_table::add(&mut pool.followings, sender(ctx), following);
         pool.no_of_followings =  1;
         // update profile pool price
-        pool.price = getPrice(1);
+        pool.price = price::getProfilePrice(1);
         transfer::transfer( profile, sender(ctx));
         transfer::share_object(pool);
     }
@@ -280,7 +282,7 @@ module mypost::profile {
         assert!(following_pool.owner != sender(ctx), CANNOT_FOLLOW_SELF);
         let value = coin::value(&payment);
 
-        let current_price = getPrice(following_pool.no_of_followers);
+        let current_price = price::getProfilePrice(following_pool.no_of_followers);
         let subjectFee = current_price * RPOFILE_OWNER_FEE_PERCENT / 100;
         let protocolFee = current_price * PROTOCOL_FEE_PERCENT / 100;
         assert!(value >= current_price + subjectFee + protocolFee, INSUFFICIENT_FUND);
@@ -337,7 +339,7 @@ module mypost::profile {
         follower_pool.no_of_followings = follower_pool.no_of_followings + 1;
         // update profile pool price
         following_pool.last_price = current_price;
-        following_pool.price = getPrice(following_pool.no_of_followers);
+        following_pool.price = price::getProfilePrice(following_pool.no_of_followers);
     }
 
     #[lint_allow(self_transfer)]
@@ -358,7 +360,7 @@ module mypost::profile {
             assert!(following_profile_exists, PROFILE_NOT_EXISTS);
             assert!(follower_profile_exists, PROFILE_NOT_EXISTS);
 
-            let current_price = getPrice(following_pool.no_of_followers - 1);
+            let current_price = price::getProfilePrice(following_pool.no_of_followers - 1);
             let subjectFee = current_price * RPOFILE_OWNER_FEE_PERCENT / 100;
             let protocolFee = current_price * PROTOCOL_FEE_PERCENT / 100;
             // remove coin from pool
@@ -399,16 +401,16 @@ module mypost::profile {
         );
         follower_pool.no_of_followings = follower_pool.no_of_followings - 1;
         following_pool.last_price = current_price;
-        following_pool.price = getPrice(following_pool.no_of_followers);
+        following_pool.price = price::getProfilePrice(following_pool.no_of_followers);
     }
 
 
-    fun getPrice(no_of_accessors: u64): u64 {
-        //let initial_price: u64 = 10000000; // 0.01 SUI
-        let price = no_of_accessors * no_of_accessors * SUI_MIST / 5000;
-        // pool.price = price;
-        (price)
-    }
+    // fun getPrice(no_of_accessors: u64): u64 {
+    //     //let initial_price: u64 = 10000000; // 0.01 SUI
+    //     let price = no_of_accessors * no_of_accessors * SUI_MIST / 5000;
+    //     // pool.price = price;
+    //     (price)
+    // }
 
     public(friend) fun get_profile_id(pool: &ProfilePool): ID {
         let id = pool.for;

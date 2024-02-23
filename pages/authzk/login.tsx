@@ -61,7 +61,7 @@ export default withNewZkLoginSession(
                 <div className='flex flex-1 flex-col items-center mt-16'>
                 <div className='mt-2 text-2xl font-bold leading-relaxed'>Login or Signup</div>
                 <div className='mt-5'>
-                    <button className='bg-sky-500 py-3 px-20 rounded-3xl hover:bg-sky-800' onClick={() => router.push('/auth')}>
+                    <button className='bg-sky-200 py-3 px-20 rounded-3xl disabled' onClick={() => router.push('/auth')}>
                         <span className='text-white text-sm font-semibold leading-relaxed'>Passkey</span>
                     </button>
                 </div>
