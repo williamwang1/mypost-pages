@@ -75,21 +75,29 @@ export default withNewZkLoginSession(
                         } flex w-full items-center justify-center space-x-3 text-sm transition-all duration-75 focus:outline-none`}
                         onClick={() => {
                             setSignInClicked(true);
-                            console.log(callbackBaseUrl)
+                            console.log(JSON.stringify(redirectTo))
+                            router.replace(
+                              getGoogleAuthUrl(
+                                session,
+                                GOOGLE_CLIENT_ID!,
+                                new URL("google", callbackBaseUrl),
+                                `${API_HOST}/account`
+                              )
+                            )
                             // getGoogleAuthUrl(
                             //   session,
                             //   GOOGLE_CLIENT_ID!,
                             //   new URL("google", callbackBaseUrl),
                             //   `${API_HOST}/account`
                             //   )
-                            router.replace(
-                                getGoogleAuthUrl(
-                                session,
-                                GOOGLE_CLIENT_ID!,
-                                new URL("google", callbackBaseUrl),
-                                `${API_HOST}/account`
-                                ), `${API_HOST}/account`
-                            );
+                            // router.replace(
+                            //     getGoogleAuthUrl(
+                            //     session,
+                            //     GOOGLE_CLIENT_ID!,
+                            //     new URL("google", callbackBaseUrl),
+                            //     `${API_HOST}/account`
+                            //     ), `${API_HOST}/account`
+                            // );
                         }}
                     >
                     {signInClicked ? (

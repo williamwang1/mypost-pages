@@ -44,14 +44,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     })
     const accounts: Account[] = await accountsdb.json()
 
-    if (metadata && metadata.profile_id && accounts.length > 0) {
-        return {
-            redirect: {
-              destination: `${API_HOST}/profile`, // Redirect destination
-              permanent: true, // Temporary redirect
-            },
-        }
-    }
+    // if (metadata && metadata.profile_id && accounts.length > 0) {
+    //     return {
+    //         redirect: {
+    //           destination: `${API_HOST}/profile`, // Redirect destination
+    //           permanent: true, // Temporary redirect
+    //         },
+    //     }
+    // }
     return { props: { accounts, metadata} };
 }
 

@@ -27,7 +27,7 @@ export default function ProfileSummary({ followingmeta, accounts, session ,slug}
     const [pool, setPool] = useState<any>({})
     const [followerProfile, setFollowerProfile] = useState<any>({})
     const [followingProfile, setFollowingProfile] = useState<any>({})
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
     const timerRef = React.useRef(0);
     const [followermeta, setFollowermeta] = useState<any>({})
     const {mutateAsync: follow, isPending: isFollowCreating } = useFollowMutation();
