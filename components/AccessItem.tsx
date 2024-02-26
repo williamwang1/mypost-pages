@@ -9,6 +9,18 @@ import React, { useEffect, useState } from 'react'
 
 export default function AccessItem({ item, onLoadingChange }: {item: AccessHistory,  onLoadingChange: (loading: boolean) => void }) {
     const [profile, setProfile] = useState<any>()
+
+    useEffect(() => {
+        const getData = async () => {
+            let data: any = await sui.getObject({
+                id: item.profile_id,
+                options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 
+            })
+            setProfile(data);
+        }
+        getData()
+    }, [item.profile_id])
+
     let avatar = ''
     let name = ''
     let address = ''
@@ -22,16 +34,6 @@ export default function AccessItem({ item, onLoadingChange }: {item: AccessHisto
     if (price > 0) {
         decimalPrice = (price / SUI_MIST).toFixed(4)
     }
-    useEffect(() => {
-        const getData = async () => {
-            let data: any = await sui.getObject({
-                id: item.address,
-                options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 
-            })
-            setProfile(data);
-        }
-        getData()
-    }, [item.address])
 
     return (
         <div key={item.id} className="relative flex group justify-between gap-x-2 items-center hover:bg-gray-50">

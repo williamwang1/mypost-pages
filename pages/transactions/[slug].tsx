@@ -59,9 +59,12 @@ function Transactions({session, accounts, metadata } : {session: any, accounts: 
     let email = accountSession.data?.user.email;
 
 
-    const handleFreeChange = (newFree: string) => {
+    const handleFreeChange = (newFree: string, limit: number) => {
         // console.log(event)
-        setFree(newFree)
+        if (newFree.length < limit) {
+            setFree(newFree)
+        }
+        
         //setFree(event.target.value)
     }
 

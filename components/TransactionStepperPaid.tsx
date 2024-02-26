@@ -40,13 +40,14 @@ export default function TransactionStepperPaid({paid, onPaidChange, step, onBack
         <div className='px-2'>
         <StepperPaid/>
         <div className="flex flex-col flex-1 mt-5">
-            <label htmlFor="content" className="block text-base font-bold leading-6 text-gray-900">
+            <div className='flex gap-x-2'>
+                <label htmlFor="content" className="block text-base font-bold leading-6 text-gray-900">
                 Paid Content
-            </label>
+                </label>
+                <label className='text-red-500'>*</label>
+            </div>
             <div className='mt-2'>
-                {/* <QuillNoSSRWrapper theme="snow" modules={modules} value={paid} onChange={(value) => onPaidChange(value)} className='h-48 max-h-60'/> */}
                 <Tiptap content={paid} readOnly={false} onChange={(value: any) => onPaidChange(value)} />
-                {/* {JSON.stringify(paid)} */}
             </div>
             
 
