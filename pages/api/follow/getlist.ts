@@ -11,10 +11,9 @@ export default async function handler(
         console.log('in transaction getlist ' + req.body.currentPage)
         try {
             //console.log('in transaction list ' + req.body.slug)
-            let transactions = await prisma.$queryRaw`select t.id, t.Digest, t.Summary, t.Public_content, t.Address, 
-            t.Profile_id, t.Create_at, t.Transaction_id, t.Pool_id, t.address, t.Package_id, t.Type 
-            from "Transaction" t
-            where t.address = ${req.body.slug} order by t.Create_at desc limit ${pageSzie} offset ${offset};`
+            let transactions = await prisma.$queryRaw`select * 
+            from "Follow" f
+            where f.Following = ${req.body.slug} order by f.Create_at desc limit ${pageSzie} offset ${offset};`
             
             //console.log('in get list' + JSON.stringify(transactions))
 

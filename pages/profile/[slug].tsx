@@ -1,5 +1,5 @@
 import Nav from "@/components/Nav";
-import React, { Fragment, useState, useRef } from 'react' ;
+import React, { Fragment, useState, useRef, useEffect } from 'react' ;
 import { SuiEvent, SuiObjectData, SuiObjectResponse } from "@mysten/sui.js/client";
 import { withZkLoginSessionRequired, ZkLoginSession } from "@shinami/nextjs-zklogin/client";
 import { sui } from '@/lib/api/shinami'
@@ -15,6 +15,7 @@ import { Account } from '@/types/auth';
 import { GetServerSideProps, NextPage } from 'next';
 import ProfileSummary from "@/components/ProfileSummary";
 import MyAcesses from "@/components/MyAcesses";
+import axios from "axios";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     // Extract the id from context.params
@@ -39,14 +40,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
     }
     
-    const profiledata: SuiObjectResponse = await sui.getObject({
-        id: metadata.profile_id,
-        options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 
-    })
-    const profilepool: SuiObjectResponse = await sui.getObject({
-        id: metadata.profile_pool_id,
-        options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 
-    })
+
 
     const accountsdb = await fetch(`${API_HOST}${ACCOUNT_LIST_ROUTE}`, {
         method: 'POST',
@@ -58,18 +52,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const accounts: Account[] = await accountsdb.json()
     
 
-    return { props: { metadata,  profiledata , profilepool, accounts, slug } };
+    return { props: { metadata, accounts, slug } };
 };
 
 const tabs = [
     {id: 0, name: 'Transactions'},
-    // {id: 2, name: 'Assets', component: <MyAssets/>, url: '/profile/asset'},
-    {id: 1, name: 'Followings'},
-    {id: 2, name: 'Followers'},
-    {id: 3, name: 'Acesses'}
+    {id: 1, name: 'Acesses'},
+    {id: 2, name: 'Followings'},
+    {id: 3, name: 'Followers'}
 ]
 
-function Profile({metadata, session, profiledata, profilepool, accounts, slug} 
+function Profile({metadata, session, accounts, slug} 
     : 
     {metadata: ProfileMedata, profiledata: SuiObjectResponse, 
         session: ZkLoginSession, profilepool: SuiObjectResponse, 
@@ -77,19 +70,17 @@ function Profile({metadata, session, profiledata, profilepool, accounts, slug}
     const { user, localSession } = session;
     const router = useRouter();
     const [activeIndex, setActiveIndex] = useState(0);
-    if (profiledata.error) {
-        return <div>profile not found</div>
-    }
-    if (profilepool.error) {
-        return <div>profile pool not found</div>
-    }
-    if (!metadata) {
-        return <div>profile not found</div>
+    const [followermeta, setFollowerMeta] = useState<any>({})
+    let current_user = user?.wallet;
+    let bottomIndex = 4
+    if (slug !== current_user) {
+        bottomIndex = -1
     }
 
+
     return (
-        <Nav bottomIndex={4} leftIndex={-1} user={user}>
-            <ProfileSummary summary={profiledata.data} pool={profilepool.data} metadata={metadata} accounts={accounts} user={user}/>
+        <Nav bottomIndex={bottomIndex} leftIndex={-1} user={user}>
+            <ProfileSummary followingmeta={metadata} accounts={accounts} session={session} slug={slug}/>
             <div className='bg-white shadow-md'>
                 <Tab.Group defaultIndex={activeIndex} >
                     <Tab.List className='flex flex-1 justify-between mt-4 px-2'>
@@ -116,14 +107,15 @@ function Profile({metadata, session, profiledata, profilepool, accounts, slug}
                                 <MyTransactions slug={slug}/>
                             )}
                             {tab.id == 1 && (
-                                <MyFollowings slug={slug}/>
-                            )}
-                            {tab.id == 2 && (
-                                <MyFollowers slug={slug}/>
-                            )}
-                            {tab.id == 3 && (
                                 <MyAcesses slug={slug}/>
                             )}
+                            {tab.id == 2 && (
+                                <MyFollowings slug={slug}/>
+                            )}
+                            {tab.id == 3 && (
+                                <MyFollowers slug={slug}/>
+                            )}
+
 
                         </Tab.Panel>
                     ))}

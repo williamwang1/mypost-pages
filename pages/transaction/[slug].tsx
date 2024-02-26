@@ -297,7 +297,7 @@ function Transaction ({session, profiledata, txs,transactiondata, slug}
                     className="divide-y divide-gray-100 mt-2 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl"
                     >
                         {items && items.map((transaction) => (
-                            <TransactionHistoryItem transaction={transaction} key={transaction.id} profile={profiledata}/>
+                            <TransactionHistoryItem transaction={transaction} key={transaction.id}/>
                         ))}
                     </div>
                 </InfiniteScroll>

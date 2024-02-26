@@ -14,7 +14,7 @@ export default function TransactionStepperPaid({paid, onPaidChange, step, onBack
     }) {
 
 
-    let digest = free + '<br/><br/>' + "<a href='www.mypost.money/transaction/<transaction digest>'>transaction digest</h1>"
+    let digest = free + '<br/>' + '<h1>' + 'paid content' + '</h1>'
 
 
     let button = null
@@ -29,30 +29,16 @@ export default function TransactionStepperPaid({paid, onPaidChange, step, onBack
     } else {
                 button = <button
                 type="button"
-                className="px-6 py-2 bg-sky-800 disabled rounded-md border justify-center items-center text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500"
+                className="px-6 py-2 bg-sky-200 disabled rounded-md border justify-center items-center text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500"
                 // onClick={() => handleStepChange(step + 1)}
             >
-                Disabled
+                Next
             </button>
     }
 
     return (
         <div className='px-2'>
         <StepperPaid/>
-        <div className="flex flex-1 items-center mt-2 gap-x-2">
-            <label htmlFor="price" className="text-base font-bold leading-6 text-gray-900">
-                Price
-            </label>
-            <label htmlFor="price" className="text-base font-normal leading-6 text-gray-500">
-                0
-            </label>
-            <label htmlFor="price" className="text-base font-bold leading-6 text-gray-900">
-                SUI
-            </label>
-            <div className=''>
-                <PriceTooltip/>
-            </div>
-        </div>
         <div className="flex flex-col flex-1 mt-5">
             <label htmlFor="content" className="block text-base font-bold leading-6 text-gray-900">
                 Paid Content
@@ -81,6 +67,20 @@ export default function TransactionStepperPaid({paid, onPaidChange, step, onBack
                     </span>
                 </div>
             </div> */}
+            <div className="flex flex-1 items-center mt-2 gap-x-2">
+                <label htmlFor="price" className="text-base font-bold leading-6 text-gray-900">
+                    Price
+                </label>
+                <label htmlFor="price" className="text-base font-normal leading-6 text-gray-500">
+                    0
+                </label>
+                <label htmlFor="price" className="text-base font-bold leading-6 text-gray-900">
+                    SUI
+                </label>
+                <div className=''>
+                    <PriceTooltip/>
+                </div>
+            </div>
         
             <div className="flex justify-between mt-28 px-4 mb-16">
                 <button type="button" 
@@ -89,13 +89,6 @@ export default function TransactionStepperPaid({paid, onPaidChange, step, onBack
                 >
                     Back
                 </button>
-                {/* <button
-                    type="button"
-                    className="px-6 py-2 bg-sky-400 rounded-md border justify-center items-center text-sm font-semibold text-white shadow-sm hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500"
-                    onClick={() => onPaidNextChange(digest, step + 1)}
-                >
-                    Next
-                </button> */}
                 {button}
             </div>
         </div>

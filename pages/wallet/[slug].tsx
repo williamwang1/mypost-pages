@@ -81,8 +81,7 @@ function Wallet({session, balance, slug} : {session: any, balance: any, slug: st
                         
                     )}
                     {tab.id == 1 && (
-                        // <MyFollowings slug={slug}/>
-                        <h1>Assets</h1>
+                        <div className="text-center">no data</div>
                     )}
 
                 </Tab.Panel>

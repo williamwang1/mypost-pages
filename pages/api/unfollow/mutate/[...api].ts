@@ -10,13 +10,13 @@ import {
     zkLoginTxExecHandler,
 } from "@shinami/nextjs-zklogin/server/pages";
 import { mask, validate } from "superstruct";
-import { FollowRequest, CommonResponse, } from "@/lib/shared/interfaces";
+import { FollowRequest, CommonResponse, UnFollowRequest, } from "@/lib/shared/interfaces";
 import { FollowData } from "@/types/follow";
 import { FOLLOW_MUTATEDB_ROUTE, FOLLOW_MUTATEFALSE_ROUTE, UNFOLLOW_MUTATEDB_ROUTE, UNFOLLOW_MUTATEFALSE_ROUTE } from "@/lib/api/constant";
 
 
 const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {
-    const [error, body] = validate(req.body, FollowRequest);
+    const [error, body] = validate(req.body, UnFollowRequest);
     if (error) throw new InvalidRequest(error.message);
   
     console.log("Preparing create buy tx for zkLogin wallet", wallet);
@@ -31,8 +31,8 @@ const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {
         txb.moveCall({
             target: `${MYPOST_MOVE_PACKAGE_ID}::profile::unfollow`,
             arguments: [
-                txb.pure.address(wallet),
                 txb.object(body.global),
+                txb.pure.address(body.protocol_destination),
                 txb.object(body.my_profile),
                 txb.object(body.following_pool),
                 txb.object(body.follower_pool),
@@ -71,7 +71,7 @@ const parseTxRes: TransactionResponseParser<CommonResponse> = async (req, txRes,
         following_profile: followEventData.following_profile,
         following_id: followEventData.following_id,
         price: followEventData.price,
-        type: 'follow',
+        type: 'unfollow',
         digest: txRes.digest,
         create_at: new Date()
     }

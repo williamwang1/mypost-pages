@@ -1,13 +1,14 @@
 import { sui } from '@/lib/api/shinami'
 import { SUI_MIST } from '@/lib/constant'
 import { trucateAddress } from '@/lib/shared/utils'
+import { FollowData } from '@/types/follow'
 import { AccessHistory } from '@/types/transaction'
 import { ChevronRightIcon } from '@heroicons/react/20/solid'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 
 
-export default function AccessItem({ item, onLoadingChange }: {item: AccessHistory,  onLoadingChange: (loading: boolean) => void }) {
+export default function FollowItem({ item }: {item: FollowData}) {
     const [profile, setProfile] = useState<any>()
     let avatar = ''
     let name = ''
@@ -17,6 +18,7 @@ export default function AccessItem({ item, onLoadingChange }: {item: AccessHisto
         name = profile?.data?.content?.fields?.name
         address =  trucateAddress(profile?.data?.content?.fields?.owner)
     }
+   
     let price = parseInt(item.price)
     let decimalPrice = '0'
     if (price > 0) {
@@ -25,13 +27,13 @@ export default function AccessItem({ item, onLoadingChange }: {item: AccessHisto
     useEffect(() => {
         const getData = async () => {
             let data: any = await sui.getObject({
-                id: item.address,
+                id: item.follower_profile,
                 options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 
             })
             setProfile(data);
         }
         getData()
-    }, [item.address])
+    }, [item.follower_profile])
 
     return (
         <div key={item.id} className="relative flex group justify-between gap-x-2 items-center hover:bg-gray-50">

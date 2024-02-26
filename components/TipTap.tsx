@@ -376,10 +376,10 @@ const editor = useEditor({
       </FloatingMenu>}
 
       <EditorContent content={content} editor={editor} className=''/>
-      {!readOnly && <div className="character-count">
-        {editor?.storage.characterCount.characters()}/{limit} characters
-        <br />
-        {editor?.storage.characterCount.words()} words
+      {!readOnly && <div className="character-count text-sm mt-2">
+        {editor?.storage.characterCount.characters()}/{limit}
+        {/* <br />
+        {editor?.storage.characterCount.words()} words */}
       </div>}
     </>
     

@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { JWT } from "next-auth/jwt";
 import { Google } from "@/components/icons";
 import { ChevronRightIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import { trucateAddress } from "@/lib/shared/utils";
 
 
 
@@ -17,7 +18,6 @@ export default function UserDropdown({ user }: { user: ZkLoginUser}) {
 
   const handleLogout = () => {
     
-    //signOut()
     router.push(`${AUTH_API_BASE}/logout`)
   }
 
@@ -27,8 +27,8 @@ export default function UserDropdown({ user }: { user: ZkLoginUser}) {
         content={
           <div className="w-full rounded-md bg-white p-2 sm:w-56">
             <div className="p-2">
-              <p className="truncate text-sm text-gray-500">
-                {user.wallet}
+              <p className="text-sm text-gray-500">
+                {trucateAddress(user.wallet)}
               </p>
             </div>
             <button

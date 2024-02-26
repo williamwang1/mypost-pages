@@ -2,14 +2,15 @@ import React, { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import TransactionItem from "./TransactionItem";
 import { API_HOST } from '@/lib/api/move';
-import { TransactionList } from "@/types/transaction";
+import { AccessHistory, TransactionList } from "@/types/transaction";
 import { ACCESS_PROFILE_LIST_ROUTE } from "@/lib/api/constant";
 import axios from "axios";
 import FollowerItem from "./FollowerItem";
 import { FollowData } from "@/types/follow";
+import AccessItem from "./AccessItem";
 
 const MyAcesses = ({slug}: {slug: string}) => {
-  const [items, setItems] = useState<FollowData[]>([]);
+  const [items, setItems] = useState<AccessHistory[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(true);
@@ -73,7 +74,7 @@ const MyAcesses = ({slug}: {slug: string}) => {
         className="divide-y divide-gray-100 mt-2 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl"
       >
             {items &&
-              items.map((f) => <FollowerItem f={f} key={f.id} onLoadingChange={handleLoading}/>)}
+              items.map((item) => <AccessItem item={item} key={item.id} onLoadingChange={handleLoading}/>)}
       </div>
     </InfiniteScroll>
   );

@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { SuiObjectResponse } from "@mysten/sui.js/client";
 import { sui } from '@/lib/api/shinami'
 import Image from 'next/image';
+import { SUI_MIST } from '@/lib/constant';
 
 export default function FollowingItem({f} : {f: FollowData}) {
     const [profile, setProfile] = useState<any>({})
@@ -20,7 +21,11 @@ export default function FollowingItem({f} : {f: FollowData}) {
         getProfile()
     }, [f.following_profile])
 
-
+    let price = parseInt(f.price)
+    let decimalPrice = '0'
+    if (price > 0) {
+        decimalPrice = (price / SUI_MIST).toFixed(4)
+    }
 
     if(!profile) {
         return <div>Loading</div>
@@ -52,7 +57,7 @@ export default function FollowingItem({f} : {f: FollowData}) {
             <div>
               <div className='bg-white rounded-3xl flex items-center gap-x-2'>
                     <Image src='/images/sui.png' alt='WW' width={25} height={25} className='py-1'/>
-                    <span className='text-center text-sky-500 text-base font-medium leading-relaxed'>{f.price}</span>
+                    <span className='text-center text-sky-500 text-base font-medium leading-relaxed'>{decimalPrice}</span>
               </div>
             </div>
             <ChevronRightIcon className="h-5 w-5 flex-none text-gray-400 align-middle pr-2" aria-hidden="true"/>

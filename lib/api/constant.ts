@@ -47,6 +47,14 @@ export const ACCESS_MUTATE_FALSE_ROUTE = '/api/access/mutatefalse'
 
 export const ACCESS_MUTATE_ROUTE = '/api/access/mutatedb'
 
+export const FOLLOW_MUTATE_ROUTE = '/api/follow/mutate'
+
+export const UNFOLLOW_MUTATE_ROUTE = '/api/unfollow/mutate'
+
+export const FOLLOW_CHECK_ROUTE = '/api/follow/check'
+
+export const FOLLOW_HISTORY_LIST_ROUTE = '/api/follow/getlist'
+
 export const FOLLOW_MUTATEDB_ROUTE = '/api/follow/mutatedb'
 
 export const FOLLOW_MUTATEFALSE_ROUTE = '/api/follow/mutatefalse'

@@ -1,18 +1,40 @@
+import { sui } from '@/lib/api/shinami'
 import { SUI_MIST } from '@/lib/constant'
+import { trucateAddress } from '@/lib/shared/utils'
 import { AccessHistory } from '@/types/transaction'
 import { ChevronRightIcon } from '@heroicons/react/20/solid'
 import Image from 'next/image'
+import { useEffect, useState } from 'react'
 
 
-export default function TransactionHistoryItem({transaction, profile}: {transaction: AccessHistory, profile: any}) {
-    let avatar = profile?.data?.content?.fields?.avatar
-    let name = profile?.data?.content?.fields?.name
+export default function TransactionHistoryItem({transaction}: {transaction: AccessHistory}) {
+    const [profile, setProfile] = useState<any>()
+    let avatar = ''
+    let name = ''
+    let address = ''
+    if (profile) {
+        avatar = profile?.data?.content?.fields?.avatar
+        name = profile?.data?.content?.fields?.name
+        address =  trucateAddress(profile?.data?.content?.fields?.owner)
+    }
+    // let avatar = profile?.data?.content?.fields?.avatar
+    // let name = profile?.data?.content?.fields?.name
     // let address = profile?.data?.content?.fields?.owner
     let price = parseInt(transaction.price)
     let decimalPrice = '0'
     if (price > 0) {
         decimalPrice = (price / SUI_MIST).toFixed(4)
     }
+    useEffect(() => {
+        const getData = async () => {
+            let data: any = await sui.getObject({
+                id: transaction.accessor_profile,
+                options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 
+            })
+            setProfile(data);
+        }
+        getData()
+    }, [transaction.accessor_profile])
     return (
         <div key={transaction.id} className="relative flex group justify-between gap-x-2 items-center hover:bg-gray-50">
             <div className='flex gap-x-2 items-center'>
@@ -23,7 +45,7 @@ export default function TransactionHistoryItem({transaction, profile}: {transact
                     {name}
                 </div>
                 <div className='py-2 text-sm text-gray-500 truncate'>
-                    {transaction.address}
+                    {trucateAddress(transaction.address)}
                 </div>
                 <div className='py-2 text-sm text-gray-500 truncate'>
                     {transaction.type}

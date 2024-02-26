@@ -93,7 +93,7 @@ export default function TransactionButton (
             onBoughtchange(true)
             onAccessChange(accessCheck[0]);
         }
-        onBoughtchange(true)
+        //onBoughtchange(true)
         //setBuyConfirm(false)
         onLoadingChange(false)
     }

@@ -20,6 +20,7 @@ interface FollowData {
     follower:          string,
     following:         string,
     price:            string,
+    type:             string,
     create_at:         Date,
     status :           boolean
 }

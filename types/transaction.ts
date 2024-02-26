@@ -96,6 +96,7 @@ interface TransactionList {
     summary: string,
     public_content: string,
     address: string,
+    type: string
     profile_id: string,
     create_at: Date,
     transaction_id: string,

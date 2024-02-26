@@ -50,7 +50,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 function Transactions({session, accounts, metadata } : {session: any, accounts: Account[], metadata: ProfileMedata}) {
     const { isLoading, user, localSession } = session;
     const [step, setStep] = useState(1)
-    const [summary, setSummary] = React.useState('');
+    const [summary, setSummary] = React.useState('summary');
     const [free, setFree] = React.useState('');
     const [digest, setDigest] = React.useState('');
     const [paid, setPaid] = React.useState('');

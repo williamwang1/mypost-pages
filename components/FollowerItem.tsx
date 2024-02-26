@@ -4,6 +4,8 @@ import { sui } from '@/lib/api/shinami'
 import { ChevronRightIcon, EllipsisVerticalIcon } from '@heroicons/react/20/solid'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image';
+import { SUI_MIST } from "@/lib/constant";
+import { trucateAddress } from "@/lib/shared/utils";
 
 
 export default function FollowerItem({f, onLoadingChange}: {f: FollowData, onLoadingChange: (loading: boolean) => void}) {
@@ -11,7 +13,6 @@ export default function FollowerItem({f, onLoadingChange}: {f: FollowData, onLoa
   const router = useRouter()
 
   useEffect(() => {
-
     const getProfile = async () => {
       const profiledata: any = await sui.getObject({
           id: f.follower_profile,
@@ -27,7 +28,11 @@ export default function FollowerItem({f, onLoadingChange}: {f: FollowData, onLoa
     router.push(`/profile/${f.follower}`)
   }
 
-
+  let price = parseInt(f.price)
+  let decimalPrice = '0'
+  if (price > 0) {
+      decimalPrice = (price / SUI_MIST).toFixed(4)
+  }
   let avatar = profile.data?.content?.fields?.avatar
   let address = profile.data?.content?.fields?.owner
   let username = profile.data?.content?.fields?.name
@@ -46,8 +51,8 @@ export default function FollowerItem({f, onLoadingChange}: {f: FollowData, onLoa
                     <span className="absolute inset-x-0 -top-px bottom-0" />
                     {username}
               </p>
-              <p className="mt-1 flex text-xs leading-5 text-gray-500 truncate max-w-32">
-                {address}
+              <p className="mt-1 flex text-xs leading-5 text-gray-500">
+                {trucateAddress(address)}
               </p>
             </div>
           </div>
@@ -55,7 +60,7 @@ export default function FollowerItem({f, onLoadingChange}: {f: FollowData, onLoa
             <div>
               <div className='bg-white rounded-3xl flex items-center gap-x-2'>
                     <Image src='/images/sui.png' alt='WW' width={25} height={25} className='py-1'/>
-                    <span className='text-center text-sky-500 text-base font-medium leading-relaxed'>{f.price}</span>
+                    <span className='text-center text-sky-500 text-base font-medium leading-relaxed'>{decimalPrice}</span>
               </div>
             </div>
             <ChevronRightIcon className="h-5 w-5 flex-none text-gray-400 align-middle pr-2" aria-hidden="true"/>

@@ -52,9 +52,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             },
         }
     }
-
-
-
     return { props: { accounts, metadata} };
 }
 
@@ -90,23 +87,6 @@ function NewAccount ({session, metadata, accounts} : { metadata: ProfileMedata, 
     // let expireDate = new Date(expire + '').toLocaleDateString();
     // let status = accounts[0].status;
     // let email = accounts[0].email;
-
-    // useEffect(() => {
-    //     let fectchData = async () => {
-    //         console.log('in account fetch ' + email)
-    //         const accountsdb = await fetch(`${API_HOST}${ACCOUNT_LIST_ROUTE}`, {
-    //             method: 'POST',
-    //             headers: {
-    //             'Content-Type': 'application/json',
-    //             },
-    //             body: JSON.stringify({email}),
-    //         })
-    //         const accounts: Account[] = await accountsdb.json()
-    //         //sconsole.log(JSON.stringify(accounts))
-    //         setAccounts(accounts)
-    //     }
-    //     fectchData()
-    // },[email])
 
 
     const handleNext = async (e: any) => {

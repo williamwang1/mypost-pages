@@ -140,7 +140,7 @@ export default function TransactionStepperPost({accounts, step, onBackChange , s
                          </div>
                      </div> */}
                  </div>
-                 <div className='bg-white shadow-md'>
+                 <div className='bg-white shadow-md px-2'>
                      <Tab.Group defaultIndex={0} >
                          <Tab.List className='flex flex-1 gap-x-2 mt-4'>
                              {tabs.map((tab) => (
@@ -158,9 +158,9 @@ export default function TransactionStepperPost({accounts, step, onBackChange , s
                         <Tab.Panels className='pt-2'>
                         {tabs.map((tab) => (
                             <Tab.Panel key={tab.id}>
-                                <div className="mt-2">
+                                {/* <div className="mt-2">
                                     <label>{summary}</label>
-                                </div>
+                                </div> */}
                                 <div className='mt-2 pb-2'>
                                     <Tiptap content={digest} readOnly={true} onChange={undefined} />
                                 </div>
