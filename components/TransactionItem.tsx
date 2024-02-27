@@ -56,12 +56,12 @@ export default function TransactionItem({t, onLoadingChange} : {t: TransactionLi
 
 
     return (
-      <li key={t.id} className="relative flex justify-between gap-x-6 hover:bg-gray-50">
+      <li key={t.id} className="relative flex justify-between gap-x-6 hover:bg-gray-50" onClick={handleClick}>
           <div className='flex flex-col px-3 py-2'>
-            <div className="flex flex-1 gap-x-2 items-center">
+            <div className="flex flex-1 gap-x-4 items-center">
               <div className='text-sm font-semibold leading-6 text-gray-900'>{trucateAddress(t.digest)}</div>
-              <div className="text-sm text-slate-500">{t.type}</div>
-              <Toast.Provider swipeDirection="right">
+              <div className="text-sm text-sky-400 font-semibold">{t.type}</div>
+              {/* <Toast.Provider swipeDirection="right">
                 <button  onClick={handleCopyClick}>
                     <ClipboardDocumentIcon className="h-4 w-4 flex-none font-bold text-gray-500 hover:text-gray-800" aria-hidden="true"/>
                 </button>
@@ -72,12 +72,11 @@ export default function TransactionItem({t, onLoadingChange} : {t: TransactionLi
                     {/* <Toast.Close aria-label="Close" className='font-bold text-xl'>
                         <span aria-hidden>×</span>
                     </Toast.Close> */}
-                </Toast.Root>
+                {/* </Toast.Root>
                 <Toast.Viewport />
-              </Toast.Provider>
+              </Toast.Provider> */}
               
             </div>
-            <div onClick={handleClick}>
             <div className='text-sm leading-relaxed text-gray-900 mt-2 break-all truncate'>
               {t.public_content}
             </div>
@@ -96,7 +95,6 @@ export default function TransactionItem({t, onLoadingChange} : {t: TransactionLi
                     <span className='text-center text-sky-500 text-xs leading-relaxed'>{price}</span>
                     
                 </div>
-            </div>
             </div>
 
           </div>

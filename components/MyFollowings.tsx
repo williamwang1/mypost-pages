@@ -14,36 +14,12 @@ export default function MyFollowings({slug}: {slug: string}) {
   const [items, setItems] = useState<FollowData[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
-  const isInitialRender = useRef(true);
   const [loading, setLoading] = useState(true);
 
-  // const fetchData = async (currentPage: number) => {
-  //   //console.log('in fectch data ' + currentPage)
-  //   setLoading(true); 
-  //   try {
-  //     const transactionsdb = await fetch(`${API_HOST}${FOLLOW_FOLLOWING_LIST_ROUTE}`, {
-  //       method: 'POST',
-  //       headers: {
-  //       'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ slug, currentPage }),
-  //     })
-  
-  //     const newData : FollowData[] = await transactionsdb.json();
-  //     //console.log('in fetch data ' + JSON.stringify(newData))
-  //     if (newData.length === 0) {
-  //       setHasMore(false);
-  //     } else {
-  //       setItems((prevItems) => [...prevItems, ...newData]);
-  //     }
-  //     setPage((prevPage) => prevPage + 1)
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //     // Handle error appropriately
-  //   } finally {
-  //     setLoading(false); // Set loading to false after fetching data
-  //   }
-  // }
+  const handleLoading = (loading: boolean) => {
+    setLoading(loading)
+  }
+
   const fetchMoreData = () => {
     axios
       .post(`${API_HOST}${FOLLOW_FOLLOWING_LIST_ROUTE}`, { slug: slug,  currentPage: page })
@@ -54,9 +30,10 @@ export default function MyFollowings({slug}: {slug: string}) {
         }  else {
           setItems((prevItems) => [...prevItems, ...res.data]);
         }
+        setLoading(false)
       })
       .catch((err) => console.log(err));
-      setLoading(false)
+      
     setPage((prevPage) => prevPage + 1);
   };
 
@@ -71,12 +48,16 @@ export default function MyFollowings({slug}: {slug: string}) {
             }  else {
               setItems(res.data);
             }
-              setLoading(false)
+            setLoading(false)
           })
           .catch((err) => console.log(err));
     }
     getData();
   }, [slug]);
+
+  if (loading) {
+    return <div>Loading</div>
+  }
 
 
   return (
@@ -95,7 +76,7 @@ export default function MyFollowings({slug}: {slug: string}) {
       className="divide-y divide-gray-100 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl"
     >
       {items && items.map((f) => (
-        <FollowingItem f={f} key={f.id}/>
+        <FollowingItem f={f} key={f.id} onLoadingChange={handleLoading} slug={slug}/>
       ))}
     </div>
     </InfiniteScroll>

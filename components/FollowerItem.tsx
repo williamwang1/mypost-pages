@@ -8,7 +8,7 @@ import { SUI_MIST } from "@/lib/constant";
 import { trucateAddress } from "@/lib/shared/utils";
 
 
-export default function FollowerItem({f, onLoadingChange}: {f: FollowData, onLoadingChange: (loading: boolean) => void}) {
+export default function FollowerItem({f, onLoadingChange, slug}: {f: FollowData, onLoadingChange: (loading: boolean) => void, slug: string}) {
   const [profile, setProfile] = useState<any>({})
   const router = useRouter()
 
@@ -24,8 +24,11 @@ export default function FollowerItem({f, onLoadingChange}: {f: FollowData, onLoa
   }, [f.follower_profile])
 
   const handleClick = () => {
-    onLoadingChange(true)
-    router.push(`/profile/${f.follower}`)
+    if (address !== slug) {
+      onLoadingChange(true)
+      router.push(`/profile/${f.follower}`)
+    }
+
   }
 
   let price = parseInt(f.price)

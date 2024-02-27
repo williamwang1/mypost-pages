@@ -3,12 +3,16 @@ import { FollowData } from '@/types/follow'
 import { ChevronRightIcon, EllipsisVerticalIcon } from '@heroicons/react/20/solid'
 import { useEffect, useState } from 'react'
 import { SuiObjectResponse } from "@mysten/sui.js/client";
+import { useRouter } from 'next/navigation'
 import { sui } from '@/lib/api/shinami'
 import Image from 'next/image';
 import { SUI_MIST } from '@/lib/constant';
+import { trucateAddress } from '@/lib/shared/utils';
+import { Router } from 'lucide-react';
 
-export default function FollowingItem({f} : {f: FollowData}) {
+export default function FollowingItem({f, onLoadingChange, slug} : {f: FollowData, onLoadingChange: (loading: boolean) => void, slug: string}) {
     const [profile, setProfile] = useState<any>({})
+    const router = useRouter()
 
     useEffect(() => {
       const getProfile = async () => {
@@ -27,17 +31,22 @@ export default function FollowingItem({f} : {f: FollowData}) {
         decimalPrice = (price / SUI_MIST).toFixed(4)
     }
 
-    if(!profile) {
-        return <div>Loading</div>
-    }
     let avatar = profile.data?.content?.fields?.avatar
     let address = profile.data?.content?.fields?.owner
     let username = profile.data?.content?.fields?.name
     let bio = profile.data?.content?.fields?.bio
     let timestamp = <time>{f.create_at.toString().substring(0,10)}</time>;
 
+    const handleClick = () => {
+      console.log('in following item ' + slug + ' ' + address)
+      if (address !== slug) {
+        onLoadingChange(true)
+        router.push(`/profile/${address}`)
+      }
+    }
+
     return (
-      <div className='relative group hover:bg-gray-50'>
+      <div className='relative group hover:bg-gray-50' onClick={handleClick}>
         <li key={f.id} className="flex justify-between">
           <div className='flex gap-x-2 items-center'>
             <div className='rounded-full border-white flex items-center px-2'>
@@ -48,8 +57,8 @@ export default function FollowingItem({f} : {f: FollowData}) {
                     <span className="absolute inset-x-0 -top-px bottom-0" />
                     {username}
               </p>
-              <p className="mt-1 flex text-xs leading-5 text-gray-500 truncate max-w-32">
-                {address}
+              <p className="mt-1 flex text-xs leading-5 text-gray-500">
+                {trucateAddress(address)}
               </p>
             </div>
           </div>

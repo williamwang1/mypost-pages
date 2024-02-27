@@ -15,34 +15,6 @@ export default function MyFollowers({slug}: {slug: string}) {
   const isInitialRender = useRef(true);
   const [loading, setLoading] = useState(true)
 
-  // const fetchData = async (currentPage: number) => {
-  //   //console.log('in fectch data ' + currentPage)
-  //   setLoading(true); 
-  //   try {
-  //     const transactionsdb = await fetch(`${API_HOST}${FOLLOW_FOLLOWER_LIST_ROUTE}`, {
-  //       method: 'POST',
-  //       headers: {
-  //       'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ slug, currentPage }),
-  //     })
-  
-  //     const newData : FollowData[] = await transactionsdb.json();
-  //     //console.log('in fetch data ' + JSON.stringify(newData))
-  //     if (newData.length === 0) {
-  //       setHasMore(false);
-  //     } else {
-  //       setItems((prevItems) => [...prevItems, ...newData]);
-  //     }
-  //     setPage((prevPage) => prevPage + 1)
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //     // Handle error appropriately
-  //   } finally {
-  //     setLoading(false); // Set loading to false after fetching data
-  //   }
-  // }
-
   const fetchMoreData = () => {
     axios
       .post(`${API_HOST}${FOLLOW_FOLLOWER_LIST_ROUTE}`, { slug: slug,  currentPage: page })
@@ -82,6 +54,10 @@ export default function MyFollowers({slug}: {slug: string}) {
     setLoading(loading)
   }
 
+  if (loading) {
+    return <div>Loading</div>
+  }
+
   return (
     <InfiniteScroll
       dataLength={items.length}
@@ -99,7 +75,7 @@ export default function MyFollowers({slug}: {slug: string}) {
       className="divide-y divide-gray-100 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl"
     >
       {items && items.map((f) => 
-          <FollowerItem f={f} key={f.id} onLoadingChange={handleLoading}/>
+          <FollowerItem f={f} key={f.id} onLoadingChange={handleLoading} slug={slug}/>
       )}
     </div>
     </InfiniteScroll>

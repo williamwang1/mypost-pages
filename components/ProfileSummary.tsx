@@ -366,7 +366,7 @@ export default function ProfileSummary({ followingmeta, accounts, session ,slug}
                     <div>
                         {action}
                     </div>
-                    <EllipsisVerticalIcon className='w-8 h-8 text-gray-600'/>
+                    <EllipsisVerticalIcon className='w-6 h-6 text-gray-600'/>
                 </div>
             </div>
             <div className='mt-2 text-gray-900 text-base font-black leading-relaxed'>{username}</div>
@@ -374,15 +374,15 @@ export default function ProfileSummary({ followingmeta, accounts, session ,slug}
                 <div className='text-gray-500 text-xs font-normal leading-relaxed'>{trucateAddress(following_address)}</div>
                 <Toast.Provider swipeDirection="right">
                     <button  onClick={handleCopyClick}>
-                        <ClipboardDocumentIcon className="h-5 w-5 flex-none font-bold text-gray-500 hover:text-gray-800" aria-hidden="true"/>
+                        <ClipboardDocumentIcon className="h-4 w-4 flex-none font-bold text-gray-500 hover:text-gray-800" aria-hidden="true"/>
                     </button>
                     <Toast.Root         
                         open={open}
                         onOpenChange={setOpen} className='fixed bottom-18 right-8 z-50 flex gap-x-2 items-center shadow-lg bg-sky-500 text-white rounded-xl'>
                         <Toast.Description className='font-bold px-2 py-1'>copied!</Toast.Description>
-                        {/* <Toast.Close aria-label="Close" className='font-bold text-xl'>
+                        <Toast.Close aria-label="Close" className='font-bold text-xl'>
                             <span aria-hidden>×</span>
-                        </Toast.Close> */}
+                        </Toast.Close>
                     </Toast.Root>
                     <Toast.Viewport />
                 </Toast.Provider>
@@ -405,18 +405,16 @@ export default function ProfileSummary({ followingmeta, accounts, session ,slug}
                         </div>
                     </div>
                 </div>
-                {/* <div>
-                    {action}
-                </div> */}
-                <div className='flex py-3 gap-x-2 items-center'>
+                <div className='flex py-3 flex-col items-center px-4 gap-y-2'>
                     <button className='bg-sky-400 rounded-3xl flex items-center px-2 gap-x-2 py-1' onClick={() => router.push(`/follow/${following_address}`)}>
                         <Image src='/images/sui.png' alt='WW' width={25} height={25} className='py-1'/>
                         {/* <span className='text-white font-semibold'>SUI</span> */}
                         <span className='text-center text-white text-base font-medium leading-relaxed'>{price}</span>
                     </button>
-                    <div>
+                    <a className='text-sky-400 text-sm' href='/faq/price'>price chart</a>
+                    {/* <div>
                     <ProfileTooltip/>
-                    </div>
+                    </div> */}
                     
                 </div>
 

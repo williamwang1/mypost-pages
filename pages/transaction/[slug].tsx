@@ -4,10 +4,10 @@ import Nav from '@/components/Nav';
 import { ACCESS_CHECK_ROUTE, ACCESS_HISTORY_LIST_ROUTE, PROFILE_GET_ROUTE, TRANSACTION_GET } from '@/lib/api/constant';
 import { API_HOST } from '@/lib/api/move';
 import { sui } from '@/lib/api/shinami'
-import { EllipsisVerticalIcon } from '@heroicons/react/24/outline'
+import { ClipboardDocumentIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline'
 import { TransactionList } from '@/types/transaction';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Tiptap from '@/components/TipTap';
 import { AccessHistory } from '@/types/transaction';
 import {Drawer} from 'vaul';
@@ -17,6 +17,8 @@ import TransactionButton from '@/components/TransactionButton';
 import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
 import TransactionHistoryItem from '@/components/TransactionHistoryItem';
+import { trucateAddress } from '@/lib/shared/utils';
+import * as Toast from '@radix-ui/react-toast';
 
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -78,7 +80,10 @@ function Transaction ({session, profiledata, txs,transactiondata, slug}
     {session: any, profiledata: any, txs: TransactionList[], 
         transactiondata: any, slug: string}) {
     const { isLoading, user, localSession } = session;
-    let avatar = profiledata?.data?.content?.fields?.avatar
+    let avatar =''
+    if (profiledata) {
+        avatar = profiledata?.data?.content?.fields?.avatar
+    }
     let name = profiledata?.data?.content?.fields?.name
     let address = profiledata?.data?.content?.fields?.owner
     let timestamp = <time>{txs[0].create_at?.toString().substring(0,10)}</time>;
@@ -97,6 +102,8 @@ function Transaction ({session, profiledata, txs,transactiondata, slug}
     const [items, setItems] = useState<AccessHistory[]>([]);
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(2);
+    const [open, setOpen] = useState(false);
+    const timerRef = React.useRef(0);
     let encrypt_content = transactiondata?.data?.content?.fields?.content
     let boughtPrice = ''
     if (access) {
@@ -117,6 +124,23 @@ function Transaction ({session, profiledata, txs,transactiondata, slug}
         let price = parseInt(_lastPrice)
         lastPrice = ( price / SUI_MIST).toFixed(4)
     }
+
+    const handleCopyClick = (text: string) => {
+        navigator.clipboard.writeText(text) // Write text to clipboard
+          .then(() => {
+            //console.log("Text copied to clipboard:", address);
+            setOpen(false);
+            window.clearTimeout(timerRef.current);
+            timerRef.current = window.setTimeout(() => {
+            setOpen(true);
+          }, 100);
+            //alert(address);
+          })
+          .catch(err => {
+            console.error("Failed to copy text: ", err);
+            // alert("Failed to copy text. Please try again.");
+          });
+    };
 
     const handleClick = async () => {
         //console.log('in transction slug ' + JSON.stringify(bought))
@@ -233,19 +257,36 @@ function Transaction ({session, profiledata, txs,transactiondata, slug}
                         <Image src={avatar} alt='WW' width={50} height={50} className='rounded-full border-white'/>
                         <div>
                             <div className='text-sm font-semibold leading-6 text-gray-900'>{name}</div>
-                            <div className='text-gray-500 text-xs font-normal leading-relaxed truncate max-w-20'>{address}</div>
+                            <div className='text-gray-500 text-xs font-normal leading-relaxed'>{trucateAddress(address)}</div>
                         </div>
                     </div>
                     <button>
-                    <EllipsisVerticalIcon className='w-8 h-8 text-gray-400'/>
+                    <EllipsisVerticalIcon className='w-8 h-8 text-slate-700'/>
                     </button>
 
                     
                 </div>
                 <div className='mt-5 text-gray-900 leading-relaxed text-base w-4/5'>
-                    <div className='flex text-clip'>
-                    {summary}
+                    <div className='flex gapx-x-4'>
+                        <div className='flex text-clip'>
+                        {trucateAddress(slug)}
+                        </div>
+                        <Toast.Provider swipeDirection="right">
+                            <button  onClick={() => handleCopyClick(slug)}>
+                                <ClipboardDocumentIcon className="h-4 w-4 flex-none font-bold text-gray-500 hover:text-gray-800" aria-hidden="true"/>
+                            </button>
+                            <Toast.Root         
+                                open={open}
+                                onOpenChange={setOpen} className='fixed bottom-18 right-8 z-50 flex gap-x-2 items-center shadow-lg bg-sky-500 text-white rounded-xl'>
+                                <Toast.Description className='font-bold px-2 py-1'>copied!</Toast.Description>
+                                {/* <Toast.Close aria-label="Close" className='font-bold text-xl'>
+                                    <span aria-hidden>×</span>
+                                </Toast.Close> */}
+                            </Toast.Root>
+                            <Toast.Viewport />
+                        </Toast.Provider>
                     </div>
+                    
                     <div className='flex text-clip'>
                     {public_content}
                     </div>
