@@ -4,7 +4,7 @@ import Nav from '@/components/Nav';
 import { ACCESS_CHECK_ROUTE, ACCESS_HISTORY_LIST_ROUTE, PROFILE_GET_ROUTE, TRANSACTION_GET } from '@/lib/api/constant';
 import { API_HOST } from '@/lib/api/move';
 import { sui } from '@/lib/api/shinami'
-import { ClipboardDocumentIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline'
+import { ClipboardDocumentIcon, EllipsisVerticalIcon, InformationCircleIcon } from '@heroicons/react/24/outline'
 import { TransactionList } from '@/types/transaction';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
@@ -103,6 +103,8 @@ function Transaction ({session, profiledata, txs,transactiondata, slug}
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(2);
     const [open, setOpen] = useState(false);
+    const [addressOpen, setAddressOpen] = useState(false)
+    const [noaccessOpen, setNoAcessOpen] = useState(false)
     const timerRef = React.useRef(0);
     let encrypt_content = transactiondata?.data?.content?.fields?.content
     let boughtPrice = ''
@@ -125,22 +127,36 @@ function Transaction ({session, profiledata, txs,transactiondata, slug}
         lastPrice = ( price / SUI_MIST).toFixed(4)
     }
 
-    const handleCopyClick = (text: string) => {
-        navigator.clipboard.writeText(text) // Write text to clipboard
+    const handleDigestCopy = () => {
+        navigator.clipboard.writeText(slug) // Write text to clipboard
           .then(() => {
-            //console.log("Text copied to clipboard:", address);
             setOpen(false);
             window.clearTimeout(timerRef.current);
             timerRef.current = window.setTimeout(() => {
             setOpen(true);
           }, 100);
-            //alert(address);
           })
           .catch(err => {
             console.error("Failed to copy text: ", err);
             // alert("Failed to copy text. Please try again.");
           });
     };
+
+    const handleAddressCopy = () => {
+        navigator.clipboard.writeText(address) // Write text to clipboard
+        .then(() => {
+          setAddressOpen(false);
+          window.clearTimeout(timerRef.current);
+          timerRef.current = window.setTimeout(() => {
+          setAddressOpen(true);
+        }, 100);
+        })
+        .catch(err => {
+          console.error("Failed to copy text: ", err);
+          // alert("Failed to copy text. Please try again.");
+        });
+    }
+
 
     const handleClick = async () => {
         //console.log('in transction slug ' + JSON.stringify(bought))
@@ -160,6 +176,11 @@ function Transaction ({session, profiledata, txs,transactiondata, slug}
         } else {
             //TODO show pop-up to buy
             console.log('no access')
+            setNoAcessOpen(false);
+            window.clearTimeout(timerRef.current);
+            timerRef.current = window.setTimeout(() => {
+            setNoAcessOpen(true);
+        })
         }
     }
 
@@ -183,9 +204,23 @@ function Transaction ({session, profiledata, txs,transactiondata, slug}
         setLoaiding(loading)
     }
 
-    let private_content = (<div className='overflow-hidden break-words max-w-full underline hover:text-gray-500' onClick={handleClick}>
-                            <Tiptap content={encrypt_content} readOnly={true} onChange={undefined}/>
-                            </div>)
+    const handleItemsChange = (items: AccessHistory[]) => {
+        setItems(items)
+    }
+    let private_content = (
+        <Toast.Provider swipeDirection="right">
+            <div className='overflow-hidden break-words max-w-full underline hover:text-gray-500' onClick={handleClick}>
+                <Tiptap content={encrypt_content} readOnly={true} onChange={undefined}/>
+            </div>
+            <Toast.Root         
+                open={noaccessOpen}
+                onOpenChange={setNoAcessOpen} className='fixed bottom-18 right-8 z-50 flex gap-x-2 items-center shadow-lg bg-sky-500 text-white rounded-xl'>
+                <Toast.Description className='font-bold px-2 py-1'>Please buy first !</Toast.Description>
+            </Toast.Root>
+            <Toast.Viewport />
+        </Toast.Provider>
+    )
+
     if (unlock) {
         private_content = <Tiptap content={plaintext} readOnly={true} onChange={undefined}/>
     }
@@ -257,22 +292,40 @@ function Transaction ({session, profiledata, txs,transactiondata, slug}
                         <Image src={avatar} alt='WW' width={50} height={50} className='rounded-full border-white'/>
                         <div>
                             <div className='text-sm font-semibold leading-6 text-gray-900'>{name}</div>
-                            <div className='text-gray-500 text-xs font-normal leading-relaxed'>{trucateAddress(address)}</div>
+                            {/* <div className='text-gray-500 text-xs font-normal leading-relaxed'>{trucateAddress(address)}</div> */}
+                            <div className='flex gap-x-2 items-center'>
+                                {/* <div className='flex text-clip'>
+                                {trucateAddress(address)}
+                                </div> */}
+                                <div className='text-gray-500 text-xs font-normal leading-relaxed'>{trucateAddress(address)}</div>
+                                <Toast.Provider swipeDirection="right">
+                                    <button  onClick={handleAddressCopy}>
+                                        <ClipboardDocumentIcon className="h-4 w-4 flex-none font-bold text-gray-500 hover:text-gray-800" aria-hidden="true"/>
+                                    </button>
+                                    <Toast.Root         
+                                        open={addressOpen}
+                                        onOpenChange={setAddressOpen} className='fixed bottom-18 right-8 z-50 flex gap-x-2 items-center shadow-lg bg-sky-500 text-white rounded-xl'>
+                                        <Toast.Description className='font-bold px-2 py-1'>copied!</Toast.Description>
+                                        {/* <Toast.Close aria-label="Close" className='font-bold text-xl'>
+                                            <span aria-hidden>×</span>
+                                        </Toast.Close> */}
+                                    </Toast.Root>
+                                    <Toast.Viewport />
+                                </Toast.Provider>
+                            </div>
                         </div>
                     </div>
                     <button>
-                    <EllipsisVerticalIcon className='w-8 h-8 text-slate-700'/>
+                        <EllipsisVerticalIcon className='w-8 h-8 text-slate-700'/>
                     </button>
-
-                    
                 </div>
                 <div className='mt-5 text-gray-900 leading-relaxed text-base w-4/5'>
-                    <div className='flex gapx-x-4'>
+                    <div className='flex gap-x-2 items-center'>
                         <div className='flex text-clip'>
                         {trucateAddress(slug)}
                         </div>
                         <Toast.Provider swipeDirection="right">
-                            <button  onClick={() => handleCopyClick(slug)}>
+                            <button  onClick={handleDigestCopy}>
                                 <ClipboardDocumentIcon className="h-4 w-4 flex-none font-bold text-gray-500 hover:text-gray-800" aria-hidden="true"/>
                             </button>
                             <Toast.Root         
@@ -311,70 +364,35 @@ function Transaction ({session, profiledata, txs,transactiondata, slug}
                 <TransactionButton session={session} poolData={poolData} 
                 onPoolDataChange={handlePoolDataChange} txs={txs} slug={slug}
                 accessData={access} onAccessChange={handleAccessDataChange}  bought={bought} 
-                onBoughtchange={handleBoughtChange} onLoadingChange={handleLoading} onUnlockchange={handleUnlock}/>
-                {/* <TransactionHistory slug={slug} profile={profiledata} 
-                session={session} pool={profiledata} txs={txs} items={items} onItemsChange={handleItemsChange}/> */}
-                {/* <TradingHistory slug={slug} profile={profiledata} 
-                session={session} pool={profiledata} txs={txs} items={items} onFirstItemsChange={handleFirstItemsChange} onNextItemsChange={handleNextItemsChange}/> */}
+                onBoughtchange={handleBoughtChange} onLoadingChange={handleLoading} 
+                onUnlockchange={handleUnlock} onItemsChange={handleItemsChange}/>
                 <div className=' bg-white w-auto h-auto mt-2 overflow-y-auto'>
-                <div className='mt-2 flex justify-between items-center'>
-                    <div className='text-black text-lg font-bold leading-7'>
-                        Trading History
+                    <div className='mt-2 flex justify-between items-center'>
+                        <div className='text-black text-lg font-bold leading-7'>
+                            Trading History
+                        </div>
                     </div>
-                </div>
-                <InfiniteScroll
-                    dataLength={items.length}
-                    next={fetchMoreData}
-                    hasMore={hasMore}
-                    loader={itemLoading && <h1>Loading...</h1>}
-                    endMessage={
-                    <p style={{ textAlign: 'center' }}>
-                        <b>no more data</b>
-                    </p>
-                    }
-                >
-                    <div
-                    role="list"
-                    className="divide-y divide-gray-100 mt-2 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl"
+                    <InfiniteScroll
+                        dataLength={items.length}
+                        next={fetchMoreData}
+                        hasMore={hasMore}
+                        loader={itemLoading && <h1>Loading...</h1>}
+                        endMessage={
+                        <p style={{ textAlign: 'center' }}>
+                            <b>no more data</b>
+                        </p>
+                        }
                     >
-                        {items && items.map((transaction) => (
-                            <TransactionHistoryItem transaction={transaction} key={transaction.id}/>
-                        ))}
-                    </div>
-                </InfiniteScroll>
-            </div>
-
-                {/* {JSON.stringify(transactiondata?.data?.content?.fields)} */}
-                {/* {sellConfirm &&
-                    <Drawer.Root>
-                        <Drawer.Portal>
-                            <Drawer.Overlay className="fixed inset-0 bg-black/40" />
-                                <Drawer.Content className="bg-zinc-100 flex flex-col rounded-t-[10px] h-[50%] mt-24 fixed bottom-0 left-0 right-0">
-                                    <div className='p-4 bg-white'>
-                                        <button disabled className='bg-sky-800 rounded-3xl py-3 w-full'
-                                        onClick={handleSellConfirm}
-                                        >
-                                            <span className='text-white font-semibold'>Confirm</span>
-                                        </button>
-                                    </div>
-                                </Drawer.Content>
-                        </Drawer.Portal>
-                    </Drawer.Root>} */}
-                {/* {inbalance &&
-                <Drawer.Root>
-                    <Drawer.Portal>
-                        <Drawer.Overlay className="fixed inset-0 bg-black/40" />
-                            <Drawer.Content className="bg-zinc-100 flex flex-col rounded-t-[10px] h-[50%] mt-24 fixed bottom-0 left-0 right-0">
-                                <div className='p-4 bg-white'>
-                                    <button disabled className='bg-sky-800 rounded-3xl py-3 w-full'
-                                    onClick={handleSellConfirm}
-                                    >
-                                        <span className='text-white font-semibold'>Insufficient Balance</span>
-                                    </button>
-                                </div>
-                            </Drawer.Content>
-                    </Drawer.Portal>
-                </Drawer.Root>} */}
+                        <div
+                        role="list"
+                        className="divide-y divide-gray-100 mt-2 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl"
+                        >
+                            {items && items.map((transaction) => (
+                                <TransactionHistoryItem transaction={transaction} key={transaction.id}/>
+                            ))}
+                        </div>
+                    </InfiniteScroll>
+                </div>
             </div>
         </Nav>
     )

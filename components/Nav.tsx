@@ -13,6 +13,7 @@ import {
   UsersIcon,
   XMarkIcon,
   BarsArrowDownIcon,
+  Bars4Icon,
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import BottomNav from "./BottomNav";
@@ -130,11 +131,14 @@ export default function Nav({children, bottomIndex, leftIndex, user} : {children
             <div className="sticky top-0 z-40 flex shrink-0 justify-between items-center bg-white px-2 shadow-xl py-2">
                 <button type="button" className=" text-gray-700" onClick={() => setSidebarOpen(true)}>
                     <span className="sr-only">Open sidebar</span>
-                    <BarsArrowDownIcon className="h-6 w-6" aria-hidden="true" />
+                    <Bars4Icon className="h-6 w-6" aria-hidden="true" />
                 </button>
                 <UserDropdown user={user}/>
             </div>
-            {children}
+            <div className="mb-14">
+                {children}
+            </div>
+            
             <BottomNav index={bottomIndex} user={user}/>
         </div>
     )

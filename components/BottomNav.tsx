@@ -47,7 +47,7 @@ export default function BottomNav(props: {index: number, user: any}) {
 
  
     return (
-        <nav className="flex flex-1 w-full fixed bottom-0 left-0 right-0 bg-white shadow-xl z-50">
+        <nav className="flex flex-1 w-full fixed bottom-0 left-0 right-0 bg-slate-50 shadow-xl z-50">
         <ul role="list" className="flex flex-1 justify-evenly w-full">
             {navigation.map((item , index) => (
             <li key={index} onClick={() => handleSelect(index)}>

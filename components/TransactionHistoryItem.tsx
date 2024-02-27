@@ -45,7 +45,7 @@ export default function TransactionHistoryItem({transaction}: {transaction: Acce
                     {name}
                 </div>
                 <div className='py-2 text-sm text-gray-500 truncate'>
-                    {trucateAddress(transaction.address)}
+                    {transaction.address.substring(0, 6) + '...'}
                 </div>
                 <div className='py-2 text-sm text-gray-500 truncate'>
                     {transaction.type}

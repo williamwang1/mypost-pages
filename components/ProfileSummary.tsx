@@ -405,13 +405,13 @@ export default function ProfileSummary({ followingmeta, accounts, session ,slug}
                         </div>
                     </div>
                 </div>
-                <div className='flex py-3 flex-col items-center px-4 gap-y-2'>
-                    <button className='bg-sky-400 rounded-3xl flex items-center px-2 gap-x-2 py-1' onClick={() => router.push(`/follow/${following_address}`)}>
-                        <Image src='/images/sui.png' alt='WW' width={25} height={25} className='py-1'/>
+                <div className='flex py-3 flex-col items-center px-2'>
+                    <button className='rounded-3xl flex items-center px-2 gap-x-2 py-1' onClick={() => router.push(`/follow/${following_address}`)}>
+                        <Image src='/images/sui.png' alt='WW' width={25} height={25} className=''/>
                         {/* <span className='text-white font-semibold'>SUI</span> */}
-                        <span className='text-center text-white text-base font-medium leading-relaxed'>{price}</span>
+                        <span className='text-center text-base font-medium leading-relaxed text-sky-400'>{price}</span>
                     </button>
-                    <a className='text-sky-400 text-sm' href='/faq/price'>price chart</a>
+                    <a className='text-sky-400 text-sm underline' href='/faq/price'>learn more</a>
                     {/* <div>
                     <ProfileTooltip/>
                     </div> */}

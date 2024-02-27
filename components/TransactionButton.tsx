@@ -4,20 +4,21 @@ import { sui } from '@/lib/api/shinami'
 import Image from 'next/image';
 import { AccessHistory, TransactionList } from "@/types/transaction";
 import { useBuyMutation, useSellMutation } from '@/lib/hooks/api';
-import { ACCESS_CHECK_ROUTE } from '@/lib/api/constant';
+import { ACCESS_CHECK_ROUTE, ACCESS_HISTORY_LIST_ROUTE } from '@/lib/api/constant';
 import { API_HOST } from '@/lib/api/move';
 import { SUI_MIST } from '@/lib/constant';
 import { InformationCircleIcon } from "@heroicons/react/20/solid";
+import axios from "axios";
 
 
 export default function TransactionButton (
     {session, poolData, onPoolDataChange, txs, slug, accessData, onAccessChange, bought, 
-        onBoughtchange, onLoadingChange, onUnlockchange} 
+        onBoughtchange, onLoadingChange, onUnlockchange, onItemsChange} 
         : 
     {session: any, poolData: any, accessData: any, onPoolDataChange: (poolData: any) => void,
     txs: TransactionList[], slug: string, onAccessChange: (accessData: any) => void
     bought: boolean, onBoughtchange: (bought: boolean) => void, onLoadingChange: (loading: boolean) => void,
-    onUnlockchange: (unlock: boolean) => void}
+    onUnlockchange: (unlock: boolean) => void, onItemsChange: (items: any) => void}
 ) {
     const { isLoading, user, localSession } = session;
     //const [bought, setBought] = useState(false)
@@ -95,6 +96,13 @@ export default function TransactionButton (
         }
         //onBoughtchange(true)
         //setBuyConfirm(false)
+        axios
+            .post(`${API_HOST}${ACCESS_HISTORY_LIST_ROUTE}`, { slug: slug,  currentPage: 1 })
+            .then((res) =>{
+                onItemsChange(res.data)
+                // setItemLoading(false)
+            })
+            .catch((err) => console.log(err));
         onLoadingChange(false)
     }
 
@@ -113,6 +121,14 @@ export default function TransactionButton (
             id: txs[0].pool_id,
             options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 
         })
+
+        axios
+            .post(`${API_HOST}${ACCESS_HISTORY_LIST_ROUTE}`, { slug: slug,  currentPage: 1 })
+            .then((res) =>{
+                onItemsChange(res.data)
+                // setItemLoading(false)
+            })
+            .catch((err) => console.log(err));
         onPoolDataChange(data);
         onAccessChange(undefined)
         onBoughtchange(false)
