@@ -19,6 +19,7 @@ import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import BottomNav from "./BottomNav";
 import UserDropdown from "./UserDropdown";
 import { ZkLoginUser } from '@shinami/nextjs-zklogin';
+import Image from "next/image";
 
 
 const navigation = [
@@ -85,11 +86,8 @@ export default function Nav({children, bottomIndex, leftIndex, user} : {children
                                 {/* Sidebar component, swap this element with another sidebar if you like */}
                                 <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4">
                                     <div className="flex h-16 shrink-0 items-center">
-                                        <img
-                                            className="h-8 w-auto"
-                                            src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                                            alt="Your Company"
-                                        />
+                                        <Image src="" 
+                                        alt="mypost" className="h-8 w-auto" width={25} height={25}/>
                                     </div>
                                     <nav className="flex flex-1 flex-col">
                                     <ul role="list" className="flex flex-1 flex-col gap-y-7">

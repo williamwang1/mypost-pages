@@ -7,12 +7,14 @@ interface ProfileEvents {
 interface ProfileMetadataCreated {
     id: string,
     for: string,
-    pool: string
+    pool: string,
+    timestamp_ms:string
 }
 
-interface ProfileMedata {
+interface ProfileDB {
     id: string,
     address: string,
+    digest: string,
     profile_id: string,
     profile_pool_id: string,
     profile_meta_id: string,
@@ -89,4 +91,4 @@ interface Display {
 }
 
 
-export type { ProfileEvents, ProfileMetadataCreated, ProfileMedata, ProfileData }
+export type { ProfileEvents, ProfileMetadataCreated, ProfileDB, ProfileData }

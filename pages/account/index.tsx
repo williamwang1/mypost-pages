@@ -1,7 +1,7 @@
 import AccountAdd from "@/components/AccountAdd";
 import AccountHeader from "@/components/AccountHeader";
 import { ZkLoginSession, withZkLoginSessionRequired } from "@shinami/nextjs-zklogin/client";
-import { ProfileMetadataCreated, ProfileMedata, ProfileData } from "@/types/profile";
+import { ProfileMetadataCreated, ProfileDB, ProfileData } from "@/types/profile";
 import Image from "next/image";
 import React, {useEffect, useState} from 'react'
 import { Account } from "@/types/auth";
@@ -32,7 +32,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
         body: JSON.stringify({ address }),
     })
-    const metadata: ProfileMedata = await metadatadb.json()
+    const metadata: ProfileDB = await metadatadb.json()
 
     const accountsdb = await fetch(`${API_HOST}${ACCOUNT_LIST_ROUTE}`, {
         method: 'POST',
@@ -46,7 +46,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { props: { accounts, metadata} };
 }
 
-function NewAccount ({accounts, session, metadata} : {accounts: Account[], metadata: ProfileMedata, session: any}) {
+function NewAccount ({accounts, session, metadata} : {accounts: Account[], metadata: ProfileDB, session: any}) {
     const { isLoading, user, localSession } = session;
 
     const [data, setData] = useState<Account[]>([])

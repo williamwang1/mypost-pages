@@ -1,17 +1,15 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import TransactionItem from "./TransactionItem";
 import { API_HOST } from '@/lib/api/move';
-import { TransactionList } from "@/types/transaction";
 import { EXPLORE_PROFILES_ROUTE, TRANSACTION_GET_LIST_ROUTE, TRANSACTION_MUTATEDB_ROUTE } from "@/lib/api/constant";
 import axios from "axios";
 import FollowerItem from "./FollowerItem";
 import { FollowData } from "@/types/follow";
 import ProfileItem from "./ProfileItem";
-import { ProfileMedata } from "@/types/profile";
+import { ProfileDB } from "@/types/profile";
 
 const ExploreProfiles = ({slug}: {slug: string}) => {
-  const [items, setItems] = useState<ProfileMedata[]>([]);
+  const [items, setItems] = useState<ProfileDB[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(true);

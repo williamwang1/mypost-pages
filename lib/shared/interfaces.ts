@@ -63,11 +63,30 @@ export const TransactionRequest = object({
 export type TransactionRequest = Infer<typeof TransactionRequest>
 
 export const ReplyRequest = object({
-  profile_pool: string(),
-  content: string()
+  pool: string(),
+  content: string(),
+  transaction_digest: string()
+})
+export type ReplyRequest = Infer<typeof ReplyRequest>
+
+export const RepostRequest = object({
+  pool: string(),
+  content: string(),
+  transaction_digest: string()
 })
 
-export type ReplyRequest = Infer<typeof ReplyRequest>
+export type RepostRequest = Infer<typeof RepostRequest>
+
+export const ReplyBuyRequest = object({
+  price: string(),
+  budget: string(),
+  coin_count: string(),
+  protocol_destination: string(),
+  transaction_digest: string(),
+  reply_digest: string(),
+  pool: string()
+})
+export type ReplyBuyRequest = Infer<typeof ReplyBuyRequest>
 
 export const BuyRequest = object({
   price: string(),
@@ -86,6 +105,30 @@ export const SellRequest = object({
 })
 export type SellRequest = Infer<typeof SellRequest>
 
+export const ReplySellRequest = object({
+  protocol_destination: string(),
+  transaction_digest: string(),
+  reply_digest: string(),
+  pool: string()
+})
+export type ReplySellRequest = Infer<typeof ReplySellRequest>
+
+export const RepostResponse = object({
+  txDigest: string(),
+  repost_id: string(),
+  profile_id: string(),
+  pool_id: string()
+});
+export type RepostResponse = Infer<typeof RepostResponse>
+
+export const ReplyResponse = object({
+  txDigest: string(),
+  reply_id: string(),
+  profile_id: string(),
+  pool_id: string()
+});
+export type ReplyResponse = Infer<typeof ReplyResponse>
+
 export const TransactionResponse = object({
   txDigest: string(),
   transaction_id: string(),
@@ -99,7 +142,6 @@ export const CommonResponse = object({
 })
 
 export type CommonResponse = Infer<typeof CommonResponse>
-
 
 
 export const AddRequest = object({

@@ -5,7 +5,7 @@ import { Account } from "@/types/auth";
 import dynamic from 'next/dynamic';
 import { Google, LoadingDots } from "@/components/icons";
 import { useTransactionMutation } from '@/lib/hooks/api';
-import { ProfileMedata } from '@/types/profile';
+import { ProfileDB } from '@/types/profile';
 import { ACCOUNT_LIST_ROUTE, PROFILE_GET_ROUTE, TRANSACTION_MUTATEDB_ROUTE } from '@/lib/api/constant';
 import { API_HOST, MYPOST_MOVE_PACKAGE_ID } from '@/lib/api/move';
 import { useRouter } from 'next/navigation'
@@ -19,7 +19,7 @@ export default function TransactionStepperPost({accounts, step, onBackChange , s
     {accounts: Account[], step: number, 
         onBackChange: (newStep: number) => void, 
         summary: string, digest: string, session: any, 
-        paid: string, metadata: ProfileMedata, free: string}) {
+        paid: string, metadata: ProfileDB, free: string}) {
     const { isLoading, user, localSession } = session;
     const router = useRouter()
     const [clicked, setClicked] = useState(false);
@@ -59,7 +59,7 @@ export default function TransactionStepperPost({accounts, step, onBackChange , s
             content: enpaid.ciphertext
         })
 
-        let text = free +  '\n' + `Check this out: https://www.mypost.money/transaction/${ txmetadata.txDigest }`
+        let text = free +  '\n' + `www.mypost.money/transaction/${ txmetadata.txDigest }`
         let slug = `${user.wallet}`;
         const response = await fetch('/api/tweet', {
             method: 'POST',

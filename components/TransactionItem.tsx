@@ -1,4 +1,4 @@
-import { TransactionList } from "@/types/transaction";
+import { TransactionDB, TransactionDBList } from "@/types/transaction";
 import { ChevronRightIcon } from '@heroicons/react/20/solid'
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -10,7 +10,7 @@ import * as Toast from '@radix-ui/react-toast';
 import { ClipboardDocumentIcon } from "@heroicons/react/24/outline";
 
 
-export default function TransactionItem({t, onLoadingChange} : {t: TransactionList, onLoadingChange: (loading: boolean) => void}) {
+export default function TransactionItem({t, onLoadingChange} : {t: TransactionDBList, onLoadingChange: (loading: boolean) => void}) {
     const router = useRouter()
     let timestamp = <time>{t.create_at.toString().substring(0,10)}</time>;
     const [pool, setPool] = useState<any>()
@@ -34,7 +34,14 @@ export default function TransactionItem({t, onLoadingChange} : {t: TransactionLi
 
     const handleClick = () => {
       onLoadingChange(true)
-      router.push(`/transaction/${t.digest}`)
+      if (t.type === 'repost') {
+        router.push(`/repost/${t.digest}`)
+      } else if (t.type === 'reply') {
+        router.push(`/reply/${t.digest}`)
+      } else {
+        router.push(`/transaction/${t.digest}`)
+      }
+      
     }
 
     const handleCopyClick = () => {
@@ -75,7 +82,6 @@ export default function TransactionItem({t, onLoadingChange} : {t: TransactionLi
                 {/* </Toast.Root>
                 <Toast.Viewport />
               </Toast.Provider> */}
-              
             </div>
             <div className='text-sm leading-relaxed text-gray-900 mt-2 break-all truncate'>
               {t.public_content}
@@ -96,7 +102,6 @@ export default function TransactionItem({t, onLoadingChange} : {t: TransactionLi
                     
                 </div>
             </div>
-
           </div>
           <div className="flex shrink-0 items-center gap-x-4">
             <ChevronRightIcon className="h-5 w-5 flex-none text-gray-400" aria-hidden="true" />

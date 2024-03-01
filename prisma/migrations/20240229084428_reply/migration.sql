@@ -17,6 +17,26 @@ CREATE TABLE "Follow" (
 );
 
 -- CreateTable
+CREATE TABLE "RepostAccess" (
+    "id" TEXT NOT NULL,
+    "digest" TEXT NOT NULL,
+    "access_id" TEXT NOT NULL,
+    "repost_id" TEXT NOT NULL,
+    "repost_pool_id" TEXT NOT NULL,
+    "repost_digest" TEXT NOT NULL,
+    "transaction_digest" TEXT NOT NULL,
+    "repost_profile_id" TEXT NOT NULL,
+    "price" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "address" TEXT NOT NULL,
+    "package_id" TEXT NOT NULL,
+    "create_at" TIMESTAMP(3) NOT NULL,
+    "status" BOOLEAN NOT NULL DEFAULT true,
+
+    CONSTRAINT "RepostAccess_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "RelyAccess" (
     "id" TEXT NOT NULL,
     "digest" TEXT NOT NULL,
@@ -25,8 +45,7 @@ CREATE TABLE "RelyAccess" (
     "reply_pool_id" TEXT NOT NULL,
     "reply_digest" TEXT NOT NULL,
     "transaction_digest" TEXT NOT NULL,
-    "profile_id" TEXT NOT NULL,
-    "accessor_profile" TEXT NOT NULL,
+    "reply_profile_id" TEXT NOT NULL,
     "price" TEXT NOT NULL,
     "type" TEXT NOT NULL,
     "address" TEXT NOT NULL,
@@ -55,6 +74,25 @@ CREATE TABLE "Access" (
     "status" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "Access_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Repost" (
+    "id" TEXT NOT NULL,
+    "digest" TEXT NOT NULL,
+    "transaction_digest" TEXT NOT NULL,
+    "public_content" TEXT NOT NULL,
+    "address" TEXT NOT NULL,
+    "profile_id" TEXT NOT NULL,
+    "repost_id" TEXT NOT NULL,
+    "pool_id" TEXT NOT NULL,
+    "package_id" TEXT NOT NULL,
+    "repost_post_id" TEXT NOT NULL,
+    "transaction_post_id" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "create_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Repost_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -140,10 +178,22 @@ CREATE TABLE "Account" (
 CREATE UNIQUE INDEX "Follow_digest_key" ON "Follow"("digest");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "RepostAccess_digest_key" ON "RepostAccess"("digest");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "RelyAccess_digest_key" ON "RelyAccess"("digest");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Access_digest_key" ON "Access"("digest");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Repost_digest_key" ON "Repost"("digest");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Repost_repost_id_key" ON "Repost"("repost_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Repost_pool_id_key" ON "Repost"("pool_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Reply_digest_key" ON "Reply"("digest");

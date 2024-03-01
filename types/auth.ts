@@ -47,15 +47,6 @@ interface Account {
 
 }
 
-interface ProfileMetadata {
-  id: string,
-  address: string,
-  profile_id: string  
-  profile_pool_id:   string
-  profile_meta_id:   string
-  global_id:    string
-  package_id:        string
-}
 
 // account: {
 //   id: string;

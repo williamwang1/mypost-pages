@@ -1,13 +1,16 @@
+import { PROFILE_GET_ROUTE } from '@/lib/api/constant'
+import { API_HOST } from '@/lib/api/move'
 import { sui } from '@/lib/api/shinami'
 import { SUI_MIST } from '@/lib/constant'
 import { trucateAddress } from '@/lib/shared/utils'
-import { AccessHistory } from '@/types/transaction'
+import { ProfileDB } from '@/types/profile'
+import { AccessDB } from '@/types/transaction'
 import { ChevronRightIcon } from '@heroicons/react/20/solid'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 
 
-export default function TransactionHistoryItem({transaction}: {transaction: AccessHistory}) {
+export default function TransactionHistoryItem({transaction}: {transaction: AccessDB}) {
     const [profile, setProfile] = useState<any>()
     let avatar = ''
     let name = ''
@@ -27,14 +30,25 @@ export default function TransactionHistoryItem({transaction}: {transaction: Acce
     }
     useEffect(() => {
         const getData = async () => {
+            let body = {
+                slug: transaction.address
+            }
+            const accessorProfileDB = await fetch(`${API_HOST}${PROFILE_GET_ROUTE}`, {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(body),
+            })
+            const accessorProfile : ProfileDB = await accessorProfileDB.json();
             let data: any = await sui.getObject({
-                id: transaction.accessor_profile,
+                id: accessorProfile.profile_id,
                 options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 
             })
             setProfile(data);
         }
         getData()
-    }, [transaction.accessor_profile])
+    }, [transaction.address])
     return (
         <div key={transaction.id} className="relative flex group justify-between gap-x-2 items-center hover:bg-gray-50">
             <div className='flex gap-x-2 items-center'>

@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import TransactionItem from "./TransactionItem";
 import { API_HOST } from '@/lib/api/move';
-import { TransactionList } from "@/types/transaction";
 import { TRANSACTION_GET_LIST_ROUTE, TRANSACTION_MUTATEDB_ROUTE } from "@/lib/api/constant";
 import axios from "axios";
 import TokenItem from "./TokenItem";
@@ -12,7 +10,6 @@ const items = [
 ]
 
 const MyTokens = ({slug}: {slug: string}) => {
-  //const [items, setItems] = useState<TransactionList[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(true);

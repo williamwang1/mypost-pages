@@ -1,7 +1,5 @@
 
 import prisma from "@/lib/prisma";
-import { ProfileMedata } from "@/types/profile";
-import { AccesstData } from "@/types/transaction";
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 
@@ -21,32 +19,7 @@ export default async function handler(
             
         console.log('in access mutate false ' + JSON.stringify(result))
 
-        // const bought: AccesstData | null = await prisma.access.findUnique({
-        //     where: {
-        //         transaction_digest_type_address_status: {
-        //             transaction_digest: req.body.transaction_digest,
-        //             address: req.body.address,
-        //             type: req.body.type,
-        //             status: true
-        //         } 
-        //     }
-        // });
-        // console.log('in buy mutate false ' + JSON.stringify(bought))
-        // if (bought) {
-        //     await prisma.access.update({
-        //         where: {
-        //           transaction_digest_type_address_status: {
-        //             transaction_digest: req.body.transaction_digest,
-        //             address: req.body.address,
-        //             type: 'buy',
-        //             status: true
-        //         } 
-        //         },
-        //         data: {
-        //             status: false
-        //         }
-        //     })
-        // } 
+
 
         res.status(200).json( result )
       } catch (err) {

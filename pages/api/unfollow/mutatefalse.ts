@@ -1,7 +1,5 @@
 
 import prisma from "@/lib/prisma";
-import { ProfileMedata } from "@/types/profile";
-import { AccesstData } from "@/types/transaction";
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 

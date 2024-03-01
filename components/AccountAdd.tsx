@@ -48,13 +48,13 @@ export default function AccountAdd({ user }: { user: ZkLoginUser}) {
     let button = null
     // console.log('select' + JSON.stringify(selected))
     if (selected.id != 0) {
-        button =<button className=' bg-sky-400 rounded-3xl py-3 w-full'
+        button =<button className=' bg-sky-500 rounded-3xl py-3 w-full'
                 onClick={handleConfirm}
                 >
                     <span className='text-white font-semibold'>Confirm</span>
                 </button>
     } else {
-        button =<button disabled className='bg-sky-800 rounded-3xl py-3 w-full'
+        button =<button disabled className='bg-sky-200 rounded-3xl py-3 w-full'
                 onClick={handleConfirm}
                 >
                     <span className='text-white font-semibold'>Confirm</span>

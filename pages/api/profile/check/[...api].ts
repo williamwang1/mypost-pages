@@ -13,7 +13,6 @@ import {
 import { mask, validate } from "superstruct";
 import { CheckProfileRequest, CheckProfileResponse, CheckProfileResult} from "@/lib/shared/interfaces";
 import { ProfileMetadataCreated } from '@/types/profile'
-import { FollowMetaData, FollowData } from "@/types/follow";
 
 
 const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {

@@ -2,7 +2,7 @@ import React, { Fragment, useState, useRef, useEffect } from 'react' ;
 import { ChevronRightIcon, CalendarDaysIcon, InformationCircleIcon} from '@heroicons/react/20/solid'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image';
-import { ProfileMetadataCreated, ProfileMedata, ProfileData } from "@/types/profile";
+import { ProfileMetadataCreated, ProfileDB, ProfileData } from "@/types/profile";
 import { API_HOST } from '@/lib/api/move';
 import { ACCOUNT_LIST_ROUTE, FOLLOW_CHECK_ROUTE, PROFILE_GET_ROUTE } from '@/lib/api/constant';
 import { Account } from '@/types/auth';
@@ -19,7 +19,7 @@ import ProfileTooltip from './ProfileTooltip';
 
 
 export default function ProfileSummary({ followingmeta, accounts, session ,slug}: 
-    {followingmeta: ProfileMedata, accounts: Account[], session: any, slug: string}) {
+    {followingmeta: ProfileDB, accounts: Account[], session: any, slug: string}) {
     const [following, setFollowing] = useState(false)
     const [followingdata, setFollowingdata] = useState<FollowData>()
     const [followConfirm, setFollowConfirm] = useState(false)
@@ -144,7 +144,7 @@ export default function ProfileSummary({ followingmeta, accounts, session ,slug}
                 },
                 body: JSON.stringify(followerBody),
             })
-            const followerpdb : ProfileMedata = await followerProfileDB.json();
+            const followerpdb : ProfileDB = await followerProfileDB.json();
             if (followerpdb) {
                 setFollowermeta(followerpdb)
                 const followerp: any = await sui.getObject({

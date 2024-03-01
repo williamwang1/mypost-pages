@@ -1,6 +1,6 @@
 
 import prisma from "@/lib/prisma";
-import { ProfileMedata } from "@/types/profile";
+import { ProfileDB } from "@/types/profile";
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 
@@ -14,7 +14,7 @@ export default async function handler(
     let result;
     try {
         //console.log(req.body.address)
-        const profile: ProfileMedata | null = await prisma.profile.findUnique({
+        const profile : ProfileDB | null = await prisma.profile.findUnique({
             where: {
                 address: req.body.address,
             }

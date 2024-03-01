@@ -1,28 +1,19 @@
 import AccountAdd from "@/components/AccountAdd";
 import AccountHeader from "@/components/AccountHeader";
 import { ZkLoginSession, withZkLoginSessionRequired } from "@shinami/nextjs-zklogin/client";
-import { ProfileMetadataCreated, ProfileMedata, ProfileData } from "@/types/profile";
+import { ProfileDB } from "@/types/profile";
 import Image from "next/image";
 import React, {useEffect, useState} from 'react'
 import { Account } from "@/types/auth";
 import { useSession } from "next-auth/react";
 import { useProfileMutation, useProfileCheckMutation } from "@/lib/hooks/api";
-import { Router, useRouter } from "next/router";
+import {  useRouter } from "next/router";
 import { Google, LoadingDots } from "@/components/icons";
 import { GLOBAL_OBJECT_ID, MYPOST_MOVE_PACKAGE_ID } from "@/lib/api/move";
 import { GetServerSideProps } from 'next';
 import { API_HOST } from '@/lib/api/move';
 import { ACCOUNT_LIST_ROUTE, PROFILE_GET_ROUTE, PROFILE_MUTATEDB_ROUTE } from '@/lib/api/constant';
 import { getFaucetHost, requestSuiFromFaucetV0 } from '@mysten/sui.js/faucet';
-import { getServerSession } from "next-auth";
-
-const accounts = [
-    {id: 1, address: 'addressxxxxxxxx1', timestamp: 'joined 11 Sep 2021', status: 'synced'},
-    // {id: 2, address: 'addressxxxxxxxx2', timestamp: 'joined 11 Sep 2021', status: 'added'},
-    // {id: 3, address: 'addressxxxxxxxx3', timestamp: 'joined 11 Sep 2021', status: 'in sync'},
-    // {id: 4, address: 'addressxxxxxxxx4', timestamp: 'joined 11 Sep 2021', status: 'failed'},
-]
-const fetcher = (...args: any) => fetch({...args}).then((res) => res.json())
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const { slug } = context.params as { slug: string };
@@ -33,7 +24,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
         body: JSON.stringify({ slug }),
     })
-    const metadata: ProfileMedata = await metadatadb.json()
+    const metadata: ProfileDB = await metadatadb.json()
 
     const accountsdb = await fetch(`${API_HOST}${ACCOUNT_LIST_ROUTE}`, {
         method: 'POST',
@@ -55,7 +46,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { props: { accounts, metadata} };
 }
 
-function NewAccount ({session, metadata, accounts} : { metadata: ProfileMedata, session: any, accounts: Account[]}) {
+function NewAccount ({session, metadata, accounts} : { metadata: ProfileDB, session: any, accounts: Account[]}) {
     const { isLoading, user, localSession } = session;
 
     const [data, setData] = useState<Account[]>([])
@@ -142,7 +133,7 @@ function NewAccount ({session, metadata, accounts} : { metadata: ProfileMedata, 
         next = <span>Next</span>
     }
     
-    let button = (<button disabled className="px-6 py-2 bg-sky-900 rounded-md border justify-center items-center text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500">
+    let button = (<button disabled className="px-6 py-2 bg-sky-200 rounded-md border justify-center items-center text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500">
                     Next
                 </button>)
     if (accounts) {

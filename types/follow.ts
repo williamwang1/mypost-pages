@@ -1,18 +1,20 @@
 
 
 
-interface FollowMetaData {
+interface FollowCreated {
     following_id:  string,
     following_profile: string,
-    follower_id:      string
-    follower_profile:  string
+    following:       string,
+    follower_id:      string,
+    follower_profile:  string,
+    follower:          string,
     price:            string,
-    create_at:         Date,
-    deleted :           boolean
+    timestamp_ms:     string
 }
 
 interface FollowData {
     id: string,
+    digest: string,
     following_id:  string,
     following_profile: string,
     follower_id:      string,
@@ -25,4 +27,4 @@ interface FollowData {
     status :           boolean
 }
 
-export type { FollowMetaData, FollowData }
+export type { FollowCreated, FollowData }

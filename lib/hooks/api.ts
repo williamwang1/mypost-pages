@@ -25,12 +25,17 @@ import {
   CommonResponse,
   FollowRequest,
   UnFollowRequest,
+  ReplyResponse,
+  RepostResponse,
+  ReplyRequest,
+  ReplyBuyRequest,
+  ReplySellRequest,
 } from "../shared/interfaces";
 import { ProfileMetadataCreated, ProfileEvents } from '@/types/profile'
 import { MYPOST_MOVE_PACKAGE_ID, GLOBAL_OBJECT_ID } from '@/lib/api/move'
 import prisma from "@/lib/prisma";
 import { PROFILE_MUTATE_ROUTE, PROFILE_CREATE_ROUTE, 
-  TRANSACTION_MUTATE_ROUTE, PROFILe_CHECk_ROUTE, BUY_MUTATE_ROUTE, SELL_MUTATE_ROUTE, FOLLOW_MUTATE_ROUTE, UNFOLLOW_MUTATE_ROUTE } from '@/lib/api/constant'
+  TRANSACTION_MUTATE_ROUTE, PROFILe_CHECk_ROUTE, BUY_MUTATE_ROUTE, SELL_MUTATE_ROUTE, FOLLOW_MUTATE_ROUTE, UNFOLLOW_MUTATE_ROUTE, REPLY_MUTATE_ROUTE, REPOST_SELL_MUTATE_ROUTE, REPLY_BUY_MUTATE_ROUTE, REPOST_BUY_MUTATE_ROUTE, REPLY_SELL_MUTATE_ROUTE } from '@/lib/api/constant'
 
 /**
  * An example mutation to execute a Sui transaction.
@@ -110,6 +115,30 @@ export function useRecentTxsQuery() {
   });
 }
 
+export function useRepostMutation(): UseMutationResult<
+  RepostResponse, ApiError, TransactionRequest & WithKeyPair
+> {
+  return useMutation({
+    mutationFn: apiTxExecMutationFn({
+      baseUri: () => `${REPLY_MUTATE_ROUTE}`,
+      body: ({ keyPair, ...req }) => req,
+      resultSchema: RepostResponse,
+    })
+  })
+}
+
+export function useReplyMutation(): UseMutationResult<
+  ReplyResponse, ApiError, ReplyRequest & WithKeyPair
+> {
+  return useMutation({
+    mutationFn: apiTxExecMutationFn({
+      baseUri: () => `${REPLY_MUTATE_ROUTE}`,
+      body: ({ keyPair, ...req }) => req,
+      resultSchema: ReplyResponse,
+    })
+  })
+}
+
 export function useTransactionMutation(): UseMutationResult<
   TransactionResponse, ApiError, TransactionRequest & WithKeyPair
 > {
@@ -146,12 +175,60 @@ CommonResponse, ApiError, UnFollowRequest & WithKeyPair
   })
 }
 
+export function useReplyBuyMutation(): UseMutationResult<
+CommonResponse, ApiError, ReplyBuyRequest & WithKeyPair
+> {
+  return useMutation({
+    mutationFn: apiTxExecMutationFn({
+      baseUri: () => `${REPLY_BUY_MUTATE_ROUTE}`,
+      body: ({ keyPair, ...req }) => req,
+      resultSchema: CommonResponse,
+    })
+  })
+}
+
+export function useRepostBuyMutation(): UseMutationResult<
+CommonResponse, ApiError, ReplyBuyRequest & WithKeyPair
+> {
+  return useMutation({
+    mutationFn: apiTxExecMutationFn({
+      baseUri: () => `${REPOST_BUY_MUTATE_ROUTE}`,
+      body: ({ keyPair, ...req }) => req,
+      resultSchema: CommonResponse,
+    })
+  })
+}
+
 export function useBuyMutation(): UseMutationResult<
 CommonResponse, ApiError, BuyRequest & WithKeyPair
 > {
   return useMutation({
     mutationFn: apiTxExecMutationFn({
       baseUri: () => `${BUY_MUTATE_ROUTE}`,
+      body: ({ keyPair, ...req }) => req,
+      resultSchema: CommonResponse,
+    })
+  })
+}
+
+export function useReplySellMutation(): UseMutationResult<
+  CommonResponse, ApiError, ReplySellRequest & WithKeyPair
+> {
+  return useMutation({
+    mutationFn: apiTxExecMutationFn({
+      baseUri: () => `${REPLY_SELL_MUTATE_ROUTE}`,
+      body: ({ keyPair, ...req }) => req,
+      resultSchema: CommonResponse,
+    })
+  })
+}
+
+export function useRepostSellMutation(): UseMutationResult<
+  CommonResponse, ApiError, SellRequest & WithKeyPair
+> {
+  return useMutation({
+    mutationFn: apiTxExecMutationFn({
+      baseUri: () => `${REPOST_SELL_MUTATE_ROUTE}`,
       body: ({ keyPair, ...req }) => req,
       resultSchema: CommonResponse,
     })

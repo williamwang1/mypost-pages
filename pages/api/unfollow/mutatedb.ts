@@ -1,6 +1,5 @@
 
 import prisma from "@/lib/prisma";
-import { ProfileMedata } from "@/types/profile";
 import { FollowData } from "@/types/follow";
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from "next-auth";

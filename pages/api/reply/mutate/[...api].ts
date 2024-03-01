@@ -10,9 +10,9 @@ import {
     zkLoginTxExecHandler,
 } from "@shinami/nextjs-zklogin/server/pages";
 import { mask, validate } from "superstruct";
-import { CommonResponse, ReplyRequest, TransactionRequest, TransactionResponse} from "@/lib/shared/interfaces";
-import { AccessBought, AccesstData, ReplyCreated, TransactionCreated } from "@/types/transaction";
-import { ACCESS_MUTATE_FALSE_ROUTE, ACCESS_MUTATE_ROUTE, ACCESS_SELL_FALSE_ROUTE, TRANSACTION_MUTATEDB_ROUTE } from "@/lib/api/constant";
+import { CommonResponse, ReplyRequest, } from "@/lib/shared/interfaces";
+import { ReplyAccessBoughtEvent, ReplyCreated, TransactionCreated } from "@/types/transaction";
+import { REPLY_ACCESS_MUTATEDB, REPLY_MUTATEDB_ROUTE } from "@/lib/api/constant";
 
 
 const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {
@@ -29,10 +29,10 @@ const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {
         txb.moveCall({
             target: `${MYPOST_MOVE_PACKAGE_ID}::reply::create`,
             arguments: [
-                txb.object(body.profile_pool),
+                txb.object(body.pool),
                 txb.pure(body.content),
                 txb.pure.u64(5000),
-                txb.pure('new transction'),
+                txb.pure(body.transaction_digest),
                 txb.pure('new reply'),
                 txb.object('0x6')
             ],
@@ -51,62 +51,62 @@ const parseTxRes: TransactionResponseParser<CommonResponse> = async (_, txRes, u
     let data = txRes.events?.at(0)?.parsedJson as ReplyCreated;
     let body = {
         digest: txRes.digest,
-        summary: '',
+        transaction_digest: data.transaction_digest,
         public_content: '',
         address: user.wallet,
         profile_id: data.profile_id,
-        //transaction_id: data.transaction_id,
+        reply_id: data.reply_id,
         pool_id: data.pool_id,
         package_id: `${MYPOST_MOVE_PACKAGE_ID}`,
-        post_id: '',
-        type: 'post',
+        reply_post_id: '',
+        transaction_post_id: '',
+        type: 'reply',
         create_at: new Date()
     }
     //console.log('request body ' + JSON.stringify(body))
     // update profile data in db
-    const txMetaRes = await fetch(`${API_HOST}${TRANSACTION_MUTATEDB_ROUTE}`, {
+    const txMetaRes = await fetch(`${API_HOST}${REPLY_MUTATEDB_ROUTE}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             },
         body: JSON.stringify(body)
     })
-    // console.log(txMetaRes.status)
-    // console.log(txMetaRes.statusText)
     if (!txMetaRes.ok) {
         throw new Error(`Error: ${txMetaRes.statusText}`);
     }
     let profileJson = await txMetaRes.json()
     //console.log(profileJson)
     // update access data in db
-    let accessBought = txRes.events?.at(1)?.parsedJson as AccessBought;
-    let acessSellBody = {
-        transaction_digest: accessBought.transaction_digest,
-        address: accessBought.buyer,
-        type: 'sell',
-    }
-    const sellRes = await fetch(`${API_HOST}${ACCESS_MUTATE_FALSE_ROUTE}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(acessSellBody)
-    })
-    let sellJson = await sellRes.json()
+    let accessBought = txRes.events?.at(1)?.parsedJson as ReplyAccessBoughtEvent;
+    // let acessSellBody = {
+    //     reply_digest: accessBought.reply_digest,
+    //     address: accessBought.buyer,
+    //     type: 'sell',
+    // }
+    // const sellRes = await fetch(`${API_HOST}${REPLY_ACCESS_MUTATE_FALSE_ROUTE}`, {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify(acessSellBody)
+    // })
+    // let sellJson = await sellRes.json()
     let accessBoughtBody = {
         digest: txRes.digest,
         access_id: accessBought.access_id,
-        transaction_id: accessBought.transaction_id,
-        transaction_digest: txRes.digest,
-        profile_id: accessBought.profile_id,
-        accessor_profile: accessBought.profile_id,
+        reply_id: accessBought.reply_id,
+        reply_pool_id: accessBought.pool_id,
+        reply_digest: txRes.digest,
+        transaction_digest: accessBought.transaction_digest,
+        reply_profile_id: accessBought.profile_id,
         price: accessBought.price,
         type: 'buy',
         address: user.wallet,
         package_id: `${MYPOST_MOVE_PACKAGE_ID}`,
         create_at: new Date()
     }
-    const accessRes = await fetch(`${API_HOST}${ACCESS_MUTATE_ROUTE}`, {
+    const accessRes = await fetch(`${API_HOST}${REPLY_ACCESS_MUTATEDB}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ const parseTxRes: TransactionResponseParser<CommonResponse> = async (_, txRes, u
     let followJson = await accessRes.json()
 
 
-    return { txDigest: txRes.digest,  profile_id: data.profile_id, pool_id: data.pool_id};
+    return { txDigest: txRes.digest, reply_id: data.reply_id ,profile_id: data.profile_id, pool_id: data.pool_id};
 };
 
 

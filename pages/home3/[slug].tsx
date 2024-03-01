@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { GetServerSideProps } from 'next';
 import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
-import { AccessHistory, TransactionList } from '@/types/transaction';
+import { AccessDB } from '@/types/transaction';
 import { API_HOST } from '@/lib/api/move';
 import { useRouter } from 'next/navigation'
 import { ACCESS_HISTORY_LIST_ROUTE, ACCESS_CHECK_ROUTE, TRANSACTION_GET_LIST_ROUTE } from '@/lib/api/constant'
@@ -17,7 +17,7 @@ function Home3 (
     {slug}: 
   {slug: string}
 ) {
-  const [items, setItems] = useState<AccessHistory[]>([]);
+  const [items, setItems] = useState<AccessDB[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(true)

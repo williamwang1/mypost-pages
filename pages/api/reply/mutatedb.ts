@@ -16,49 +16,52 @@ export default async function handler(
     if (req.method === 'POST') {
         const {
             digest,
-            summary,
+            transaction_digest,
             public_content,
             address,
             profile_id,
-            transaction_id, 
+            reply_id, 
             pool_id,      
             package_id,   
-            post_id, 
+            reply_post_id, 
+            transaction_post_id,
             type,
             create_at,
         } = req.body;
-        console.log('in transaction save or update ' + JSON.stringify(req.body))
+        console.log('in reply mutatedb ' + JSON.stringify(req.body))
     
         try {
-          const tx = await prisma.transaction.upsert({
+          const tx = await prisma.reply.upsert({
             where: {
               // Use your @@unique fields here as a composite identifier
               digest: digest
             },
             update: {
               // Fields to update if the account exists
-              summary,
+              transaction_digest,
               public_content,
               address,
               profile_id,
-              transaction_id, 
+              reply_id, 
               pool_id,      
               package_id,   
-              post_id, 
+              reply_post_id, 
+              transaction_post_id,
               type,
               create_at,
             },
             create: {
               // Fields to create a new account if it doesn't exist
               digest,
-              summary,
+              transaction_digest,
               public_content,
               address,
               profile_id,
-              transaction_id, 
+              reply_id, 
               pool_id,      
               package_id,   
-              post_id, 
+              reply_post_id, 
+              transaction_post_id,
               type,
               create_at,
             },

@@ -3,6 +3,7 @@
 module mypost::profile {
     friend mypost::transaction;
     friend mypost::reply;
+    friend mypost::repost;
     use std::option::{Self, Option};
     use std::string::{Self, String};
     use sui::coin::{Self, Coin};
@@ -145,6 +146,18 @@ module mypost::profile {
         transfer::share_object(global_profiles);
     }
 
+    entry fun edit_profile(
+        name: vector<u8>,
+        bio: vector<u8>,
+        avatar: vector<u8>,
+        profile: &mut Profile,
+        ctx: &mut TxContext
+    ) {
+        profile.avatar = string::utf8(avatar);
+        profile.bio = string::utf8(bio);
+        profile.name = string::utf8(name);
+    }
+
     #[lint_allow(self_transfer)]
     public entry fun create_profile_pool(
         name: vector<u8>,
@@ -194,7 +207,7 @@ module mypost::profile {
 
         let data = ProfileMetaData{id: metadata_id, for: inner_id, pool: inner_pool_id};
         event::emit(
-            ProfileMetaDataCreated{
+            ProfileMetaDataCreated {
                 id: metadata_inner_id,
                 for: inner_id,
                 pool: inner_pool_id,
@@ -405,12 +418,7 @@ module mypost::profile {
     }
 
 
-    // fun getPrice(no_of_accessors: u64): u64 {
-    //     //let initial_price: u64 = 10000000; // 0.01 SUI
-    //     let price = no_of_accessors * no_of_accessors * SUI_MIST / 5000;
-    //     // pool.price = price;
-    //     (price)
-    // }
+
 
     public(friend) fun get_profile_id(pool: &ProfilePool): ID {
         let id = pool.for;
@@ -437,68 +445,7 @@ module mypost::profile {
             object_table::add(&mut pool.transactions, id, transaction_metadata);
     }
 
-    //     public entry fun create(
-    //     name: vector<u8>,
-    //     bio: vector<u8>,
-    //     avatar: vector<u8>,
-    //     payment: Coin<SUI>,
-    //     protocol_destination: address,
-    //     global: &mut Global,
-    //     ctx: &mut TxContext
-    //     ) {
-    //     // check payments is enough
-    //     let value = coin::value(&payment);
-    //     assert!(value == MINIMUM_FUND, INSUFFICIENT_FUND);
-    //     transfer::public_transfer(payment, protocol_destination);
-    //     // check whether have profile created
-    //     let exists = object_table::contains(&global.profiles, sender(ctx));
-    //     assert!(!exists, PROFILE_EXISTS);
-    //     // create profile, transfer to sender, add into global
-    //     let id = object::new(ctx);
-    //     let inner_id = object::uid_to_inner(&id);
-    //     let pool_id = object::new(ctx);
-    //     let inner_pool_id = object::uid_to_inner(&pool_id);
-    //     // let summary_id = object::new(ctx);
-    //     // let inner_summary_id = object::uid_to_inner(&summary_id);
 
-    //     // create profilepool 
-    //     let pool = ProfilePool{
-    //         id: pool_id,
-    //         for: inner_id,
-    //         initial_price: 0,
-    //         price: 0,
-    //         balance: balance::zero(),
-    //     };
-    //     transfer::share_object(pool);
-    //     event::emit(
-    //         ProfilePoolCreated{
-    //             id: inner_pool_id,
-    //             for: inner_id,
-    //             name: string::utf8(name),
-    //             owner: sender(ctx),
-    //             initial_price: 1
-    //         }
-    //     );
-    //     let profile = Profile{
-    //         id: id,
-    //         owner: sender(ctx),
-    //         name: string::utf8(name),
-    //         bio: string::utf8(bio),
-    //         avatar: string::utf8(avatar),
-    //         no_of_followers: 0,
-    //         no_of_followings: 0,
-    //         followers: object_table::new(ctx),
-    //         followings: object_table::new(ctx),
-    //     };
-    //     transfer::transfer(profile, sender(ctx));
-    //     event::emit(
-    //         ProfileCreated {
-    //             id: inner_id,
-    //             name: string::utf8(name),
-    //             owner: sender(ctx),
-    //         }
-    //     );
-    // }
 
 
     #[test_only]

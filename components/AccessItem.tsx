@@ -1,13 +1,13 @@
 import { sui } from '@/lib/api/shinami'
 import { SUI_MIST } from '@/lib/constant'
 import { trucateAddress } from '@/lib/shared/utils'
-import { AccessHistory } from '@/types/transaction'
+import { AccessDB } from '@/types/transaction'
 import { ChevronRightIcon } from '@heroicons/react/20/solid'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 
 
-export default function AccessItem({ item, onLoadingChange }: {item: AccessHistory,  onLoadingChange: (loading: boolean) => void }) {
+export default function AccessItem({ item, onLoadingChange }: {item: AccessDB,  onLoadingChange: (loading: boolean) => void }) {
     const [profile, setProfile] = useState<any>()
 
     useEffect(() => {

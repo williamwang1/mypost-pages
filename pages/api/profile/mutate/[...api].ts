@@ -13,7 +13,7 @@ import {
 import { mask, validate } from "superstruct";
 import { CommonResponse, ProfileRequest, TransactionResponse} from "@/lib/shared/interfaces";
 import { ProfileMetadataCreated } from '@/types/profile'
-import { FollowMetaData, FollowData } from "@/types/follow";
+import { FollowCreated, FollowData } from "@/types/follow";
 import { FOLLOW_MUTATEDB_ROUTE, PROFILE_MUTATEDB_ROUTE } from "@/lib/api/constant";
 
 // interface ProfileMeataEvent {
@@ -91,7 +91,7 @@ const parseTxRes: TransactionResponseParser<CommonResponse> = async (_, txRes, u
     let profileJson = await profileRes.json()
     console.log('in profile mutate ' + JSON.stringify(profileJson))
     // update follow data in db
-    let followEventData = txRes.events?.at(1)?.parsedJson as FollowData;
+    let followEventData = txRes.events?.at(1)?.parsedJson as FollowCreated;
     let followBody = {
         follower: followEventData.follower,
         following: followEventData.following,

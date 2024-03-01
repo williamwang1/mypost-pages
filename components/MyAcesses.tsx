@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import TransactionItem from "./TransactionItem";
 import { API_HOST } from '@/lib/api/move';
-import { AccessHistory, TransactionList } from "@/types/transaction";
+import { AccessDB } from "@/types/transaction";
 import { ACCESS_PROFILE_LIST_ROUTE } from "@/lib/api/constant";
 import axios from "axios";
 import FollowerItem from "./FollowerItem";
@@ -10,7 +10,7 @@ import { FollowData } from "@/types/follow";
 import AccessItem from "./AccessItem";
 
 const MyAcesses = ({slug}: {slug: string}) => {
-  const [items, setItems] = useState<AccessHistory[]>([]);
+  const [items, setItems] = useState<AccessDB[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(true);

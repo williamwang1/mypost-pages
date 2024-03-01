@@ -1,7 +1,6 @@
 import React, { Fragment, useState, useEffect } from 'react' ;
 import { ZkLoginSession, withZkLoginSessionRequired } from "@shinami/nextjs-zklogin/client";
 import Nav from '@/components/Nav';
-// import Transaction from '@/components/TransactionHelper';
 import StepperPaid from '@/components/StepperPaid';
 import StepperPublic from '@/components/StepperPublic';
 import StepperPreview from '@/components/StepperPost';

@@ -48,9 +48,9 @@ function Home({session, slug}: {session: any, slug: string}) {
                     {tab.id == 0 && (
                         <MyHomeFollowing slug={slug} />
                     )}
-                    {tab.id == 1 && (
+                    {/* {tab.id == 1 && (
                         <MyHomeRecommend slug={slug}/>
-                    )}
+                    )} */}
 
                 </Tab.Panel>
             ))}

@@ -4,11 +4,11 @@ import { sui } from '@/lib/api/shinami'
 import { ChevronRightIcon, EllipsisVerticalIcon } from '@heroicons/react/20/solid'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image';
-import { ProfileMedata } from "@/types/profile";
+import { ProfileDB } from "@/types/profile";
 import { SUI_MIST } from "@/lib/constant";
 
 
-export default function ProfileItem({p, onLoadingChange}: {p: ProfileMedata, onLoadingChange: (loading: boolean) => void}) {
+export default function ProfileItem({p, onLoadingChange}: {p: ProfileDB, onLoadingChange: (loading: boolean) => void}) {
   const [profile, setProfile] = useState<any>({})
   const [pool, setPool] = useState<any>({})
   const router = useRouter()

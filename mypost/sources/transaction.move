@@ -162,17 +162,9 @@ module mypost::transaction {
         transfer::share_object(pool);
     }
 
-    // fun getPrice(no_of_accessors: u64, cofficient: u64): u64 {
-    //     //let initial_price: u64 = 10000000; // 0.01 SUI
-    //     let price = no_of_accessors * no_of_accessors * SUI_MIST / cofficient;
-    //     // pool.price = price;
-    //     (price)
-    // }
-
     public fun get_no_of_accessors(tpool: &TransactionPool): u64 {
         (tpool.no_of_accessors)
     }
-
 
     public entry fun buy (
         // protocol_fee: u64,

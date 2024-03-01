@@ -3,7 +3,7 @@ import React, { Fragment, useState, useRef, useEffect } from 'react' ;
 import { SuiEvent, SuiObjectData, SuiObjectResponse } from "@mysten/sui.js/client";
 import { withZkLoginSessionRequired, ZkLoginSession } from "@shinami/nextjs-zklogin/client";
 import { sui } from '@/lib/api/shinami'
-import { ProfileMetadataCreated, ProfileMedata, ProfileData } from "@/types/profile";
+import { ProfileMetadataCreated, ProfileDB, ProfileData } from "@/types/profile";
 import { Tab } from '@headlessui/react'
 import { useRouter } from 'next/navigation'
 import MyTransactions from '@/components/MyTransactions';
@@ -32,7 +32,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
         body: JSON.stringify({ slug }),
     })
-    const metadata: ProfileMedata = await metadatadb.json();
+    const metadata: ProfileDB = await metadatadb.json();
     console.log('in profile ' + JSON.stringify(metadata))
     if (!metadata) {
         return {
@@ -66,7 +66,7 @@ const tabs = [
 
 function Follow({metadata, session, accounts, slug} 
     : 
-    {metadata: ProfileMedata, profiledata: SuiObjectResponse, 
+    {metadata: ProfileDB, profiledata: SuiObjectResponse, 
         session: ZkLoginSession, profilepool: SuiObjectResponse, 
         accounts: Account[], transactions: any, slug: string}) {
     const { user, localSession } = session;

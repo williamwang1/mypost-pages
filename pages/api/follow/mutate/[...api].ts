@@ -11,10 +11,8 @@ import {
 } from "@shinami/nextjs-zklogin/server/pages";
 import { mask, validate } from "superstruct";
 import { FollowRequest, CommonResponse, } from "@/lib/shared/interfaces";
-import { ProfileMetadataCreated } from '@/types/profile'
-import { FollowMetaData, FollowData } from "@/types/follow";
-import { AccessBought, TransactionCreated } from "@/types/transaction";
-import { ACCESS_MUTATE_ROUTE, ACCESS_MUTATE_FALSE_ROUTE, FOLLOW_MUTATEDB_ROUTE, UNFOLLOW_MUTATEFALSE_ROUTE } from "@/lib/api/constant";
+import { FollowData } from "@/types/follow";
+import { FOLLOW_MUTATEDB_ROUTE, UNFOLLOW_MUTATEFALSE_ROUTE } from "@/lib/api/constant";
 
 
 const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {

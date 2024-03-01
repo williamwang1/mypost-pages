@@ -4,6 +4,7 @@ module mypost::price {
     friend mypost::reply;
     friend mypost::transaction;
     friend mypost::profile;
+    friend mypost::repost;
 
     const SUI_MIST: u64 = 1000000000;
 

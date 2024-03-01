@@ -11,10 +11,8 @@ import {
 } from "@shinami/nextjs-zklogin/server/pages";
 import { mask, validate } from "superstruct";
 import { CommonResponse, TransactionRequest, TransactionResponse} from "@/lib/shared/interfaces";
-import { ProfileMetadataCreated } from '@/types/profile'
-import { FollowMetaData, FollowData } from "@/types/follow";
-import { AccessBought, AccesstData, TransactionCreated } from "@/types/transaction";
-import { ACCESS_BUY_ROUTE, ACCESS_MUTATE_FALSE_ROUTE, ACCESS_MUTATE_ROUTE, ACCESS_SELL_FALSE_ROUTE, TRANSACTION_MUTATEDB_ROUTE } from "@/lib/api/constant";
+import { AccessBought, TransactionCreated } from "@/types/transaction";
+import { ACCESS_MUTATE_ROUTE, TRANSACTION_MUTATEDB_ROUTE } from "@/lib/api/constant";
 
 
 const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {
@@ -93,20 +91,20 @@ const parseTxRes: TransactionResponseParser<CommonResponse> = async (_, txRes, u
     console.log('in transaction mutate ' + JSON.stringify(txJson))
     // update access data in db
     let accessBought = txRes.events?.at(1)?.parsedJson as AccessBought;
-    let acessSellBody = {
-        transaction_digest: accessBought.transaction_digest,
-        address: accessBought.buyer,
-        type: 'sell',
-    }
-    const sellRes = await fetch(`${API_HOST}${ACCESS_MUTATE_FALSE_ROUTE}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(acessSellBody)
-    })
-    let sellJson = await sellRes.json()
-    console.log('in transaction mutate ' + JSON.stringify(sellJson))
+    // let acessSellBody = {
+    //     transaction_digest: accessBought.transaction_digest,
+    //     address: accessBought.buyer,
+    //     type: 'sell',
+    // }
+    // const sellRes = await fetch(`${API_HOST}${ACCESS_MUTATE_FALSE_ROUTE}`, {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify(acessSellBody)
+    // })
+    // let sellJson = await sellRes.json()
+    // console.log('in transaction mutate ' + JSON.stringify(sellJson))
     let accessBoughtBody = {
         digest: txRes.digest,
         access_id: accessBought.access_id,

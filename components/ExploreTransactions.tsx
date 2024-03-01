@@ -2,12 +2,12 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import TransactionItem from "./TransactionItem";
 import { API_HOST } from '@/lib/api/move';
-import { TransactionList } from "@/types/transaction";
+import { TransactionDB, TransactionDBList } from "@/types/transaction";
 import { EXPLORE_TRANSACTIONS_ROUTE } from "@/lib/api/constant";
 import axios from "axios";
 
 const ExploreTransactions = ({slug}: {slug: string}) => {
-  const [items, setItems] = useState<TransactionList[]>([]);
+  const [items, setItems] = useState<TransactionDBList[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(2);
   const isInitialRender = useRef(true);

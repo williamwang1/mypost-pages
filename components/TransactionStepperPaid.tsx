@@ -1,7 +1,6 @@
 import React, { Fragment, useState, useRef } from 'react' ;
 import StepperPaid from '@/components/StepperPaid';
 import { useRouter } from 'next/navigation'
-import dynamic from 'next/dynamic';
 import Tiptap from './TipTap';
 import PriceTooltip from './PriceTooltip';
 
