@@ -37,7 +37,7 @@ CREATE TABLE "RepostAccess" (
 );
 
 -- CreateTable
-CREATE TABLE "RelyAccess" (
+CREATE TABLE "ReplyAccess" (
     "id" TEXT NOT NULL,
     "digest" TEXT NOT NULL,
     "access_id" TEXT NOT NULL,
@@ -53,7 +53,7 @@ CREATE TABLE "RelyAccess" (
     "create_at" TIMESTAMP(3) NOT NULL,
     "status" BOOLEAN NOT NULL DEFAULT true,
 
-    CONSTRAINT "RelyAccess_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "ReplyAccess_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -62,10 +62,9 @@ CREATE TABLE "Access" (
     "digest" TEXT NOT NULL,
     "access_id" TEXT NOT NULL,
     "transaction_id" TEXT NOT NULL,
-    "pool_id" TEXT,
+    "pool_id" TEXT NOT NULL,
     "transaction_digest" TEXT NOT NULL,
     "profile_id" TEXT NOT NULL,
-    "accessor_profile" TEXT NOT NULL,
     "price" TEXT NOT NULL,
     "type" TEXT NOT NULL,
     "address" TEXT NOT NULL,
@@ -181,7 +180,7 @@ CREATE UNIQUE INDEX "Follow_digest_key" ON "Follow"("digest");
 CREATE UNIQUE INDEX "RepostAccess_digest_key" ON "RepostAccess"("digest");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "RelyAccess_digest_key" ON "RelyAccess"("digest");
+CREATE UNIQUE INDEX "ReplyAccess_digest_key" ON "ReplyAccess"("digest");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Access_digest_key" ON "Access"("digest");

@@ -10,7 +10,7 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 
 
-export default function TransactionHistoryItem({reply}: {reply: ReplyAccessDB}) {
+export default function ReplyHistoryItem({reply}: {reply: ReplyAccessDB}) {
     const [profile, setProfile] = useState<any>()
     let avatar = ''
     let name = ''

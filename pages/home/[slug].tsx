@@ -14,13 +14,22 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 const tabs = [
     {id: 0, name: 'Following'},
     // {id: 2, name: 'Assets', component: <MyAssets/>, url: '/profile/asset'},
-    {id: 1, name: 'Recommend'},
+    // {id: 1, name: 'Recommend'},
 ]
 
 
 function Home({session, slug}: {session: any, slug: string}) {
     const { isLoading, user, localSession } = session;
     const [activeIndex, setActiveIndex] = useState(0);
+    const [loading, setLoading] = useState(false)
+
+    const handleLoadingChange = (load: boolean) => {
+        setLoading(true)
+    }
+
+    if (loading) {
+        return <div>Loading</div>
+    }
 
     return (
     <Nav bottomIndex={0} leftIndex={-1} user={user}>

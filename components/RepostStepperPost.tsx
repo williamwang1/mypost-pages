@@ -2,10 +2,9 @@ import React, { Fragment, useState } from 'react' ;
 import StepperPreview from "./StepperPost";
 import { Account } from "@/types/auth";
 import { ProfileDB } from '@/types/profile';
-import ReplyContentHeader from './ReplyContentHeader';
-import CommonStepperPost from './CommonStepperPost';
-import CommonStepperReply from './CommonStepperReply';
 import { TransactionDB } from '@/types/transaction';
+import RepostContentHeader from './RepostContentHeader';
+import CommonStepperRepost from './CommonStepperRepost';
 
 
 export default function RepostStepperPost({accounts, step, onBackChange, summary, digest, transactionDigest, 
@@ -22,8 +21,8 @@ export default function RepostStepperPost({accounts, step, onBackChange, summary
     return (
         <div className='px-2'>
             <StepperPreview/>
-            <ReplyContentHeader digest={digest}/>
-            <CommonStepperReply accounts={accounts} digest={digest} transactionDigest={transactionDigest} step={step} 
+            <RepostContentHeader digest={digest}/>
+            <CommonStepperRepost accounts={accounts} digest={digest} transactionDigest={transactionDigest} step={step} 
             onBackChange={onBackChange} session={session} paid={paid} metadata={metadata} free={free} tx={tx}/>
     </div>
 

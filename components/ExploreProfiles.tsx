@@ -60,7 +60,9 @@ const ExploreProfiles = ({slug}: {slug: string}) => {
     setLoading(loading)
   }
 
-
+  if (loading) {
+    return <div>Loading</div>
+  }
   return (
     <InfiniteScroll
       dataLength={items.length}

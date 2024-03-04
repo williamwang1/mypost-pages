@@ -36,7 +36,7 @@ module mypost::repost {
 
     struct RepostAccess has key, store {
         id: UID,
-        reply_id: ID,
+        repost_id: ID,
         pool_id: ID,
         profile_id: ID,
         accessor_address: address,
@@ -68,7 +68,7 @@ module mypost::repost {
 
     struct RepostAccessBought has copy, drop {
         access_id: ID,
-        transaction_id: ID,
+        repost_id: ID,
         profile_id: ID,
         pool_id: ID,
         buyer: address,
@@ -80,12 +80,12 @@ module mypost::repost {
 
     struct RepostAccessSold has copy, drop {
         access_id: ID,
-        transaction_id: ID,
+        repost_id: ID,
         profile_id: ID,
         pool_id: ID,
         seller: address,
         transaction_digest: String,
-        reply_digest: String,
+        repost_digest: String,
         price: u64,
         timestamp_ms: u64
     }
@@ -139,7 +139,7 @@ module mypost::repost {
 
         let access = RepostAccess {
             id: access_id,
-            reply_id: inner_id,
+            repost_id: inner_id,
             pool_id: pool_inner_id,
             profile_id: profile_id,
             accessor_address: sender(ctx),
@@ -149,7 +149,7 @@ module mypost::repost {
         event::emit(
             RepostAccessBought{
                 access_id: acess_inner_id,
-                transaction_id: inner_id,
+                repost_id: inner_id,
                 profile_id: profile_id,
                 pool_id: pool_inner_id,
                 buyer: sender(ctx),
@@ -203,7 +203,7 @@ module mypost::repost {
         let owner_profile_id = pool.owner_profile;
         let access = RepostAccess {
             id: access_id,
-            reply_id: pool.for,
+            repost_id: pool.for,
             profile_id: owner_profile_id,
             pool_id: pool_inner_id,
             accessor_address: sender(ctx),
@@ -214,7 +214,7 @@ module mypost::repost {
             RepostAccessBought {
                 access_id: access_inner_id,
                 profile_id: owner_profile_id,
-                transaction_id: pool.for,
+                repost_id: pool.for,
                 pool_id: object::uid_to_inner(& pool.id),
                 price: current_price,
                 transaction_digest: string::utf8(transaction_digest),
@@ -263,17 +263,17 @@ module mypost::repost {
         debug::print(&pool.balance);
         let access = object_table::remove(&mut pool.accessors, sender(ctx));
         let RepostAccess{id: access_id, accessor_address:_, 
-        price: _, profile_id: _, reply_id: _, pool_id: _,
+        price: _, profile_id: _, repost_id: _, pool_id: _,
         timestamp_ms: _} = access;
         let owner_profile_id = pool.owner_profile;
         //let owner_profile_id = object::id_from_bytes(owner_profile);
         event::emit(
             RepostAccessSold {
                 access_id: object::uid_to_inner(&access_id),
-                transaction_id: pool.for,
+                repost_id: pool.for,
                 profile_id: owner_profile_id,
                 pool_id: object::uid_to_inner(&pool.id),
-                reply_digest: string::utf8(reply_digest),
+                repost_digest: string::utf8(reply_digest),
                 price: sold_price,
                 transaction_digest: string::utf8(transaction_digest),
                 seller: sender(ctx),

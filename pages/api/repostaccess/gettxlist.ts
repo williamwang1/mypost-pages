@@ -8,11 +8,11 @@ export default async function handler(
         let pageSize = 20;
         let pageNumber = req.body.currentPage - 1;
         let offset = pageNumber * pageSize;
-        console.log('in access lit ' + req.body.currentPage)
+        console.log('in repost access lit ' + req.body.currentPage)
         try {
             //console.log(req.body.slug)
             let accesses = await prisma.$queryRaw`SELECT *
-            FROM "ReplyAccess" at where at.Reply_digest = ${req.body.reply_digest}
+            FROM "RepostAccess" at where at.Repost_digest = ${req.body.repost_digest}
             ORDER BY at.Create_at DESC
             LIMIT ${pageSize} OFFSET ${offset};`
             

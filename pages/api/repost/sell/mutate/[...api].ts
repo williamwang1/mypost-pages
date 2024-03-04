@@ -10,13 +10,14 @@ import {
     zkLoginTxExecHandler,
 } from "@shinami/nextjs-zklogin/server/pages";
 import { mask, validate } from "superstruct";
-import { CommonResponse, SellRequest, TransactionRequest, TransactionResponse} from "@/lib/shared/interfaces";
-import { AccessSold, TransactionCreated } from "@/types/transaction";
-import { ACCESS_BUY_ROUTE, ACCESS_MUTATE_FALSE_ROUTE, ACCESS_MUTATE_ROUTE, ACCESS_SELL_FALSE_ROUTE, TRANSACTION_MUTATEDB_ROUTE } from "@/lib/api/constant";
+import { CommonResponse, ReplySellRequest, RepostSellRequest } from "@/lib/shared/interfaces";
+
+import { ReplyAccessSoldEvent, RepostAccessSoldEvent } from "@/types/transaction";
+import { REPLY_ACCESS_MUTATEDB, REPLY_ACCESS_MUTATE_FALSE_ROUTE, REPOST_ACCESS_MUTATEDB, REPOST_ACCESS_MUTATE_FALSE_ROUTE } from "@/lib/api/constant";
 
 
 const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {
-    const [error, body] = validate(req.body, SellRequest);
+    const [error, body] = validate(req.body, RepostSellRequest);
     if (error) throw new InvalidRequest(error.message);
   
     console.log("Preparing create sell tx for zkLogin wallet", wallet);
@@ -27,10 +28,11 @@ const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {
         // Source code for this example Move function:
         // https://github.com/shinamicorp/shinami-typescript-sdk/blob/90f19396df9baadd71704a0c752f759c8e7088b4/move_example/sources/math.move#L13
         txb.moveCall({
-            target: `${MYPOST_MOVE_PACKAGE_ID}::transaction::sell`,
+            target: `${MYPOST_MOVE_PACKAGE_ID}::repost::sell`,
             arguments: [
                 txb.pure.address(wallet),
                 txb.pure(body.transaction_digest),
+                txb.pure(body.repost_digest),
                 txb.object(body.pool),
                 txb.object('0x6')
             ],
@@ -45,34 +47,35 @@ const parseTxRes: TransactionResponseParser<CommonResponse> = async (_, txRes, u
     const event = first(txRes.events);
     if (!event) throw new Error("Event missing from tx response");
 
-    let accessSold = txRes.events?.at(0)?.parsedJson as AccessSold;
-    let acessBoughtBody = {
-        transaction_digest: accessSold.transaction_digest,
+    let accessSold = txRes.events?.at(0)?.parsedJson as RepostAccessSoldEvent;
+    let acessSoldBody = {
+        repost_digest: accessSold.repost_digest,
         address: accessSold.seller,
         type: 'buy',
     }
-    const boughtRes = await fetch(`${API_HOST}${ACCESS_MUTATE_FALSE_ROUTE}`, {
+    const boughtRes = await fetch(`${API_HOST}${REPOST_ACCESS_MUTATE_FALSE_ROUTE}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(acessBoughtBody)
+        body: JSON.stringify(acessSoldBody)
     })
     let boughtJson = await boughtRes.json()
     let soldbody = {
         digest: txRes.digest,
         access_id: accessSold.access_id,
-        transaction_id: accessSold.transaction_id,
+        repost_id: accessSold.repost_id,
+        repost_pool_id: accessSold.pool_id,
+        repost_digest: accessSold.repost_digest,
         transaction_digest: accessSold.transaction_digest,
-        profile_id: accessSold.profile_id,
-        accessor_profile: accessSold.profile_id,
+        repost_profile_id: accessSold.profile_id,
         price: accessSold.price,
         type: 'sell',
         address: user.wallet,
         package_id: `${MYPOST_MOVE_PACKAGE_ID}`,
         create_at: new Date()
     }
-    const accessRes = await fetch(`${API_HOST}${ACCESS_MUTATE_ROUTE}`, {
+    const accessRes = await fetch(`${API_HOST}${REPOST_ACCESS_MUTATEDB}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

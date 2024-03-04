@@ -1,7 +1,7 @@
 import React, { Fragment, useState, useRef } from 'react' ;
 import StepperPaid from '@/components/StepperPaid';
 import CommonStepperPaid from './CommonStepperPaid';
-import ReplyContentHeader from './ReplyContentHeader';
+import RepostContentHeader from './RepostContentHeader';
 
 
 export default function RepostStepperPaid({paid, onPaidChange, step, onBackChange, onPaidNextChange, free, digest}
@@ -15,7 +15,7 @@ export default function RepostStepperPaid({paid, onPaidChange, step, onBackChang
         <div className='px-2'>
             <StepperPaid/>
             <div className="flex flex-col flex-1">
-                <ReplyContentHeader digest={digest}/>
+                <RepostContentHeader digest={digest}/>
                 <CommonStepperPaid paid={paid} onPaidChange={onPaidChange} step={step} 
                 onBackChange={onBackChange} onPaidNextChange={onPaidNextChange} free={free}/>
             </div>

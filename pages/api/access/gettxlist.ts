@@ -10,12 +10,12 @@ export default async function handler(
         let offset = pageNumber * pageSize;
         console.log('in access lit ' + req.body.currentPage)
         try {
-            //console.log(req.body.slug)
+            console.log(req.body.slug)
             let accesses = await prisma.$queryRaw`SELECT *
             FROM "Access" at where at.Transaction_digest = ${req.body.slug}
             ORDER BY at.Create_at DESC
             LIMIT ${pageSize} OFFSET ${offset};`
-            
+
             //console.log('in get list' + JSON.stringify(accesses))
 
             res.status(200).json( accesses )

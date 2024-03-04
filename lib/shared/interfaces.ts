@@ -88,6 +88,17 @@ export const ReplyBuyRequest = object({
 })
 export type ReplyBuyRequest = Infer<typeof ReplyBuyRequest>
 
+export const RepostBuyRequest = object({
+  price: string(),
+  budget: string(),
+  coin_count: string(),
+  protocol_destination: string(),
+  transaction_digest: string(),
+  repost_digest: string(),
+  pool: string()
+})
+export type RepostBuyRequest = Infer<typeof RepostBuyRequest>
+
 export const BuyRequest = object({
   price: string(),
   budget: string(),
@@ -112,6 +123,14 @@ export const ReplySellRequest = object({
   pool: string()
 })
 export type ReplySellRequest = Infer<typeof ReplySellRequest>
+
+export const RepostSellRequest = object({
+  protocol_destination: string(),
+  transaction_digest: string(),
+  repost_digest: string(),
+  pool: string()
+})
+export type RepostSellRequest = Infer<typeof RepostSellRequest>
 
 export const RepostResponse = object({
   txDigest: string(),

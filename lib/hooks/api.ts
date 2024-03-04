@@ -30,12 +30,12 @@ import {
   ReplyRequest,
   ReplyBuyRequest,
   ReplySellRequest,
+  RepostRequest,
+  RepostBuyRequest,
+  RepostSellRequest,
 } from "../shared/interfaces";
-import { ProfileMetadataCreated, ProfileEvents } from '@/types/profile'
-import { MYPOST_MOVE_PACKAGE_ID, GLOBAL_OBJECT_ID } from '@/lib/api/move'
-import prisma from "@/lib/prisma";
 import { PROFILE_MUTATE_ROUTE, PROFILE_CREATE_ROUTE, 
-  TRANSACTION_MUTATE_ROUTE, PROFILe_CHECk_ROUTE, BUY_MUTATE_ROUTE, SELL_MUTATE_ROUTE, FOLLOW_MUTATE_ROUTE, UNFOLLOW_MUTATE_ROUTE, REPLY_MUTATE_ROUTE, REPOST_SELL_MUTATE_ROUTE, REPLY_BUY_MUTATE_ROUTE, REPOST_BUY_MUTATE_ROUTE, REPLY_SELL_MUTATE_ROUTE } from '@/lib/api/constant'
+  TRANSACTION_MUTATE_ROUTE, PROFILe_CHECk_ROUTE, BUY_MUTATE_ROUTE, SELL_MUTATE_ROUTE, FOLLOW_MUTATE_ROUTE, UNFOLLOW_MUTATE_ROUTE, REPLY_MUTATE_ROUTE, REPOST_SELL_MUTATE_ROUTE, REPLY_BUY_MUTATE_ROUTE, REPOST_BUY_MUTATE_ROUTE, REPLY_SELL_MUTATE_ROUTE, REPOST_MUTATE_ROUTE } from '@/lib/api/constant'
 
 /**
  * An example mutation to execute a Sui transaction.
@@ -116,11 +116,11 @@ export function useRecentTxsQuery() {
 }
 
 export function useRepostMutation(): UseMutationResult<
-  RepostResponse, ApiError, TransactionRequest & WithKeyPair
+  RepostResponse, ApiError, RepostRequest & WithKeyPair
 > {
   return useMutation({
     mutationFn: apiTxExecMutationFn({
-      baseUri: () => `${REPLY_MUTATE_ROUTE}`,
+      baseUri: () => `${REPOST_MUTATE_ROUTE}`,
       body: ({ keyPair, ...req }) => req,
       resultSchema: RepostResponse,
     })
@@ -188,7 +188,7 @@ CommonResponse, ApiError, ReplyBuyRequest & WithKeyPair
 }
 
 export function useRepostBuyMutation(): UseMutationResult<
-CommonResponse, ApiError, ReplyBuyRequest & WithKeyPair
+CommonResponse, ApiError, RepostBuyRequest & WithKeyPair
 > {
   return useMutation({
     mutationFn: apiTxExecMutationFn({
@@ -224,7 +224,7 @@ export function useReplySellMutation(): UseMutationResult<
 }
 
 export function useRepostSellMutation(): UseMutationResult<
-  CommonResponse, ApiError, SellRequest & WithKeyPair
+  CommonResponse, ApiError, RepostSellRequest & WithKeyPair
 > {
   return useMutation({
     mutationFn: apiTxExecMutationFn({

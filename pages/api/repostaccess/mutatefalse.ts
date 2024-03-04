@@ -12,13 +12,11 @@ export default async function handler(
     // }
     let result;
     try {
-        result = await prisma.$queryRaw`update "Access" a
+        result = await prisma.$queryRaw`update "RepostAccess" a
             set status = false
-            where a.transaction_digest = ${req.body.transaction_digest} and a.address=${req.body.address}
+            where a.repost_digest = ${req.body.repost_digest} and a.address=${req.body.address}
             and type = ${req.body.type};`
-            
-        console.log('in sell mutate false ' + JSON.stringify(result))
-
+        console.log('in reply access mutate false ' + JSON.stringify(result))
         res.status(200).json( result )
       } catch (err) {
         res.status(500).json({ err })

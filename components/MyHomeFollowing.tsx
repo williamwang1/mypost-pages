@@ -6,7 +6,7 @@ import { TransactionDB, TransactionDBList } from "@/types/transaction";
 import { HOME_LIST_ROUTE, TRANSACTION_GET_LIST_ROUTE, TRANSACTION_MUTATEDB_ROUTE } from "@/lib/api/constant";
 import axios from "axios";
 
-const MyHomeFollowing = ({slug}: {slug: string}) => {
+const MyHomeFollowing = ({slug }: {slug: string }) => {
   const [items, setItems] = useState<TransactionDBList[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(2);
@@ -51,6 +51,10 @@ const MyHomeFollowing = ({slug}: {slug: string}) => {
 
   const handleLoading = (loading: boolean) => {
     setLoading(loading)
+  }
+
+  if (loading) {
+    return <div>Loading</div>
   }
 
 

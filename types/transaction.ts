@@ -24,6 +24,30 @@ interface RepostCreated {
     timestamp_ms: string,
 }
 
+interface RepostAccessBoughtEvent {
+    access_id: string,
+    repost_id: string,
+    profile_id: string,
+    pool_id: string,
+    buyer: string,
+    transaction_digest: string,
+    repost_digest: string,
+    price: string,
+    timestamp_ms: string
+}
+
+interface RepostAccessSoldEvent {
+    access_id: string,
+    repost_id: string,
+    profile_id: string,
+    pool_id: string,
+    seller: string,
+    transaction_digest: string,
+    repost_digest: string,
+    price: string,
+    timestamp_ms: string
+}
+
 interface ReplyAccessBoughtEvent {
     access_id: string,
     reply_id: string,
@@ -52,11 +76,11 @@ interface RepostAccessDB {
     id:                  string,
     digest:              string,
     access_id:           string,  
-    reply_id:            string, 
-    reply_pool_id:       string,
-    reply_digest:        string,
+    repost_id:            string, 
+    repost_pool_id:       string,
+    repost_digest:        string,
     transaction_digest:  string,
-    reply_profile_id:    string,
+    repost_profile_id:    string,
     price:               string,
     type:                string,
     address:             string,
@@ -82,6 +106,22 @@ interface ReplyAccessDB {
     status:              boolean       
 }
 
+interface RepostDB {
+    id: string,
+    digest: string,
+    transaction_digest: string,
+    public_content: string,
+    address: string,
+    profile_id: string,
+    repost_id: string,
+    pool_id: string,
+    package_id: string,
+    repost_post_id: string,
+    transaction_post_id: string,
+    type: string
+    create_at: Date,
+}
+
 interface ReplyDB {
     id: string,
     digest: string,
@@ -102,6 +142,7 @@ interface AccessBought {
     access_id: string,
     transaction_id: string,
     profile_id: string,
+    pool_id: string,
     price: string,
     buyer: string,
     transaction_digest: string,
@@ -112,6 +153,7 @@ interface AccessSold {
     access_id: string,
     transaction_id: string,
     profile_id: string,
+    pool_id: string,
     price: string,
     seller: string,
     transaction_digest: string,
@@ -191,4 +233,5 @@ interface TransactionDBList {
 
 export type { TransactionCreated, AccessBought, AccessSold, TransactionMetaData, 
     TransactionDetails, TransactionDB, AccessDB, ReplyCreated, 
-    ReplyAccessBoughtEvent, ReplyAccessSoldEvent, ReplyDB, ReplyAccessDB, RepostCreated, TransactionDBList}
+    ReplyAccessBoughtEvent, ReplyAccessSoldEvent, ReplyDB, RepostDB, 
+    RepostAccessDB, RepostAccessBoughtEvent, RepostAccessSoldEvent, ReplyAccessDB, RepostCreated, TransactionDBList}

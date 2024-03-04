@@ -65,6 +65,7 @@ const parseTxRes: TransactionResponseParser<CommonResponse> = async (_, txRes, u
         transaction_id: accessSold.transaction_id,
         transaction_digest: accessSold.transaction_digest,
         profile_id: accessSold.profile_id,
+        pool_id: accessSold.pool_id,
         accessor_profile: accessSold.profile_id,
         price: accessSold.price,
         type: 'sell',

@@ -10,13 +10,13 @@ import {
     zkLoginTxExecHandler,
 } from "@shinami/nextjs-zklogin/server/pages";
 import { mask, validate } from "superstruct";
-import { BuyRequest, CommonResponse, TransactionRequest, TransactionResponse} from "@/lib/shared/interfaces";
-import { AccessBought, TransactionCreated } from "@/types/transaction";
-import { ACCESS_MUTATE_ROUTE, ACCESS_MUTATE_FALSE_ROUTE } from "@/lib/api/constant";
+import { CommonResponse, ReplyBuyRequest, RepostBuyRequest } from "@/lib/shared/interfaces";
+import { ReplyAccessBoughtEvent, RepostAccessBoughtEvent, TransactionCreated } from "@/types/transaction";
+import {  REPLY_ACCESS_MUTATE_FALSE_ROUTE, REPLY_ACCESS_MUTATEDB, REPOST_ACCESS_MUTATE_FALSE_ROUTE, REPOST_ACCESS_MUTATEDB } from "@/lib/api/constant";
 
 
 const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {
-    const [error, body] = validate(req.body, BuyRequest);
+    const [error, body] = validate(req.body, RepostBuyRequest);
     if (error) throw new InvalidRequest(error.message);
   
     console.log("Preparing create buy tx for zkLogin wallet", wallet);
@@ -39,22 +39,22 @@ const buildTx: GaslessTransactionBytesBuilder = async (req, { wallet }) => {
                 i = i + 1;   
             }
         }
-
         console.log('arguments 1st argument ' + coindata.data[0].coinObjectId + ' ')
         //txb.makeMoveVec({ objects: coinObject })
         txb.moveCall({
-            target: `${MYPOST_MOVE_PACKAGE_ID}::transaction::buy`,
+            target: `${MYPOST_MOVE_PACKAGE_ID}::repost::buy`,
             arguments: [
                 txb.object(coindata.data[0].coinObjectId),
                 txb.pure.address(wallet),
                 txb.pure(body.transaction_digest),
+                txb.pure(body.repost_digest),
                 txb.object(body.pool),
                 txb.object('0x6')
             ],
         });
       },
     });
-    return { gaslessTxBytes, gasBudget: 200_000_000 };
+    return { gaslessTxBytes, gasBudget: 100_000_000 };
 };
 
 const parseTxRes: TransactionResponseParser<CommonResponse> = async (req, txRes, user) => {
@@ -64,13 +64,13 @@ const parseTxRes: TransactionResponseParser<CommonResponse> = async (req, txRes,
 
     //console.log('in buy mutate ' + JSON.stringify(req.body))
     // update access data in db
-    let accessBought = txRes.events?.at(0)?.parsedJson as AccessBought;
+    let accessBought = txRes.events?.at(0)?.parsedJson as RepostAccessBoughtEvent;
     let acessSellBody = {
-        transaction_digest: accessBought.transaction_digest,
+        repost_digest: accessBought.repost_digest,
         address: accessBought.buyer,
         type: 'sell',
     }
-    const sellRes = await fetch(`${API_HOST}${ACCESS_MUTATE_FALSE_ROUTE}`, {
+    const sellRes = await fetch(`${API_HOST}${REPOST_ACCESS_MUTATE_FALSE_ROUTE}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -82,18 +82,19 @@ const parseTxRes: TransactionResponseParser<CommonResponse> = async (req, txRes,
     let accessBoughtBody = {
         digest: txRes.digest,
         access_id: accessBought.access_id,
-        transaction_id: accessBought.transaction_id,
-        transaction_digest: accessBought.transaction_digest,
-        profile_id: accessBought.profile_id,
-        accessor_profile: accessBought.profile_id,
+        repost_id: accessBought.repost_id,
+        repost_pool_id: accessBought.pool_id,
+        repost_digest: accessBought.repost_digest,
+        transaction_digest: txRes.digest,
+        repost_profile_id: accessBought.profile_id,
         price: accessBought.price,
         type: 'buy',
-        address: accessBought.buyer,
+        address: user.wallet,
         package_id: `${MYPOST_MOVE_PACKAGE_ID}`,
         create_at: new Date()
     }
     //console.log('in buy mutate ' + JSON.stringify(accessBoughtBody))
-    const boughtRes = await fetch(`${API_HOST}${ACCESS_MUTATE_ROUTE}`, {
+    const boughtRes = await fetch(`${API_HOST}${REPOST_ACCESS_MUTATEDB}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

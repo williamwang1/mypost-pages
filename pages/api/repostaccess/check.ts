@@ -15,9 +15,9 @@ export default async function handler(
     // console.log('in check ' + req.body.transaction_digest)
     try {
         //console.log('in chcek ' + req.body.address)
-        let accesses = await prisma.$queryRaw`SELECT * from "ReplyAccess" at 
+        let accesses = await prisma.$queryRaw`SELECT * from "RepostAccess" at 
         where at.Address=${req.body.address} 
-        and at.Reply_digest=${req.body.reply_digest} and at.Status=true and at.Type='buy' ORDER BY at.Create_at DESC`
+        and at.Repost_digest=${req.body.repost_digest} and at.Status=true and at.Type='buy' ORDER BY at.Create_at DESC`
         res.status(200).json( accesses )
       } catch (err) {
         res.status(500).json({ err })

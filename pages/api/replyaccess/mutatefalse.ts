@@ -12,7 +12,7 @@ export default async function handler(
     // }
     let result;
     try {
-        result = await prisma.$queryRaw`update "RelyAccess" a
+        result = await prisma.$queryRaw`update "ReplyAccess" a
             set status = false
             where a.reply_digest = ${req.body.reply_digest} and a.address=${req.body.address}
             and type = ${req.body.type};`

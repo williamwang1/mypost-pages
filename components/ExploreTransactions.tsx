@@ -54,6 +54,10 @@ const ExploreTransactions = ({slug}: {slug: string}) => {
     getData();
   }, [slug]);
 
+  if (loading) {
+    return <div>Loading</div>
+  }
+
 
   return (
     <InfiniteScroll

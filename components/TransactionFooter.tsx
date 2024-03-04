@@ -19,16 +19,16 @@ export default function TransactionFooter ({ tx, poolData, onPoolDataChange }
         currentPrice = ( price / SUI_MIST).toFixed(4)
     }
 
-    useEffect(() => {
-        const fetchData = async () => {
-            let data: any = await sui.getObject({
-                id: tx.pool_id,
-                options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 
-            })
-            onPoolDataChange(data);
-        }
-        fetchData()
-    }, [onPoolDataChange, tx.pool_id])
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         let data: any = await sui.getObject({
+    //             id: tx.pool_id,
+    //             options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 
+    //         })
+    //         onPoolDataChange(data);
+    //     }
+    //     fetchData()
+    // }, [onPoolDataChange, tx.pool_id])
 
     return (
     <div className='flex items-center justify-between mt-2'>

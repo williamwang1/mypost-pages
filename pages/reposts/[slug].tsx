@@ -8,17 +8,14 @@ import { ACCOUNT_LIST_ROUTE, PROFILE_GET_ROUTE, TRANSACTION_GET, TRANSACTION_MUT
 import { API_HOST } from '@/lib/api/move';
 import { Account } from "@/types/auth";
 import { useSession } from 'next-auth/react';
-import ReplyStepperPublic from '@/components/ReplyStepperPublic';
-import ReplyStepperPaid from '@/components/ReplyStepperPaid';
-import ReplyStepperPost from '@/components/ReplyStepperPost';
+import { TransactionDB } from '@/types/transaction';
 import RepostStepperPublic from '@/components/RepostStepperPublic';
 import RepostStepperPaid from '@/components/RepostStepperPaid';
 import RepostStepperPost from '@/components/RepostStepperPost';
-import { TransactionDB } from '@/types/transaction';
 
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-    // console.log('in replies ' + context.query)
+    //console.log('in replies ' + JSON.stringify(context.query))
     const { slug, digest } = context.query as { slug: string, digest: string };
     const metadatadb = await fetch(`${API_HOST}${PROFILE_GET_ROUTE}`, {
         method: 'POST',
@@ -58,10 +55,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     //console.log(JSON.stringify(metadata))
 
 
-    return { props: { accounts, metadata, tx } };
+    return { props: { accounts, metadata, digest, tx } };
 }
 
-function Reposts({session, accounts, metadata, tx } : {session: any, accounts: Account[], metadata: ProfileDB, tx: TransactionDB}) {
+function Reposts({session, accounts, metadata, digest, tx } 
+    :
+    {session: any, accounts: Account[], metadata: ProfileDB, digest: string, tx: TransactionDB}) {
     const { isLoading, user, localSession } = session;
     const [step, setStep] = useState(1)
     const [summary, setSummary] = React.useState('summary');
@@ -76,7 +75,6 @@ function Reposts({session, accounts, metadata, tx } : {session: any, accounts: A
         if (newFree.length < limit) {
             setFree(newFree)
         }
-        
         //setFree(event.target.value)
     }
 
@@ -109,22 +107,22 @@ function Reposts({session, accounts, metadata, tx } : {session: any, accounts: A
 
     let stepper = (
         <RepostStepperPublic free={free} handleFree={handleFreeChange} 
-        step={step} handleStepChange={handlePublicNext} digest={transactionDigest}/>
+        step={step} handleStepChange={handlePublicNext} digest={digest}/>
     )
     if (step == 2) {
         stepper = (
-        <RepostStepperPaid paid={paid} onPaidChange={handlePaiChange} 
-        step={step} free={free} onBackChange={handleBack} 
-        onPaidNextChange={onPaidNextChange} digest={transactionDigest}/>
+            <RepostStepperPaid paid={paid} onPaidChange={handlePaiChange} 
+            step={step} free={free} onBackChange={handleBack} 
+            onPaidNextChange={onPaidNextChange} digest={digest}/>
         )
     }
     if (step == 3) {
         stepper = (
-            <RepostStepperPost accounts={accounts}
-            step={step} onBackChange={handleBack}
-            summary={summary} digest={transactionDigest}
-            session={session} paid={paid}
-            metadata={metadata} free={free} transactionDigest={transactionDigest} tx={tx}/>
+            <RepostStepperPost accounts={accounts} 
+            step={step} onBackChange={handleBack} 
+            summary={summary} digest={digest} transactionDigest={transactionDigest}
+            session={session} paid={paid} 
+            metadata={metadata} free={free} tx={tx}/>
         )
     }
 

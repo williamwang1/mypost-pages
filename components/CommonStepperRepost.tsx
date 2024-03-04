@@ -3,15 +3,15 @@ import { Tab } from '@headlessui/react';
 import { Account } from "@/types/auth";
 import Tiptap from "./TipTap";
 import { ProfileDB } from "@/types/profile";
-import { useReplyMutation, useTransactionMutation } from '@/lib/hooks/api';
+import { useRepostMutation } from '@/lib/hooks/api';
 import { API_HOST, MYPOST_MOVE_PACKAGE_ID } from "@/lib/api/move";
-import { REPLY_MUTATEDB_ROUTE, TRANSACTION_MUTATEDB_ROUTE, TWEET_REPLY_ROUTE } from "@/lib/api/constant";
+import { REPLY_MUTATEDB_ROUTE, REPOST_MUTATEDB_ROUTE, TRANSACTION_MUTATEDB_ROUTE, TWEET_REPLY_ROUTE, TWEET_REPOST_ROUTE } from "@/lib/api/constant";
 import {useRouter} from "next/router";
 import { LoadingDots } from "@/components/icons";
 import { TransactionDB } from "@/types/transaction";
 
 
-export default function CommonStepperReply({accounts, digest, transactionDigest, step, onBackChange, 
+export default function CommonStepperRepost({accounts, digest, transactionDigest, step, onBackChange, 
     session, paid, metadata, free, tx}
     : 
     {accounts: Account[], step: number, transactionDigest: string,
@@ -22,7 +22,7 @@ export default function CommonStepperReply({accounts, digest, transactionDigest,
     const [clicked, setClicked] = useState(false);
     const router = useRouter()
     //const {mutateAsync: transaction, isPending: isCreating } = useTransactionMutation()
-    const {mutateAsync: reply, isPending: isCreating } = useReplyMutation()
+    const {mutateAsync: repost, isPending: isCreating } = useRepostMutation()
 
     let tabs: any[] = [];
     accounts.map((a) => {
@@ -52,19 +52,18 @@ export default function CommonStepperReply({accounts, digest, transactionDigest,
         // console.log(enpaid.ciphertext)
         // let text = enpaid.ciphertext
 
-
-        let txmetadata = await reply({
+        let txmetadata = await repost({
             keyPair: localSession.ephemeralKeyPair,
             pool: metadata.profile_pool_id,
             content: enpaid.ciphertext,
             transaction_digest: digest
         })
 
-        let text = free +  '\n' + `www.mypost.money/reply/${ txmetadata.txDigest }`
+        let text = free +  '\n' + `www.mypost.money/repost/${ txmetadata.txDigest }`
         let slug = `${user.wallet}`;
         let post_id = tx.post_id
-        //console.log('in transaction post data ' + JSON.stringify(tx))
-        const response = await fetch(`${TWEET_REPLY_ROUTE}`, {
+        console.log('in repost before twitter repost ' + JSON.stringify(tx))
+        const response = await fetch(`${TWEET_REPOST_ROUTE}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -72,35 +71,23 @@ export default function CommonStepperReply({accounts, digest, transactionDigest,
             body: JSON.stringify({ text, post_id, slug }),
           });
         let tweetRes = await response.json()
-        console.log('in transaction post data ' + JSON.stringify(tweetRes))
+        console.log('in repost post data after twitter repost ' + JSON.stringify(tweetRes))
         // console.log('in transaction post data ' + JSON.stringify(tweetRes.data.data.id))
         let txbody = {
-            // digest: txmetadata.txDigest,
-            // summary: 'summary',
-            // public_content: free,
-            // address: `${user.wallet}`,
-            // profile_id: metadata.profile_id,
-            // transaction_id: txmetadata.transaction_id,
-            // pool_id: txmetadata.pool_id,
-            // package_id: `${MYPOST_MOVE_PACKAGE_ID}`,
-            // post_id: tweetRes.data.data.id,
-            // type: 'post',
-            // create_at: new Date()
-
             digest: txmetadata.txDigest,
             transaction_digest: digest,
             public_content: free,
             address: `${user.wallet}`,
             profile_id: metadata.profile_id,
-            reply_id: txmetadata.reply_id,
+            repost_id: txmetadata.repost_id,
             pool_id: txmetadata.pool_id,
             package_id: `${MYPOST_MOVE_PACKAGE_ID}`,
-            reply_post_id: tweetRes.data.data.id,
+            repost_post_id: tweetRes.data.rest_id,
             transaction_post_id: post_id,
-            type: 'reply',
+            type: 'repost',
             create_at: new Date()
         }
-        await fetch(`${API_HOST}${REPLY_MUTATEDB_ROUTE}`, {
+        await fetch(`${API_HOST}${REPOST_MUTATEDB_ROUTE}`, {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',
@@ -137,40 +124,40 @@ export default function CommonStepperReply({accounts, digest, transactionDigest,
     } else {
         submit = <button
             type="button"
-            className="px-6 py-2 bg-sky-800 disabled rounded-md border justify-center items-center text-sm font-semibold text-white shadow-sm "
+            className="px-6 py-2 bg-sky-200 disabled rounded-md border justify-center items-center text-sm font-semibold text-white shadow-sm "
                 >
-                   Disabled
+                   Submit
                 </button>
     }
 
     return (
     <React.Fragment>
             <div className='bg-white shadow-md rounded-xl px-2'>
-                    <Tab.Group defaultIndex={0} >
-                        <Tab.List className='flex flex-1 gap-x-2 mt-4'>
-                            {tabs.map((tab) => (
-                        <Tab as={Fragment} key={tab.id}>
-                            {({ selected }) =>                         
-                                <button className={ selected ? 'text-sky-400 text-normal font-bold border-b-2 border-sky-500 focus:outline-none' : 'text-gray-900 text-normal font-normal leading-relaxed' }
-                                    // onClick={() => router.push(`${tab}`)}
-                                >
-                                {tab.name}
-                                </button>
-                            }
-                        </Tab>
+                <Tab.Group defaultIndex={0} >
+                    <Tab.List className='flex flex-1 gap-x-2 mt-4'>
+                        {tabs.map((tab) => (
+                            <Tab as={Fragment} key={tab.id}>
+                                {({ selected }) =>                         
+                                    <button className={ selected ? 'text-sky-400 text-normal font-bold border-b-2 border-sky-500 focus:outline-none' : 'text-gray-900 text-normal font-normal leading-relaxed' }
+                                        // onClick={() => router.push(`${tab}`)}
+                                    >
+                                    {tab.name}
+                                    </button>
+                                }
+                            </Tab>
                         ))}
                     </Tab.List>
                     <Tab.Panels className='pt-2'>
-                    {tabs.map((tab) => (
-                        <Tab.Panel key={tab.id}>
-                            {/* <div className="mt-2">
-                                <label>{summary}</label>
-                            </div> */}
-                            <div className='mt-2 pb-2'>
-                                <Tiptap content={transactionDigest} readOnly={true} onChange={undefined} />
-                            </div>
-                        </Tab.Panel>
-                    ))}
+                        {tabs.map((tab) => (
+                            <Tab.Panel key={tab.id}>
+                                {/* <div className="mt-2">
+                                    <label>{summary}</label>
+                                </div> */}
+                                <div className='mt-2 pb-2'>
+                                    <Tiptap content={transactionDigest} readOnly={true} onChange={undefined} />
+                                </div>
+                            </Tab.Panel>
+                        ))}
                     </Tab.Panels>
                 </Tab.Group>
             </div>
@@ -185,7 +172,6 @@ export default function CommonStepperReply({accounts, digest, transactionDigest,
                     SUI
                 </label>
                 <a href='' target='_blank' className='text-sky-500 text-sm underline'>Learn more</a>
-                
             </div>
             <div className="flex flex-col flex-1 mt-5">
                 <div className="flex justify-between mt-28 px-4 mb-16">

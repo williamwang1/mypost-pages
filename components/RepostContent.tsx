@@ -3,16 +3,13 @@ import * as Toast from '@radix-ui/react-toast';
 import { ClipboardDocumentIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 import React, { useEffect, useRef, useState } from 'react';
 import Tiptap from './TipTap';
-import { ReplyDB } from '@/types/transaction';
-import axios from 'axios';
-import { API_HOST } from '@/lib/api/move';
-import { REPLY_ACCESS_CHECK_ROUTE } from '@/lib/api/constant';
-import ReplyContentHeader from './ReplyContentHeader';
+import { ReplyDB, RepostDB } from '@/types/transaction';
+import RepostContentHeader from './RepostContentHeader';
 
-export default function ReplyContent({reply, replyonchain, session,
+export default function RepostContent({repost, repostonchain, session,
     unlock, onUnlockchange, bought }
     :
-    {reply: ReplyDB, replyonchain: any, session: any,
+    {repost: RepostDB, repostonchain: any, session: any,
         unlock: boolean, onUnlockchange: (lock: boolean) => void, bought: boolean}) {
     const { isLoading, user, localSession } = session;
     const [open, setOpen] = useState(false);
@@ -22,10 +19,10 @@ export default function ReplyContent({reply, replyonchain, session,
     //const [unlock, setUnlock] = useState(false);
     const [plaintext, setPlaintext] = useState('');
     //const [bought, setBought] = useState(false);
-    let encrypt_content = replyonchain?.data?.content?.fields?.content
+    let encrypt_content = repostonchain?.data?.content?.fields?.content
 
     const handleDigestCopy = () => {
-        navigator.clipboard.writeText(reply.digest) // Write text to clipboard
+        navigator.clipboard.writeText(repost.digest) // Write text to clipboard
           .then(() => {
             setOpen(false);
             window.clearTimeout(timerRef.current);
@@ -83,17 +80,16 @@ export default function ReplyContent({reply, replyonchain, session,
         private_content = <Tiptap content={plaintext} readOnly={true} onChange={undefined}/>
     }
 
-
     // if (loading) {
     //     return(<div>Loading</div>)
     // }
 
     return (
         <div className='mt-5 text-gray-900 leading-relaxed text-base w-4/5'>
-            <ReplyContentHeader digest={reply.transaction_digest}/>
+            <RepostContentHeader digest={repost.transaction_digest}/>
             <div className='flex gap-x-2 items-center'>
                 <div className='flex text-clip font-bold'>
-                {trucateAddress(reply.digest)}
+                {trucateAddress(repost.digest)}
                 </div>
                 <Toast.Provider swipeDirection="right">
                     <button  onClick={handleDigestCopy}>
@@ -110,9 +106,8 @@ export default function ReplyContent({reply, replyonchain, session,
                     <Toast.Viewport />
                 </Toast.Provider>
             </div>
-            
             <div className='flex text-clip break-words max-w-full overflow-hidden'>
-                {reply.public_content}
+                {repost.public_content}
             </div>
             {private_content}
         </div>

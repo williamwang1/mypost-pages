@@ -2,9 +2,9 @@ import { useState } from "react"
 import {Drawer} from 'vaul';
 import { sui } from '@/lib/api/shinami'
 import Image from 'next/image';
-import { AccessDB, ReplyDB, TransactionDB } from "@/types/transaction";
-import { useBuyMutation, useReplyBuyMutation, useReplySellMutation, useSellMutation } from '@/lib/hooks/api';
-import { ACCESS_CHECK_ROUTE, ACCESS_HISTORY_LIST_ROUTE, REPLY_ACCESS_CHECK_ROUTE, REPLY_ACCESS_HISTORY_LIST_ROUTE } from '@/lib/api/constant';
+import { RepostDB, TransactionDB } from "@/types/transaction";
+import { useRepostBuyMutation, useRepostSellMutation } from '@/lib/hooks/api';
+import { ACCESS_CHECK_ROUTE, ACCESS_HISTORY_LIST_ROUTE, REPLY_ACCESS_CHECK_ROUTE, REPLY_ACCESS_HISTORY_LIST_ROUTE, REPOST_ACCESS_CHECK_ROUTE, REPOST_ACCESS_HISTORY_LIST_ROUTE } from '@/lib/api/constant';
 import { API_HOST } from '@/lib/api/move';
 import { SUI_MIST } from '@/lib/constant';
 import { InformationCircleIcon } from "@heroicons/react/20/solid";
@@ -12,22 +12,22 @@ import axios from "axios";
 import { useRouter } from "next/router";
 
 
-export default function ReplyButton (
-    {session, poolData, onPoolDataChange, tx, slug, accessData, onAccessChange, bought, 
-        onBoughtchange, onLoadingChange, onUnlockchange, onItemsChange, reply} 
+export default function RepostButton (
+    {session, poolData, onPoolDataChange, tx, repost_digest, accessData, onAccessChange, bought, 
+        onBoughtchange, onLoadingChange, onUnlockchange, onItemsChange, repost} 
         : 
     {session: any, poolData: any, accessData: any, onPoolDataChange: (poolData: any) => void,
-    tx: TransactionDB, slug: string, onAccessChange: (accessData: any) => void
+    tx: TransactionDB, repost_digest: string, onAccessChange: (accessData: any) => void
     bought: boolean, onBoughtchange: (bought: boolean) => void, onLoadingChange: (loading: boolean) => void,
-    onUnlockchange: (unlock: boolean) => void, onItemsChange: (items: any) => void, reply: ReplyDB}
+    onUnlockchange: (unlock: boolean) => void, onItemsChange: (items: any) => void, repost: RepostDB}
 ) {
     const { isLoading, user, localSession } = session;
     //const [bought, setBought] = useState(false)
     const [sellConfirm, setSellConfirm] = useState(false)
     const [buyConfirm, setBuyConfirm] = useState(false)
     const [inBalance, setInbalance] = useState(false)
-    const {mutateAsync: buy, isPending: isCreating } = useReplyBuyMutation();
-    const {mutateAsync: sell, isPending: isSellCreating } = useReplySellMutation();
+    const {mutateAsync: buy, isPending: isCreating } = useRepostBuyMutation();
+    const {mutateAsync: sell, isPending: isSellCreating } = useRepostSellMutation();
     const router = useRouter()
 
     let boughtPrice = ''
@@ -70,18 +70,18 @@ export default function ReplyButton (
             budget: poolData?.data?.content?.fields.price,
             coin_count: balance.coinObjectCount.toString(),
             protocol_destination: user.wallet,
-            reply_digest: reply.digest,
+            repost_digest: repost.digest,
             transaction_digest: tx.digest,
-            pool: reply.pool_id
+            pool: repost.pool_id
         })
         let data: any = await sui.getObject({
-            id: reply.pool_id,
+            id: repost.pool_id,
             options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 
         })
         onPoolDataChange(data);
         console.log('in buy ' + JSON.stringify(buyMeta))
         axios
-            .post(`${API_HOST}${REPLY_ACCESS_CHECK_ROUTE}`, { reply_digest: reply.digest,  address: user.wallet })
+            .post(`${API_HOST}${REPOST_ACCESS_CHECK_ROUTE}`, { repost_digest: repost.digest,  address: user.wallet })
             .then((res) =>{
                 //console.log('in transaction slug ' + JSON.stringify(res.data))
                 if (res.data.length > 0) {
@@ -91,7 +91,7 @@ export default function ReplyButton (
             })
         .catch((err) => console.log(err));
         axios
-            .post(`${API_HOST}${REPLY_ACCESS_HISTORY_LIST_ROUTE}`, { reply_digest: reply.digest,  currentPage: 1 })
+            .post(`${API_HOST}${REPOST_ACCESS_HISTORY_LIST_ROUTE}`, { repost_digest: repost.digest,  currentPage: 1 })
             .then((res) =>{
                 onItemsChange(res.data)
                 // setItemLoading(false)
@@ -107,18 +107,18 @@ export default function ReplyButton (
         let sellMeta = await sell({
             keyPair: localSession.ephemeralKeyPair,
             protocol_destination: user.wallet,
-            reply_digest: reply.digest,
+            repost_digest: repost.digest,
             transaction_digest: tx.digest,
-            pool: reply.pool_id
+            pool: repost.pool_id
         })
         console.log('in sell ' + JSON.stringify(sellMeta))
         let data: any = await sui.getObject({
-            id: reply.pool_id,
+            id: repost.pool_id,
             options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 
         })
 
         axios
-            .post(`${API_HOST}${REPLY_ACCESS_HISTORY_LIST_ROUTE}`, { reply_digest: reply.digest,  currentPage: 1 })
+            .post(`${API_HOST}${REPOST_ACCESS_HISTORY_LIST_ROUTE}`, { repost_digest: repost.digest,  currentPage: 1 })
             .then((res) =>{
                 onItemsChange(res.data)
                 // setItemLoading(false)
@@ -147,9 +147,12 @@ export default function ReplyButton (
         setBuyConfirm(true)
     }
 
+    const handleRepost = () => {
+        router.push(`/reposts/${user.wallet}?digest=${tx.digest}`)
+    }
 
     const handleReply = () => {
-        router.push(`/replies/${user.wallet}?digest=${reply.digest}`)
+        router.push(`/replies/${user.wallet}?digest=${repost.digest}`)
     }
 
 
@@ -157,6 +160,9 @@ export default function ReplyButton (
         //console.log('in transaction button bought ' + bought)
         return (
             <div className='flex gap-x-2 justify-between mt-2'>
+                <button className='bg-sky-400 rounded-3xl px-2 hover:bg-sky-800' onClick={handleRepost}>
+                    <span className='text-center text-white text-normal font-semibold leading-relaxed px-2 py-2'>Repost</span>
+                </button>
                 <button className='bg-sky-400 rounded-3xl px-2 hover:bg-sky-800' onClick={handleReply}>
                     <span className='text-center text-white text-normal font-semibold leading-relaxed px-2 py-2'>Reply</span>
                 </button>

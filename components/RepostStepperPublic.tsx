@@ -1,7 +1,7 @@
 import React, { Fragment, useState, useRef } from 'react' ;
 import StepperPublic from '@/components/StepperPublic';
-import ReplyContentHeader from './ReplyContentHeader';
 import CommonStepperPublic from './CommonStepperPublic';
+import RepostContentHeader from './RepostContentHeader';
 
 export default function RepostStepperPublic({free, handleFree, step, handleStepChange, digest} 
     : 
@@ -12,7 +12,7 @@ export default function RepostStepperPublic({free, handleFree, step, handleStepC
     return (
         <div className='px-2'>
         <StepperPublic/>
-        <ReplyContentHeader digest={digest}/>
+        <RepostContentHeader digest={digest}/>
         <CommonStepperPublic free={free} handleFree={handleFree} 
         step={step} handleStepChange={handleStepChange} digest={digest}/>
     </div>

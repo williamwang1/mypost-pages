@@ -3,11 +3,11 @@ import { SUI_MIST } from '@/lib/constant';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { sui } from '@/lib/api/shinami';
-import { ReplyDB } from '@/types/transaction';
+import { ReplyDB, RepostDB } from '@/types/transaction';
 
-export default function ReplyFooter ({reply, poolData, onPoolDataChange} 
+export default function RepostFooter ({repost, poolData, onPoolDataChange} 
     : 
-    {reply: ReplyDB, poolData: any, onPoolDataChange: (poolData: any) => void}) {
+    {repost: RepostDB, poolData: any, onPoolDataChange: (poolData: any) => void}) {
 
     const [loading, setLoaiding] = useState(true);
     let numberofBought = poolData?.data?.content?.fields.no_of_accessors
@@ -21,7 +21,7 @@ export default function ReplyFooter ({reply, poolData, onPoolDataChange}
     //     const fetchData = async () => {
 
     //         let data: any = await sui.getObject({
-    //             id: reply.pool_id,
+    //             id: repost.pool_id,
     //             options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 
     //         })
     //         onPoolDataChange(data);
@@ -34,7 +34,7 @@ export default function ReplyFooter ({reply, poolData, onPoolDataChange}
     //         setLoaiding(false);
     //     }
     //     fetchData()
-    // }, [onPoolDataChange, reply.pool_id])
+    // }, [onPoolDataChange, repost.pool_id])
 
     // if (loading) {
     //     return <div>Footer Loading</div>
@@ -43,7 +43,7 @@ export default function ReplyFooter ({reply, poolData, onPoolDataChange}
     return (
         <div className='flex items-center justify-between mt-2'>
             <div className='mt-2 text-xs text-gray-500' >
-                created at <time>{reply.create_at?.toString().substring(0,10)}</time>
+                created at <time>{repost.create_at?.toString().substring(0,10)}</time>
             </div>
             <div className='flex gap-x-2 mx-1 items-center'>
                     <div className='text-sky-500 text-base font-medium leading-relaxed'>{numberofBought}</div>

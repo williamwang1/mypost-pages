@@ -112,6 +112,7 @@ const parseTxRes: TransactionResponseParser<CommonResponse> = async (_, txRes, u
         transaction_digest: txRes.digest,
         profile_id: accessBought.profile_id,
         accessor_profile: accessBought.profile_id,
+        pool_id: accessBought.pool_id,
         price: accessBought.price,
         type: 'buy',
         address: user.wallet,
