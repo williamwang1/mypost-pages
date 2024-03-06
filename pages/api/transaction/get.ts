@@ -8,7 +8,7 @@ export default async function handler(
         let digest = req.body.slug;
 
         try {
-            //console.log(req.body.slug)
+            console.log('in transaction get ' + req.body.digest)
             const tx = await prisma.transaction.findUnique({
                 where: {
                     digest: req.body.digest

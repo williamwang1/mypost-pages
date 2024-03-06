@@ -89,8 +89,8 @@ export default function MyApp({ Component, pageProps : { session, ...pageProps }
           /> */}
           <link rel="manifest" href="/manifest.json" />
           <meta name="twitter:card" content="Moneitize your any content in any social media more" />
-          <meta name="twitter:url" content="https://mypost.money" />
-          <meta name="twitter:title" content="Mypost" />
+          <meta name="twitter:url" content="www.mypost.money" />
+          <meta name="twitter:title" content="MyPost" />
           <meta name="twitter:description" content="Moneitize your any content in any social media more" />
           <meta name="twitter:image" content="/images/logo.png" />
           <meta name="twitter:creator" content="@Mypost" />
@@ -98,7 +98,7 @@ export default function MyApp({ Component, pageProps : { session, ...pageProps }
           <meta property="og:title" content="Mypost" />
           <meta property="og:description" content="Moneitize your any content in any social media more" />
           <meta property="og:site_name" content="Mypost" />
-          <meta property="og:url" content="https://mypost.money" />
+          <meta property="og:url" content="www.mypost.money" />
           <meta property="og:image" content="/images/logo.png" />
           {/* add the following only if you want to add a startup image for Apple devices. */}
           {/* <link

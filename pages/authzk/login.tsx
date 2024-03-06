@@ -5,7 +5,6 @@ import {
   GOOGLE_CLIENT_ID,
   TWITCH_CLIENT_ID,
 } from "@/lib/shared/openid";
-import { first } from "@/lib/shared/utils";
 import {
   getFacebookAuthUrl,
   getGoogleAuthUrl,
@@ -21,21 +20,20 @@ import { GetServerSideProps } from "next";
 export const getServerSideProps: GetServerSideProps = async (context) => {
   console.log('in login ' + JSON.stringify(context.query.redirectTo))
   let redirectTo = ''
-  if ( context.query.redirectTo ) {
+  if ( context.query.redirectTo && context.query.redirectTo.length > 0 ) {
     redirectTo = context.query.redirectTo as string
     console.log('in login redirectTo ' + redirectTo)
   }
-
   return { props: { redirectTo } };
 }
 
-const Login =  ({ session, redirectTo}: {session: any, redirectTo: string}) => {
+const Login =  ({ session, redirectTo }: { session: any, redirectTo: string }) => {
   const router = useRouter();
   //let redirectTo = first(router.query.redirectTo);
   
-  if(redirectTo.length === 0) {
-    redirectTo = window.location.origin + '/account'
-  }
+  //if(redirectTo.length === 0) {
+  redirectTo = window.location.origin + '/redirect?redirectTo=' + redirectTo 
+  //}
   const callbackBaseUrl = new URL("authzk/", window.location.origin);
   const [signInClicked, setSignInClicked] = useState(false);
 

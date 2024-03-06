@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { SUI_MIST } from '@/lib/constant';
 import { trucateAddress } from '@/lib/shared/utils';
 import { Router } from 'lucide-react';
+import { API_HOST } from '@/lib/api/move';
 
 export default function FollowingItem({f, onLoadingChange, slug} : {f: FollowData, onLoadingChange: (loading: boolean) => void, slug: string}) {
     const [profile, setProfile] = useState<any>({})
@@ -41,7 +42,7 @@ export default function FollowingItem({f, onLoadingChange, slug} : {f: FollowDat
       console.log('in following item ' + slug + ' ' + address)
       if (address !== slug) {
         onLoadingChange(true)
-        router.push(`/profile/${address}`)
+        router.push(`${API_HOST}/profile/${f.following}`)
       }
     }
 

@@ -1,4 +1,17 @@
 -- CreateTable
+CREATE TABLE "Invite" (
+    "id" TEXT NOT NULL,
+    "code" TEXT,
+    "create_by" TEXT NOT NULL,
+    "update_by" TEXT,
+    "create_at" TIMESTAMP(3) NOT NULL,
+    "update_at" TIMESTAMP(3),
+    "used" BOOLEAN NOT NULL DEFAULT false,
+
+    CONSTRAINT "Invite_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Follow" (
     "id" TEXT NOT NULL,
     "digest" TEXT NOT NULL,

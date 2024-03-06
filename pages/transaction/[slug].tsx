@@ -37,10 +37,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             body: JSON.stringify({ digest }),
         })
         tx = await txdb.json()
+        console.log('in trsnaction slug ' + JSON.stringify(txdb))
         if (!tx) {
             return {
                 redirect: {
-                  destination: `${API_HOST}/profile`, // Redirect destination
+                  destination: `${API_HOST}/notfound`, // Redirect destination
                   permanent: true, // Temporary redirect
                 },
             }
@@ -50,14 +51,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             id: tx.profile_id,
             options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 
         })
-        if (!profiledata) {
-            return {
-                redirect: {
-                  destination: `${API_HOST}/profile`, // Redirect destination
-                  permanent: true, // Temporary redirect
-                },
-            }
-        }
+        // if (!profiledata) {
+        //     return {
+        //         redirect: {
+        //           destination: `${API_HOST}/profile`, // Redirect destination
+        //           permanent: true, // Temporary redirect
+        //         },
+        //     }
+        // }
         transactiondata = await sui.getObject({
             id: tx.transaction_id,
             options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 

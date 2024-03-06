@@ -2,44 +2,40 @@ import React from "react";
 import { Fragment, useState } from 'react'
 import { Dialog, Menu, Transition } from '@headlessui/react'
 import {
+  CalendarIcon,
+  ChartPieIcon,
+  Cog6ToothIcon,
+  DocumentDuplicateIcon,
+  FolderIcon,
+  HomeIcon,
+  UsersIcon,
   XMarkIcon,
   Bars4Icon,
-  SignalIcon,
-  BellIcon,
-  BuildingStorefrontIcon,
-  BuildingOffice2Icon,
-  UserGroupIcon,
-  SquaresPlusIcon,
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import BottomNav from "./BottomNav";
 import UserDropdown from "./UserDropdown";
 import { ZkLoginUser } from '@shinami/nextjs-zklogin';
+import Image from "next/image";
 
 
 const navigation = [
-    { name: 'Airdrop', href: '/airdrop', icon: SignalIcon },
-    { name: 'Notification', href: '/notifications', icon: BellIcon },
-    { name: 'Communities', href: '/communities', icon: UserGroupIcon },
-    { name: 'Stores', href: '/stores', icon: BuildingStorefrontIcon },
-    { name: 'Marketplace', href: '/marketplace', icon: BuildingOffice2Icon },
-    { name: 'Apps', href: '/apps', icon: SquaresPlusIcon },
+    { name: 'Dashboard', href: '#', icon: HomeIcon, current: true },
+    { name: 'Team', href: '#', icon: UsersIcon, current: false },
+    { name: 'Projects', href: '#', icon: FolderIcon, current: false },
+    { name: 'Calendar', href: '#', icon: CalendarIcon, current: false },
+    { name: 'Documents', href: '#', icon: DocumentDuplicateIcon, current: false },
+    { name: 'Reports', href: '#', icon: ChartPieIcon, current: false },
 ]
 
   
-function classNames(...classes: any[]) {
+  function classNames(...classes: any[]) {
     return classes.filter(Boolean).join(' ')
-}
+  }
 
 
-export default function Nav({children, bottomIndex, leftIndex, user} : {children: React.ReactNode, bottomIndex: number, leftIndex: number, user: any}) {
+export default function Nav({children, bottomIndex, leftIndex } : {children: React.ReactNode, bottomIndex: number, leftIndex: number }) {
     const [sidebarOpen, setSidebarOpen] = useState(false)
-    const [selectedItem, setSelectedItem] = useState(leftIndex);
-
-    const handleSelect = (index: number) => {
-        //console.log('Item clicked:', index); // Log which item is clicked
-        setSelectedItem(index);
-    }
 
     return (
         <div className=''>
@@ -86,40 +82,40 @@ export default function Nav({children, bottomIndex, leftIndex, user} : {children
                                 </Transition.Child>
                                 {/* Sidebar component, swap this element with another sidebar if you like */}
                                 <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4">
-                                    {/* <div className="flex h-16 items-center">
-                                        <Image src="/images/logo_long.png" 
-                                        alt="mypost" className="h-16 w-auto" width={25} height={25}/>
-                                    </div> */}
-                                    <nav className="flex flex-1 flex-col mt-5">
-                                        <ul role="list" className="flex flex-1 flex-col gap-y-7">
-                                            <li>
-                                            <ul role="list" className="-mx-2 space-y-1">
-                                                {navigation.map((item, index) => (
-                                                <li key={index} onClick={() => handleSelect(index)}>
-                                                    <a
-                                                    href={item.href}
+                                    <div className="flex h-16 shrink-0 items-center">
+                                        <Image src="" 
+                                        alt="mypost" className="h-8 w-auto" width={25} height={25}/>
+                                    </div>
+                                    <nav className="flex flex-1 flex-col">
+                                    <ul role="list" className="flex flex-1 flex-col gap-y-7">
+                                        <li>
+                                        <ul role="list" className="-mx-2 space-y-1">
+                                            {navigation.map((item) => (
+                                            <li key={item.name}>
+                                                <a
+                                                href={item.href}
+                                                className={classNames(
+                                                    item.current
+                                                    ? 'bg-gray-50 text-indigo-600'
+                                                    : 'text-gray-700 hover:text-indigo-600 hover:bg-gray-50',
+                                                    'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
+                                                )}
+                                                >
+                                                <item.icon
                                                     className={classNames(
-                                                    selectedItem === index
-                                                        ? 'bg-gray-50 text-sky-400'
-                                                        : 'text-gray-700 hover:text-sky-400 hover:bg-gray-50',
-                                                        'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
+                                                    item.current ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600',
+                                                    'h-6 w-6 shrink-0'
                                                     )}
-                                                    >
-                                                    <item.icon
-                                                        className={classNames(
-                                                            selectedItem === index ? 'text-sky-400' : 'text-gray-400 group-hover:text-sky-400',
-                                                        'h-6 w-6 shrink-0'
-                                                        )}
-                                                        aria-hidden="true"
-                                                    />
-                                                    {item.name}
-                                                    </a>
-                                                </li>
-                                                ))}
-                                            </ul>
+                                                    aria-hidden="true"
+                                                />
+                                                {item.name}
+                                                </a>
                                             </li>
-
+                                            ))}
                                         </ul>
+                                        </li>
+
+                                    </ul>
                                     </nav>
                                 </div>
                             </Dialog.Panel>
@@ -132,13 +128,13 @@ export default function Nav({children, bottomIndex, leftIndex, user} : {children
                     <span className="sr-only">Open sidebar</span>
                     <Bars4Icon className="h-6 w-6" aria-hidden="true" />
                 </button>
-                <UserDropdown user={user}/>
+                {/* <UserDropdown user={user}/> */}
             </div>
             <div className="mb-14">
                 {children}
             </div>
             
-            <BottomNav index={bottomIndex} user={user}/>
+            {/* <BottomNav index={bottomIndex} user={user}/> */}
         </div>
     )
 }

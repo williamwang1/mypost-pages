@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image';
 import { SUI_MIST } from "@/lib/constant";
 import { trucateAddress } from "@/lib/shared/utils";
+import { API_HOST } from "@/lib/api/move";
 
 
 export default function FollowerItem({f, onLoadingChange, slug}: {f: FollowData, onLoadingChange: (loading: boolean) => void, slug: string}) {
@@ -26,7 +27,7 @@ export default function FollowerItem({f, onLoadingChange, slug}: {f: FollowData,
   const handleClick = () => {
     if (address !== slug) {
       onLoadingChange(true)
-      router.push(`/profile/${f.follower}`)
+      router.push(`${API_HOST}/profile/${f.follower}`)
     }
 
   }

@@ -32,7 +32,7 @@ function classNames(...classes: any[]) {
 //     url: string
 //}
 
-export default function AccountAdd({ user }: { user: ZkLoginUser}) {
+export default function AccountAdd({ user, redirectTo }: { user: ZkLoginUser, redirectTo: string}) {
     let [isOpen, setIsOpen] = useState(false);
     const [selected, setSelected] = useState<Type>({ id: 0, name: '', description: '', url: '', tooltip: ''});
 
@@ -43,7 +43,7 @@ export default function AccountAdd({ user }: { user: ZkLoginUser}) {
     }
 
     const handleConfirm = () => {
-        signIn("twitter", { callbackUrl: `${API_HOST}/account/${user.wallet}`}, `${user.wallet}`)
+        signIn("twitter", { callbackUrl: `${API_HOST}/account/${user.wallet}?address=${user.wallet}&redirectTo=${redirectTo}`}, `${user.wallet}`)
     }
     let button = null
     // console.log('select' + JSON.stringify(selected))

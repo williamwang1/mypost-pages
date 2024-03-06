@@ -44,7 +44,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         if (!repost) {
             return {
                 redirect: {
-                  destination: `${API_HOST}/profile`, // Redirect destination
+                  destination: `${API_HOST}/notfound`, // Redirect destination
                   permanent: true, // Temporary redirect
                 },
             }
@@ -57,7 +57,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         if (!rprofile) {
             return {
                 redirect: {
-                  destination: `${API_HOST}/account`, // Redirect destination
+                  destination: `${API_HOST}/profilenotfound`, // Redirect destination
                   permanent: true, // Temporary redirect
                 },
             }
@@ -81,7 +81,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         if (!txprofile) {
             return {
                 redirect: {
-                  destination: `${API_HOST}/account`, // Redirect destination
+                  destination: `${API_HOST}/profilenotfound`, // Redirect destination
                   permanent: true, // Temporary redirect
                 },
             }

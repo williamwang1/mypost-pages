@@ -12,6 +12,26 @@ datasource db {
   shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING") // used for migrations
 }
 
+model Points {
+  id            String  @id @default(cuid())
+  quantity      String 
+  reason        String
+  type          String
+  owner         String
+  create_by     String
+  create_at     DateTime
+}
+
+model Invite {
+  id                String  @id @default(cuid())
+  code              String?
+  create_by         String
+  update_by         String?
+  create_at         DateTime
+  update_at         DateTime?
+  used              Boolean @default(false)
+}
+
 model Follow {
   id                String  @id @default(cuid())
   digest            String  @unique

@@ -3,6 +3,7 @@ import StepperPaid from '@/components/StepperPaid';
 import { useRouter } from 'next/navigation'
 import Tiptap from './TipTap';
 import PriceTooltip from './PriceTooltip';
+import CommonStepperPaid from './CommonStepperPaid';
 
 
 export default function TransactionStepperPaid({paid, onPaidChange, step, onBackChange, onPaidNextChange, free}
@@ -38,8 +39,10 @@ export default function TransactionStepperPaid({paid, onPaidChange, step, onBack
     return (
         <div className='px-2'>
         <StepperPaid/>
-        <div className="flex flex-col flex-1 mt-5">
-            <div className='flex gap-x-2'>
+        <CommonStepperPaid paid={paid} onPaidChange={onPaidChange} step={step} 
+        onBackChange={onBackChange} onPaidNextChange={onPaidNextChange} free={free}/>
+        {/* <div className="flex flex-col flex-1 mt-5"> */}
+            {/* <div className='flex gap-x-2'>
                 <label htmlFor="content" className="block text-base font-bold leading-6 text-gray-900">
                 Paid Content
                 </label>
@@ -47,7 +50,7 @@ export default function TransactionStepperPaid({paid, onPaidChange, step, onBack
             </div>
             <div className='mt-2'>
                 <Tiptap content={paid} readOnly={false} onChange={(value: any) => onPaidChange(value)} />
-            </div>
+            </div> */}
             
 
             {/* <div className="relative mt-2 rounded-md shadow-sm">
@@ -67,7 +70,7 @@ export default function TransactionStepperPaid({paid, onPaidChange, step, onBack
                     </span>
                 </div>
             </div> */}
-            <div className="flex flex-1 items-center mt-2 gap-x-2">
+            {/* <div className="flex flex-1 items-center mt-2 gap-x-2">
                 <label htmlFor="price" className="text-base font-bold leading-6 text-gray-900">
                     Price
                 </label>
@@ -80,9 +83,9 @@ export default function TransactionStepperPaid({paid, onPaidChange, step, onBack
                 <div className=''>
                     <PriceTooltip/>
                 </div>
-            </div>
+            </div> */}
         
-            <div className="flex justify-between mt-28 px-4 mb-16">
+            {/* <div className="flex justify-between mt-28 px-4 mb-16">
                 <button type="button" 
                     className="px-4 py-2 bg-white rounded-md border border-gray-300 justify-center items-center gap-2.5 inline-flex text-sm font-semibold leading-6 text-gray-900"
                     onClick={() => onBackChange(step - 1)}
@@ -90,8 +93,8 @@ export default function TransactionStepperPaid({paid, onPaidChange, step, onBack
                     Back
                 </button>
                 {button}
-            </div>
-        </div>
+            </div> */}
+        {/* </div> */}
     </div>
     )
 }

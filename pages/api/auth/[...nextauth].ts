@@ -119,9 +119,24 @@ export function getSession() {
 //export default NextAuth(authOptions)
 
 export default async function auth(req: NextApiRequest, res: NextApiResponse) {
-  if (req.body.callbackUrl as string) {
-    address = req.body.callbackUrl.split('/').pop()
+  console.log('in next auth ' + JSON.stringify(req.body) )
+  let url = req.body.callbackUrl as string
+  if (url) {
+    let paramMap = url.split('?')[1]
+    console.log('in next auth paraMap ' + paramMap)
+    let addressMap = paramMap.split('&')[0]
+    console.log('in next auth addressMap ' + addressMap)
+    let _address = addressMap.split('=')[1]
+    console.log('in next auth address ' + _address)
+    // if (url.includes('redirectTo')) {
+    //   let addressRedirect = url.split('/').pop() as string
+    //   let address = addressRedirect.split('?')
+    //   console.log('in next auth ' + address + ' ' + addressRedirect)
+    // } else {
+       address = _address
+    // }
   }
+
 
   //console.log('in nextauth ' + JSON.stringify(req.body.address))
 

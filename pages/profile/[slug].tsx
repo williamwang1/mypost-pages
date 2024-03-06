@@ -32,7 +32,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     if (!metadata) {
         return {
             redirect: {
-              destination: `${API_HOST}/account`, // Redirect destination
+              destination: `${API_HOST}/profilenotfound`, // Redirect destination
               permanent: true, // Temporary redirect
             },
         }

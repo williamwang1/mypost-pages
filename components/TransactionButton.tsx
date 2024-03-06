@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React, { useState } from "react"
 import {Drawer} from 'vaul';
 import { sui } from '@/lib/api/shinami'
 import Image from 'next/image';
@@ -7,9 +7,12 @@ import { useBuyMutation, useSellMutation } from '@/lib/hooks/api';
 import { ACCESS_CHECK_ROUTE, ACCESS_HISTORY_LIST_ROUTE } from '@/lib/api/constant';
 import { API_HOST } from '@/lib/api/move';
 import { SUI_MIST } from '@/lib/constant';
-import { InformationCircleIcon } from "@heroicons/react/20/solid";
 import axios from "axios";
+import QRCode from "react-qr-code";
+import { trucateAddress } from '@/lib/shared/utils';
+import * as Toast from '@radix-ui/react-toast';
 import { useRouter } from "next/router";
+import { ClipboardDocumentIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
 
 
 export default function TransactionButton (
@@ -29,6 +32,27 @@ export default function TransactionButton (
     const {mutateAsync: sell, isPending: isSellCreating } = useSellMutation();
     const [inBalance, setInbalance] = useState(false)
     const router = useRouter()
+    const [open, setOpen] = React.useState(false);
+    const timerRef = React.useRef(0);
+
+    let address = user.wallet; 
+
+    const handleCopyClick = () => {
+        navigator.clipboard.writeText(address) // Write text to clipboard
+          .then(() => {
+            //console.log("Text copied to clipboard:", address);
+            setOpen(false);
+            window.clearTimeout(timerRef.current);
+            timerRef.current = window.setTimeout(() => {
+            setOpen(true);
+          }, 100);
+            //alert(address);
+          })
+          .catch(err => {
+            console.error("Failed to copy text: ", err);
+            // alert("Failed to copy text. Please try again.");
+          });
+      };
 
     let boughtPrice = ''
     if (accessData) {
@@ -55,13 +79,15 @@ export default function TransactionButton (
     }
 
     const handleBuy = async () => {
+        setInbalance(false)
         let balance = await sui.getBalance({owner: user.wallet})
-        if (parseInt(balance.totalBalance) < parseInt(poolData.price)) {
+        //console.log('in transaction buy ' + JSON.stringify(balance.totalBalance) + ' ' + JSON.stringify(_currentPrice));
+        if (parseInt(balance.totalBalance) < parseInt(_currentPrice)) {
             console.log('Insufficient Balance');
             // set notification insufficient balance
             setInbalance(true)
         }
-        // if (0 < parseInt(poolData.price)) {
+        // if (0 < parseInt(_currentPrice)) {
         //     console.log('Insufficient Balance');
         //     // set notification insufficient balance
         //     setInbalance(true)
@@ -228,14 +254,9 @@ export default function TransactionButton (
                 </button>
                 <Drawer.Root>
                     <Drawer.Trigger>
-                        {inBalance? 
-                        <div className='bg-sky-200 disabled rounded-3xl px-2'>
-                            <span className='text-center text-white text-normal font-semibold leading-relaxed px-2 py-2'>Insufficient Balance</span>
-                        </div>
-                            :                         
                         <div className='bg-sky-400 rounded-3xl px-2 hover:bg-sky-800' onClick={handleBuy}>
                             <span className='text-center text-white text-normal font-semibold leading-relaxed px-2 py-2'>Buy</span>
-                        </div>}
+                        </div>
                     </Drawer.Trigger>
                     <Drawer.Portal>
                         <Drawer.Overlay className="fixed inset-0 bg-black/40" />
@@ -250,7 +271,37 @@ export default function TransactionButton (
                                 </button>
                             </div>
                         </Drawer.Content> */}
-                        <Drawer.Content className="bg-white flex rounded-t-[10px] h-[50%] fixed bottom-0 left-0 right-0">
+                        <Drawer.Content className="bg-white flex rounded-t-[10px] h-[60%] fixed bottom-0 left-0 right-0">
+                        {inBalance ? (
+                            <div className='w-screen bg-white flex flex-col items-center gap-y-2'>
+                                <div className='font-bold mt-2 text-red-500'>Insufficient Balance</div>
+                                <div className='font-bold text-xl mt-2'>Deposit</div>
+                                <QRCode value={address} size={196}/>
+                                <div className='flex items-center gap-x-2 px-4'>
+                                    <InformationCircleIcon className="w-8 h-8 text-red-500"/>
+                                    <div className="text-red-500 text-base">Only supports receive with SUI. Sending other tokens may result in a loss of funds.</div>
+                                </div>
+                                <div className='flex gap-x-2 pb-16'>
+                                    <div>{trucateAddress(address)}</div>
+                                    <Toast.Provider swipeDirection="right">
+                                        <button  onClick={handleCopyClick}>
+                                            <ClipboardDocumentIcon className="h-5 w-5 font-bold text-gray-500 align-middle hover:text-gray-800" aria-hidden="true"/>
+                                        </button>
+                                        <Toast.Root         
+                                            open={open}
+                                            onOpenChange={setOpen} className='fixed bottom-18 right-8 z-50 flex gap-x-2 items-center shadow-lg bg-sky-500 text-white rounded-xl'>
+                                            <Toast.Description className='font-bold px-2 py-1'>copied!</Toast.Description>
+                                            {/* <Toast.Close aria-label="Close" className='font-bold text-xl'>
+                                                <span aria-hidden>×</span>
+                                            </Toast.Close> */}
+                                        </Toast.Root>
+                                        <Toast.Viewport />
+                                    </Toast.Provider>
+                                </div>
+                            </div>
+                            ) 
+                            : 
+                            (
                             <div className='p-4 w-screen bg-white flex flex-col items-center'>
                                 <div className="flex gap-x-2 mt-5 justify-evenly">
                                     <div className="flex flex-col">
@@ -278,6 +329,8 @@ export default function TransactionButton (
                                     <span className='text-white text-lg font-semibold'>Confirm</span>
                                 </button>
                             </div>
+                            )}
+
                         </Drawer.Content>
                     </Drawer.Portal>
                 </Drawer.Root>

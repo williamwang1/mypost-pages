@@ -69,7 +69,6 @@ export const ACCESS_MUTATE_FALSE_ROUTE = '/api/access/mutatefalse'
 export const ACCESS_MUTATE_ROUTE = '/api/access/mutatedb'
 
 
-
 export const HOME_LIST_ROUTE = '/api/home/getlist'
 
 export const HOME_RECOMMEND_ROUTE = '/api/home/getrecommend'
@@ -123,3 +122,11 @@ export const REPOST_ACCESS_CHECK_ROUTE = '/api/repostaccess/check'
 
 export const REPOST_ACCESS_HISTORY_LIST_ROUTE = '/api/repostaccess/gettxlist'
 
+// Invite
+export const INVITE_CHECK_ROUTE = '/api/invite/check'
+
+export const INVITE_GET_LIST_ROUTE = '/api/invite/getlist'
+
+export const INVITE_CREATE_ADMIN = '/api/invite/admin'
+
+export const INVITE_CREATE = '/api/invite/check'

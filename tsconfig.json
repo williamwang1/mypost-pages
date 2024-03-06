@@ -17,6 +17,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/api/auth/[...nextauth].ts.bk"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/api/auth/[...nextauth].ts.bk", "components/AdminProtocoltsx"],
   "exclude": ["node_modules"]
 }

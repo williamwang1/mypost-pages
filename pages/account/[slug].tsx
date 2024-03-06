@@ -12,11 +12,17 @@ import { Google, LoadingDots } from "@/components/icons";
 import { GLOBAL_OBJECT_ID, MYPOST_MOVE_PACKAGE_ID } from "@/lib/api/move";
 import { GetServerSideProps } from 'next';
 import { API_HOST } from '@/lib/api/move';
-import { ACCOUNT_LIST_ROUTE, PROFILE_GET_ROUTE, PROFILE_MUTATEDB_ROUTE } from '@/lib/api/constant';
+import { ACCOUNT_LIST_ROUTE, INVITE_CREATE, PROFILE_GET_ROUTE, PROFILE_MUTATEDB_ROUTE } from '@/lib/api/constant';
 import { getFaucetHost, requestSuiFromFaucetV0 } from '@mysten/sui.js/faucet';
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+    console.log('in account slug ' + JSON.stringify(context.query))
     const { slug } = context.params as { slug: string };
+    let redirectTo = ''
+    if ( context.query.redirectTo ) {
+      redirectTo = context.query.redirectTo as string
+      console.log('in redirect redirectTo ' + redirectTo)
+    }
     const metadatadb = await fetch(`${API_HOST}${PROFILE_GET_ROUTE}`, {
         method: 'POST',
         headers: {
@@ -43,10 +49,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     //         },
     //     }
     // }
-    return { props: { accounts, metadata} };
+    return { props: { accounts, metadata, redirectTo} };
 }
 
-function NewAccount ({session, metadata, accounts} : { metadata: ProfileDB, session: any, accounts: Account[]}) {
+function NewAccount ({session, metadata, accounts, redirectTo} : { metadata: ProfileDB, session: any, accounts: Account[], redirectTo: string}) {
     const { isLoading, user, localSession } = session;
 
     const [data, setData] = useState<Account[]>([])
@@ -83,36 +89,37 @@ function NewAccount ({session, metadata, accounts} : { metadata: ProfileDB, sess
     const handleNext = async (e: any) => {
         e.preventDefault();
         setClicked(true)
-        let check = await profileCheck({
-            keyPair: localSession.ephemeralKeyPair,
-            global: `${GLOBAL_OBJECT_ID}`,
-            address: `${user.wallet}`
+        // let check = await profileCheck({
+        //     keyPair: localSession.ephemeralKeyPair,
+        //     global: `${GLOBAL_OBJECT_ID}`,
+        //     address: `${user.wallet}`
             
-        })
+        // })
         console.log('in check profile ' + JSON.stringify(check))
-        if (check.exist) {
+        if (metadata) {
             //sync db and onchain on profile meta event if failed to save into db
-            let body = {
-                package_id: `${MYPOST_MOVE_PACKAGE_ID}`,
-                profile_id: check.profile_id,
-                digest: check.txDigest,
-                profile_meta_id: check.meta_id,
-                profile_pool_id: check.pool_id,
-                global_id: `${GLOBAL_OBJECT_ID}`,
-                address: user.wallet,
-                create_at: new Date()
-            }
-            const profileRes = await fetch(`${API_HOST}${PROFILE_MUTATEDB_ROUTE}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    },
-                body: JSON.stringify(body)
-            })
-            if (!profileRes.ok) {
-                throw new Error(`Error: ${profileRes.status}`);
-            }
-            let profileJson = await profileRes.json()
+            // let body = {
+            //     package_id: `${MYPOST_MOVE_PACKAGE_ID}`,
+            //     profile_id: check.profile_id,
+            //     digest: check.txDigest,
+            //     profile_meta_id: check.meta_id,
+            //     profile_pool_id: check.pool_id,
+            //     global_id: `${GLOBAL_OBJECT_ID}`,
+            //     address: user.wallet,
+            //     create_at: new Date()
+            // }
+            // const profileRes = await fetch(`${API_HOST}${PROFILE_MUTATEDB_ROUTE}`, {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //         },
+            //     body: JSON.stringify(body)
+            // })
+            // if (!profileRes.ok) {
+            //     throw new Error(`Error: ${profileRes.status}`);
+            // }
+            // let profileJson = await profileRes.json()
+            console.log('profile exists' + JSON.stringify(metadata))
         } else {
             const result = await profile({
                 name: username,
@@ -121,9 +128,21 @@ function NewAccount ({session, metadata, accounts} : { metadata: ProfileDB, sess
                 global: `${GLOBAL_OBJECT_ID}`,
                 keyPair: localSession.ephemeralKeyPair,
             });
+            const inviteRes = await fetch(`${API_HOST}${INVITE_CREATE}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    },
+                body: JSON.stringify({ address: user.wallet })
+            })
             console.log('create on-chain profile' + JSON.stringify(result))
         }
-        router.push(`/profile/${user.wallet}`)
+        if (redirectTo && redirectTo.length > 0) {
+            router.push(`${API_HOST}/${redirectTo}`)
+        } else {
+            router.push(`${API_HOST}/profile/${user.wallet}`)
+        }
+        
     }
 
     let next = null
@@ -190,7 +209,7 @@ function NewAccount ({session, metadata, accounts} : { metadata: ProfileDB, sess
                     </div> 
                 ))}
                 </div>
-                <AccountAdd user={user}/>
+                <AccountAdd user={user} redirectTo={redirectTo}/>
             </div>
             {/* {JSON.stringify(accounts[0].status)}
             {JSON.stringify(accounts[0].expires_at)} */}

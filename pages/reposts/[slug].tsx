@@ -44,14 +44,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     })
     const tx = await txdb.json()
 
-    // if (accounts.length === 0) {
-    //     return {
-    //         redirect: {
-    //           destination: `${API_HOST}/account`, // Redirect destination
-    //           permanent: true, // Temporary redirect
-    //         },
-    //     }
-    // }
+    if (accounts.length === 0) {
+        return {
+            redirect: {
+              destination: `${API_HOST}/accountnotfound`, // Redirect destination
+              permanent: true, // Temporary redirect
+            },
+        }
+    }
     //console.log(JSON.stringify(metadata))
 
 
