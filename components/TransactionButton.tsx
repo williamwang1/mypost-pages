@@ -182,11 +182,11 @@ export default function TransactionButton (
     }
 
     const handleRepost = () => {
-        router.push(`/reposts/${user.wallet}?digest=${tx.digest}`)
+        router.push(`/reposts/${user.wallet}?digest=${tx.digest}&type=repost`)
     }
 
     const handleReply = () => {
-        router.push(`/replies/${user.wallet}?digest=${tx.digest}`)
+        router.push(`/replies/${user.wallet}?digest=${tx.digest}&type=reply`)
     }
 
 

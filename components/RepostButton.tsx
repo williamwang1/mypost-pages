@@ -148,7 +148,7 @@ export default function RepostButton (
     }
 
     const handleRepost = () => {
-        router.push(`/reposts/${user.wallet}?digest=${tx.digest}`)
+        router.push(`/reposts/${user.wallet}?digest=${repost.digest}`)
     }
 
     const handleReply = () => {

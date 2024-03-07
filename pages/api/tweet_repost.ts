@@ -36,7 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const myRes = await rwClient.currentUser()
     console.log('in twiiter repost api before repost ' + myRes.id_str + ' ' + post_id)
     // Post the tweet
-    const response = await rwClient.v2.retweet(myRes.id_str, post_id as string)
+    const response = await rwClient.v2.quote(text, post_id as string)
     //const response = await rwClient.v2.retweet('598364492', '1764231333612863977')
     console.log('in twiiter repost api after repost ' + JSON.stringify(response))
     res.status(200).json(response);

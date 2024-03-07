@@ -2,19 +2,19 @@ import React, { Fragment, useState } from 'react' ;
 import StepperPreview from "./StepperPost";
 import { Account } from "@/types/auth";
 import { ProfileDB } from '@/types/profile';
-import { TransactionDB } from '@/types/transaction';
+import { TransactionDB, TransactionDBList } from '@/types/transaction';
 import RepostContentHeader from './RepostContentHeader';
 import CommonStepperRepost from './CommonStepperRepost';
 
 
 export default function RepostStepperPost({accounts, step, onBackChange, summary, digest, transactionDigest, 
-    session, paid, metadata, free, tx}
+    session, paid, metadata, free, tx }
     : 
     {accounts: Account[], step: number, 
         onBackChange: (newStep: number) => void, 
         summary: string, digest: string, transactionDigest: string,
         session: any, 
-        paid: string, metadata: ProfileDB, free: string, tx: TransactionDB}) {
+        paid: string, metadata: ProfileDB, free: string, tx: TransactionDBList }) {
     const { isLoading, user, localSession } = session;
 
 

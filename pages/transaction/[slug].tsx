@@ -36,9 +36,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             },
             body: JSON.stringify({ digest }),
         })
-        tx = await txdb.json()
-        console.log('in trsnaction slug ' + JSON.stringify(txdb))
-        if (!tx) {
+        let txs = await txdb.json()
+        //console.log('in trsnaction slug ' + JSON.stringify(txs))
+        if (!txs || txs.length === 0) {
             return {
                 redirect: {
                   destination: `${API_HOST}/notfound`, // Redirect destination
@@ -46,9 +46,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 },
             }
         }
+        tx = txs[0]
         console.log('in transaction slug ' + JSON.stringify(tx))
         profiledata = await sui.getObject({
-            id: tx.profile_id,
+            id: txs[0].profile_id,
             options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 
         })
         // if (!profiledata) {
@@ -60,9 +61,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         //     }
         // }
         transactiondata = await sui.getObject({
-            id: tx.transaction_id,
+            id: txs[0].transaction_id,
             options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 
         })
+        
         //console.log(JSON.stringify(transactiondata))
     } catch (error) {
         console.error("Error fetching data:", error);

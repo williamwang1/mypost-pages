@@ -8,16 +8,16 @@ import { API_HOST, MYPOST_MOVE_PACKAGE_ID } from "@/lib/api/move";
 import { REPLY_MUTATEDB_ROUTE, REPOST_MUTATEDB_ROUTE, TRANSACTION_MUTATEDB_ROUTE, TWEET_REPLY_ROUTE, TWEET_REPOST_ROUTE } from "@/lib/api/constant";
 import {useRouter} from "next/router";
 import { LoadingDots } from "@/components/icons";
-import { TransactionDB } from "@/types/transaction";
+import { TransactionDB, TransactionDBList } from "@/types/transaction";
 
 
 export default function CommonStepperRepost({accounts, digest, transactionDigest, step, onBackChange, 
-    session, paid, metadata, free, tx}
+    session, paid, metadata, free, tx }
     : 
     {accounts: Account[], step: number, transactionDigest: string,
         onBackChange: (newStep: number) => void, 
         digest: string, session: any, 
-        paid: string, metadata: ProfileDB, free: string, tx: TransactionDB}) {
+        paid: string, metadata: ProfileDB, free: string, tx: TransactionDBList }) {
     const { isLoading, user, localSession } = session;
     const [clicked, setClicked] = useState(false);
     const router = useRouter()
@@ -61,7 +61,16 @@ export default function CommonStepperRepost({accounts, digest, transactionDigest
 
         let text = free +  '\n' + `www.mypost.money/repost/${ txmetadata.txDigest }`
         let slug = `${user.wallet}`;
-        let post_id = tx.post_id
+        let post_id = tx.dependent_post_id
+        // if (type === 'post') {
+        //     post_id = tx.post_id
+        // } else if (type === 'repost') {
+        //     post_id = tx.repost_post_id
+        // } else if (type === 'reply') {
+        //     post_id = tx.reply_post_id
+        // } else {
+        //     post_id = tx.post_id
+        // }
         console.log('in repost before twitter repost ' + JSON.stringify(tx))
         const response = await fetch(`${TWEET_REPOST_ROUTE}`, {
             method: 'POST',
@@ -82,7 +91,7 @@ export default function CommonStepperRepost({accounts, digest, transactionDigest
             repost_id: txmetadata.repost_id,
             pool_id: txmetadata.pool_id,
             package_id: `${MYPOST_MOVE_PACKAGE_ID}`,
-            repost_post_id: tweetRes.data.rest_id,
+            repost_post_id: tweetRes.data.id,
             transaction_post_id: post_id,
             type: 'repost',
             create_at: new Date()

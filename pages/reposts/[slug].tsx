@@ -8,7 +8,7 @@ import { ACCOUNT_LIST_ROUTE, PROFILE_GET_ROUTE, TRANSACTION_GET, TRANSACTION_MUT
 import { API_HOST } from '@/lib/api/move';
 import { Account } from "@/types/auth";
 import { useSession } from 'next-auth/react';
-import { TransactionDB } from '@/types/transaction';
+import { TransactionDB, TransactionDBList } from '@/types/transaction';
 import RepostStepperPublic from '@/components/RepostStepperPublic';
 import RepostStepperPaid from '@/components/RepostStepperPaid';
 import RepostStepperPost from '@/components/RepostStepperPost';
@@ -42,8 +42,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
         body: JSON.stringify({ digest }),
     })
-    const tx = await txdb.json()
-
+    const txs = await txdb.json()
+    if (!txs || txs.length === 0) {
+        return {
+            redirect: {
+              destination: `${API_HOST}/txnotfound`, // Redirect destination
+              permanent: true, // Temporary redirect
+            },
+        }
+    }
+    let tx = txs[0]
     if (accounts.length === 0) {
         return {
             redirect: {
@@ -58,9 +66,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { props: { accounts, metadata, digest, tx } };
 }
 
-function Reposts({session, accounts, metadata, digest, tx } 
+function Reposts({ session, accounts, metadata, digest, tx } 
     :
-    {session: any, accounts: Account[], metadata: ProfileDB, digest: string, tx: TransactionDB}) {
+    {session: any, accounts: Account[], metadata: ProfileDB, digest: string, tx: TransactionDBList, type: string}) {
     const { isLoading, user, localSession } = session;
     const [step, setStep] = useState(1)
     const [summary, setSummary] = React.useState('summary');
@@ -122,7 +130,7 @@ function Reposts({session, accounts, metadata, digest, tx }
             step={step} onBackChange={handleBack} 
             summary={summary} digest={digest} transactionDigest={transactionDigest}
             session={session} paid={paid} 
-            metadata={metadata} free={free} tx={tx}/>
+            metadata={metadata} free={free} tx={tx} />
         )
     }
 

@@ -9,7 +9,7 @@ export default function NotFound () {
         <div className="flex flex-col gap-y-2">
             NotFound
             <Link href="/authzk/login">Go to Login or Signup</Link>
-            <Link href="/account">Create Account</Link>
+            <Link href="/transactions">Create Transaction</Link>
         </div>
     )
    

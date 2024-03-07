@@ -8,16 +8,16 @@ import { API_HOST, MYPOST_MOVE_PACKAGE_ID } from "@/lib/api/move";
 import { REPLY_MUTATEDB_ROUTE, TRANSACTION_MUTATEDB_ROUTE, TWEET_REPLY_ROUTE } from "@/lib/api/constant";
 import {useRouter} from "next/router";
 import { LoadingDots } from "@/components/icons";
-import { TransactionDB } from "@/types/transaction";
+import { TransactionDB, TransactionDBList } from "@/types/transaction";
 
 
 export default function CommonStepperReply({accounts, digest, transactionDigest, step, onBackChange, 
-    session, paid, metadata, free, tx}
+    session, paid, metadata, free, tx }
     : 
     {accounts: Account[], step: number, transactionDigest: string,
         onBackChange: (newStep: number) => void, 
         digest: string, session: any, 
-        paid: string, metadata: ProfileDB, free: string, tx: TransactionDB}) {
+        paid: string, metadata: ProfileDB, free: string, tx: TransactionDBList }) {
     const { isLoading, user, localSession } = session;
     const [clicked, setClicked] = useState(false);
     const router = useRouter()
@@ -62,7 +62,16 @@ export default function CommonStepperReply({accounts, digest, transactionDigest,
 
         let text = free +  '\n' + `www.mypost.money/reply/${ txmetadata.txDigest }`
         let slug = `${user.wallet}`;
-        let post_id = tx.post_id
+        let post_id = tx.dependent_post_id
+        // if (type === 'post') {
+        //     post_id = tx.post_id
+        // } else if (type === 'repost') {
+        //     post_id = tx.repost_post_id
+        // } else if (type === 'reply') {
+        //     post_id = tx.reply_post_id
+        // } else {
+        //     post_id = tx.post_id
+        // }
         //console.log('in transaction post data ' + JSON.stringify(tx))
         const response = await fetch(`${TWEET_REPLY_ROUTE}`, {
             method: 'POST',

@@ -48,7 +48,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             id: reply.profile_id,
             options: { showBcs: true, showContent: true, showDisplay: true, showOwner: true, showPreviousTransaction: true, showStorageRebate: true, showType: true } 
         })
-        console.log(JSON.stringify('in reply slug ' + JSON.stringify(rprofile)))
+        //console.log(JSON.stringify('in reply slug ' + JSON.stringify(rprofile)))
         if (!rprofile) {
             return {
                 redirect: {
@@ -65,9 +65,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             },
             body: JSON.stringify({ digest }),
         })
-        tx = await txdb.json()
-        //TODO get transaction digest from Reply table
-
+        const txs = await txdb.json()
+        if (!txs || txs.length === 0) {
+            return {
+                redirect: {
+                  destination: `${API_HOST}/txnotfound`, // Redirect destination
+                  permanent: true, // Temporary redirect
+                },
+            }
+        }
+        tx = txs[0]
         //console.log(JSON.stringify(txs))
         txprofile = await sui.getObject({
             id: tx.profile_id,

@@ -5,17 +5,17 @@ import { ProfileDB } from '@/types/profile';
 import ReplyContentHeader from './ReplyContentHeader';
 import CommonStepperPost from './CommonStepperPost';
 import CommonStepperReply from './CommonStepperReply';
-import { TransactionDB } from '@/types/transaction';
+import { TransactionDB, TransactionDBList } from '@/types/transaction';
 
 
 export default function ReplyStepperPost({accounts, step, onBackChange, summary, digest, transactionDigest, 
-    session, paid, metadata, free, tx}
+    session, paid, metadata, free, tx }
     : 
     {accounts: Account[], step: number, 
         onBackChange: (newStep: number) => void, 
         summary: string, digest: string, transactionDigest: string,
         session: any, 
-        paid: string, metadata: ProfileDB, free: string, tx: TransactionDB}) {
+        paid: string, metadata: ProfileDB, free: string, tx: TransactionDBList }) {
     const { isLoading, user, localSession } = session;
 
 
