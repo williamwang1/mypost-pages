@@ -8,6 +8,8 @@ import { API_HOST, MYPOST_MOVE_PACKAGE_ID } from "@/lib/api/move";
 import { TRANSACTION_MUTATEDB_ROUTE } from "@/lib/api/constant";
 import {useRouter} from "next/router";
 import { LoadingDots } from "@/components/icons";
+import * as Checkbox from '@radix-ui/react-checkbox';
+import { CheckIcon } from '@radix-ui/react-icons';
 
 
 export default function CommonStepperPost({accounts, digest, transactionDigest, step, onBackChange, session, paid, metadata, free}
@@ -18,6 +20,7 @@ export default function CommonStepperPost({accounts, digest, transactionDigest, 
         paid: string, metadata: ProfileDB, free: string}) {
     const { isLoading, user, localSession } = session;
     const [clicked, setClicked] = useState(false);
+    const [checked, setChecked] = useState(true)
     const router = useRouter()
     const {mutateAsync: transaction, isPending: isCreating } = useTransactionMutation()
 
@@ -97,7 +100,7 @@ export default function CommonStepperPost({accounts, digest, transactionDigest, 
     }
 
     let submit = null
-    if (paid && paid.length > 0) {
+    if (paid && paid.length > 0 && checked) {
         if (clicked) {
             submit = <button
             type="button"
@@ -155,18 +158,27 @@ export default function CommonStepperPost({accounts, digest, transactionDigest, 
                     </Tab.Panels>
                 </Tab.Group>
             </div>
-            <div className="flex mt-4 gap-x-2">
-                <label htmlFor="price" className="text-base font-bold leading-6 text-gray-900">
-                    Price
+            <div className="flex gap-x-2">
+                <Checkbox.Root className="" defaultChecked>
+                    <Checkbox.Indicator className="">
+                    <CheckIcon />
+                    </Checkbox.Indicator>
+                </Checkbox.Root>
+                <label className="Label" htmlFor="c1">
+                    Accept terms and conditions.
                 </label>
-                <label htmlFor="price" className="text-base font-normal leading-6 text-gray-500">
-                    0
+            </div>
+            <div className="flex gap-x-2 items-center mt-4">
+                <Checkbox.Root className="border-2 border-sky-400 hover:bg-violet3 flex h-5 w-5 appearance-none items-center justify-center rounded-[4px] bg-white outline-none focus:text-sky-400" 
+                defaultChecked id="c1" onCheckedChange={(checked) => setChecked(checked as boolean)}>
+                    <Checkbox.Indicator className="text-violet11 text-sky-400">
+                    <CheckIcon />
+                    </Checkbox.Indicator>
+                </Checkbox.Root>
+                <label className="text-normal leading-none" htmlFor="c1">
+                    I agree to post a tweet.
                 </label>
-                <label htmlFor="price" className="text-base font-bold leading-6 text-gray-900">
-                    SUI
-                </label>
-                <a href='' target='_blank' className='text-sky-500 text-sm underline'>Learn more</a>
-                
+                <label className='text-red-500'>*</label>
             </div>
             <div className="flex flex-col flex-1 mt-5">
                 <div className="flex justify-between mt-28 px-4 mb-16">

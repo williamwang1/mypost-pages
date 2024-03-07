@@ -7,31 +7,6 @@ export default async function handler(
         let digest = req.body.digest
         try {
             console.log('in transaction get ' + digest)
-            // if (type === 'post') {
-            //     tx = await prisma.transaction.findUnique({
-            //         where: {
-            //             digest: req.body.digest
-            //         }
-            //     })
-            // } else if (type === 'reply') {
-            //     tx = await prisma.reply.findUnique({
-            //         where: {
-            //             digest: req.body.digest
-            //         }
-            //     })
-            // } else if (type === 'repost') {
-            //     tx = await prisma.repost.findUnique({
-            //         where: {
-            //             digest: req.body.digest
-            //         }
-            //     })
-            // } else {
-            //     tx = await prisma.transaction.findUnique({
-            //         where: {
-            //             digest: req.body.digest
-            //         }
-            //     })
-            // }
 
             let transaction = await prisma.$queryRaw`select t.id, t.digest, t.digest as transaction_digest, t.public_content, t.address,
             t.profile_id, t.transaction_id, t.pool_id, t.package_id, t.post_id as transaction_post_id,
